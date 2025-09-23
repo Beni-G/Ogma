@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Folder Include="CRM\" />
+    <Folder Include="Orders\" />
+  </ItemGroup>
+
 </Project>
