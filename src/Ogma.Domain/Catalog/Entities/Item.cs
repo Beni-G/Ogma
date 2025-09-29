@@ -15,13 +15,12 @@ public class Item : AggregateRoot<long>
     public bool IsActive { get; private set; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="Item"/> class using the provided parameters.
+    /// Creates a new instance of the Item class with the specified parameters.
     /// </summary>
-    /// <param name="parameters">
-    /// A set of domain-specific values required to construct a valid <see cref="Item"/>.
-    /// Includes name, code, description, category, list price, item type, unit of measurement, and activation state.
-    /// </param>
-    public Item(ItemParameters itemParameters)
+    /// <param name="itemParameters"></param>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="ArgumentNullException"></exception>
+    private Item(ItemParameters itemParameters)
     {
         if (string.IsNullOrWhiteSpace(itemParameters.Name))
         {
@@ -37,6 +36,45 @@ public class Item : AggregateRoot<long>
         UnitOfMeasurement = itemParameters.UnitOfMeasurement;
         IsActive = itemParameters.IsActive;
     }
+
+    /// <summary>
+    /// Creates a new instance of the Item class with the specified ID and parameters.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="itemParameters"></param>
+    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="ArgumentNullException"></exception>
+    private Item(long id, ItemParameters itemParameters) : base(id)
+    {
+        if (string.IsNullOrWhiteSpace(itemParameters.Name))
+        {
+            throw new ArgumentException("Name cannot be null or empty.", nameof(itemParameters.Name));
+        }
+
+        Name = itemParameters.Name;
+        Code = itemParameters.Code;
+        Description = itemParameters.Description;
+        Category = itemParameters.Category ?? throw new ArgumentNullException(nameof(itemParameters.Category));
+        ListPrice = itemParameters.ListPrice;
+        ItemType = itemParameters.ItemType ?? throw new ArgumentNullException(nameof(itemParameters.ItemType));
+        UnitOfMeasurement = itemParameters.UnitOfMeasurement;
+        IsActive = itemParameters.IsActive;
+    }
+
+    /// <summary>
+    /// Instantiates a new Item using the provided parameters.
+    /// </summary>
+    /// <param name="itemParameters"></param>
+    /// <returns></returns>
+    public static Item Create(ItemParameters itemParameters) => new(itemParameters);
+
+    /// <summary>
+    /// Reconstitutes an Item from the given ID and parameters.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="itemParameters"></param>
+    /// <returns></returns>
+    public static Item Reconstitute(long id, ItemParameters itemParameters) => new(id, itemParameters);
 
     /// <summary>
     /// Updates the item's properties based on the provided parameters.
