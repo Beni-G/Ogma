@@ -2,7 +2,7 @@
 using System.Linq.Expressions;
 
 namespace Ogma.Domain.Catalog.Repositories;
-public interface IItemsRepository
+public interface IItemRepository
 {
     /// <summary>
     /// Gets an item by its unique identifier.
