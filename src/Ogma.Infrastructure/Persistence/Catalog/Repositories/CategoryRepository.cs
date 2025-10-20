@@ -41,6 +41,19 @@ public class CategoryRepository : ICategoryRepository
             .ToListAsync();
     }
 
+    public async Task<IEnumerable<Category>> GetAllCategoriesTreeAsync()
+    {
+        return await _catalogDbContext.Categories
+            .Include(c => c.SubCategories)
+            .ThenInclude(sc => sc.SubCategories)
+            .ThenInclude(ssc => ssc.SubCategories)
+            .ThenInclude(sssc => sssc.SubCategories)
+            .AsNoTracking()
+            .Where(c => c.ParentCategoryId == null)
+            .Select(c => c.ToDomain())
+            .ToListAsync();
+    }
+
     public async Task<IEnumerable<Category>> GetChildrenAsync(long ParentCategoryId)
     {
         return await _catalogDbContext.Categories
@@ -89,7 +102,7 @@ public class CategoryRepository : ICategoryRepository
         return ordered;
     }
 
-    public async Task AddAsync(Category category)
+    public async Task<Category> AddAsync(Category category)
     {
         string? path = null;
         if (category.ParentCategoryId.HasValue)
@@ -103,11 +116,13 @@ public class CategoryRepository : ICategoryRepository
             }
         }
         category.UpdatePath(path);
-        await _catalogDbContext.Categories.AddAsync(category.ToModel());
+        var model = category.ToModel();
+        await _catalogDbContext.Categories.AddAsync(model);
         await _catalogDbContext.SaveChangesAsync();
+        return model.ToDomain();
     }
 
-    public async Task UpdateAsync(Category category)
+    public async Task<bool> UpdateAsync(Category category)
     {
         var model = await _catalogDbContext.Categories
             .FirstOrDefaultAsync(c => c.Id == category.Id);
@@ -176,7 +191,8 @@ public class CategoryRepository : ICategoryRepository
             }
         }
 
-        await _catalogDbContext.SaveChangesAsync();
+        var affected = await _catalogDbContext.SaveChangesAsync();
+        return affected > 0;
     }
 
     public async Task DeleteAsync(Category category)

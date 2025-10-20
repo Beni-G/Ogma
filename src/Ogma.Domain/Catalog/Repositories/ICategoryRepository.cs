@@ -5,24 +5,30 @@ namespace Ogma.Domain.Catalog.Repositories;
 public interface ICategoryRepository
 {
     /// <summary>
-    /// Retrieves a category by its unique identifier.
+    /// Retrieves a category by its unique identifier without descendants.
     /// </summary>
     /// <param name="id">The unique identifier of the category.</param>
     /// <returns>The category if found; otherwise, null.</returns>
     Task<Category?> GetByIdAsync(long id);
 
     /// <summary>
-    /// Retrieves all categories.
+    /// Retrieves all categories without descendants.
     /// </summary>
     /// <returns>A collection of all categories.</returns>
     Task<IEnumerable<Category>> GetAllAsync();
 
     /// <summary>
-    /// Retrieves all categories that match the given predicate.
+    /// Retrieves all categories that match the given predicate without descendants.
     /// </summary>
     /// <param name="predicate">A filter expression to apply.</param>
     /// <returns>A collection of matching categories.</returns>
     Task<IEnumerable<Category>> GetAllAsync(Expression<Func<Category, bool>> predicate);
+
+    /// <summary>
+    /// Retrieves entire categories tree.
+    /// </summary>
+    /// <returns></returns>
+    Task<IEnumerable<Category>> GetAllCategoriesTreeAsync();
 
     /// <summary>
     /// Retrieves the immediate children of a given category.
@@ -49,13 +55,13 @@ public interface ICategoryRepository
     /// Adds a new category to the repository.
     /// </summary>
     /// <param name="category">The category to add.</param>
-    Task AddAsync(Category category);
+    Task<Category> AddAsync(Category category);
 
     /// <summary>
     /// Updates an existing category in the repository.
     /// </summary>
     /// <param name="category">The category to update.</param>
-    Task UpdateAsync(Category category);
+    Task<bool> UpdateAsync(Category category);
 
     /// <summary>
     /// Deletes a category from the repository.

@@ -57,4 +57,19 @@ public class ItemType : AggregateRoot<long>
     /// <param name="description"></param>
     /// <returns></returns>
     public static ItemType Reconstitute(long id, string name, string description) => new(id, name, description);
+
+    /// <summary>
+    /// Updates the Name and Description of the ItemType.
+    /// </summary>
+    /// <param name="name"></param>
+    public void Update(string name, string description)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("ItemType name is invalid.", nameof(name));
+        }
+
+        Name = name;
+        Description = description;
+    }
 }

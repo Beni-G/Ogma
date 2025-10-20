@@ -16,11 +16,10 @@ public class ItemTypeRepository : IItemTypeRepository
     }
     public async Task<ItemType?> GetByIdAsync(long id)
     {
-        return await _catalogDbContext.ItemTypes
-           .AsNoTracking()
-           .Where(it => it.Id == id)
-           .Select(it => it.ToDomain())
-           .FirstOrDefaultAsync();
+        var entity = await _catalogDbContext.ItemTypes
+            .AsNoTracking()
+            .FirstOrDefaultAsync(it => it.Id == id);
+        return entity?.ToDomain();
     }
 
     public async Task<IEnumerable<ItemType>> GetAllAsync()
@@ -40,18 +39,23 @@ public class ItemTypeRepository : IItemTypeRepository
            .ToListAsync();
     }
 
-    public async Task AddAsync(ItemType itemType)
+    public async Task<ItemType> AddAsync(ItemType itemType)
     {
-        await _catalogDbContext.ItemTypes.AddAsync(itemType.ToModel());
+        var model = itemType.ToModel();
+        await _catalogDbContext.ItemTypes.AddAsync(model);
         await _catalogDbContext.SaveChangesAsync();
+        return model.ToDomain();
+
     }
 
-    public async Task UpdateAsync(ItemType itemType)
+    public async Task<bool> UpdateAsync(ItemType itemType)
     {
-        _catalogDbContext.ItemTypes.Attach(itemType.ToModel());
-        _catalogDbContext.Entry(itemType.ToModel()).State = EntityState.Modified;
+        var model = itemType.ToModel();
+        _catalogDbContext.ItemTypes.Attach(model);
+        _catalogDbContext.Entry(model).State = EntityState.Modified;
 
-        await _catalogDbContext.SaveChangesAsync();
+        var affected = await _catalogDbContext.SaveChangesAsync();
+        return affected > 0;
     }
 
     public async Task DeleteAsync(ItemType itemType)

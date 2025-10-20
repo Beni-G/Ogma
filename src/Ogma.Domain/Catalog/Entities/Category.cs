@@ -3,14 +3,19 @@
 namespace Ogma.Domain.Catalog.Entities;
 public class Category : AggregateRoot<long>
 {
+    public const int MaxDepth = 4;
+
+    private readonly List<Category> _subCategories = new();
+
     public string Name { get; private set; }
     public long? ParentCategoryId { get; private set; }
     /// <summary>
     /// Path of the parent category, excluding this category's own ID.
     /// </summary>
     public string? Path { get; private set; }
-
-    private readonly List<Category> _subCategories = new();
+    /// <summary>
+    /// Collection of children categories.
+    /// </summary>
     public IReadOnlyCollection<Category> SubCategories => _subCategories.AsReadOnly();
 
     /// <summary>
@@ -70,11 +75,21 @@ public class Category : AggregateRoot<long>
     public static Category Reconstitute(long id, string name, long? parentCategoryId = null, string? path = null) => new(id, name, parentCategoryId, path);
 
     /// <summary>
-    /// Adds a subcategory to this category.
+    /// Updates the Name and ParentCategoryId of the Category.
     /// </summary>
-    /// <param name="subCategory"></param>
-    /// <exception cref="ArgumentNullException"></exception>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <param name="name"></param>
+    /// <param name="parentCategoryId"></param>
+    /// <exception cref="ArgumentException"></exception>
+    public void Update(string name, long? parentCategoryId)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("Category name is invalid.", nameof(name));
+        }
+
+        Name = name;
+        ParentCategoryId = parentCategoryId;
+    }
 
     /// <summary>
     /// Computes the full path including this category's ID.
@@ -89,6 +104,8 @@ public class Category : AggregateRoot<long>
     /// <exception cref="InvalidOperationException"></exception>
     public void AddSubCategory(Category subCategory)
     {
+        EnsureCanAddSubCategory();
+
         if (subCategory == null)
         {
             throw new ArgumentNullException(nameof(subCategory));
@@ -98,6 +115,34 @@ public class Category : AggregateRoot<long>
             throw new InvalidOperationException("Subcategory's parent ID does not match this category's ID.");
         }
         _subCategories.Add(subCategory);
+    }
+
+    /// <summary>
+    /// Adds a collection of subcategories to this category.
+    /// </summary>
+    /// <param name="subCategories"></param>
+    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
+    public void AddSubCategories(IEnumerable<Category> subCategories)
+    {
+        EnsureCanAddSubCategory();
+
+        if (subCategories == null)
+        {
+            throw new ArgumentNullException(nameof(subCategories));
+        }
+
+        foreach (var subCategory in subCategories)
+        {
+            if (subCategory.ParentCategoryId != Id)
+            {
+                throw new InvalidOperationException(
+                    $"Subcategory '{subCategory.Name}' has mismatched ParentCategoryId: expected {Id}, got {subCategory.ParentCategoryId}."
+                );
+            }
+
+            AddSubCategory(subCategory);
+        }
     }
 
     /// <summary>
@@ -131,4 +176,26 @@ public class Category : AggregateRoot<long>
     /// </summary>
     /// <returns></returns>
     public bool IsRootCategory() => ParentCategoryId == null;
+
+    /// <summary>
+    /// Returns the depth of the current Category.
+    /// </summary>
+    public int Depth => string.IsNullOrWhiteSpace(Path) ? 0 : Path.Split('/', StringSplitOptions.RemoveEmptyEntries).Length;
+
+    /// <summary>
+    /// Calculated the remainig depth under the category.
+    /// </summary>
+    public int RemainingDepth => MaxDepth - Depth;
+
+    /// <summary>
+    /// Checks if subcategories cand be added.
+    /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
+    private void EnsureCanAddSubCategory()
+    {
+        if (RemainingDepth <= 0)
+        {
+            throw new InvalidOperationException("Max category depth reached.");
+        }
+    }
 }

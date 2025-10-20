@@ -12,9 +12,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Scalar.AspNetCore" Version="2.8.7" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Ogma.Application\Ogma.Application.csproj" />
     <ProjectReference Include="..\Ogma.Domain\Ogma.Domain.csproj" />
     <ProjectReference Include="..\Ogma.Infrastructure\Ogma.Infrastructure.csproj" />
   </ItemGroup>

@@ -1,10 +1,15 @@
+using Ogma.Api.Middleware;
+using Ogma.Application.Extensions;
 using Ogma.Infrastructure.Persistence.Catalog.Extensions;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddCatalogPersistence(builder.Configuration);
+
+builder.Services.AddApplicationLayer();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -16,9 +21,18 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference(options =>
+    {
+        options
+        .WithTitle("Ogma")
+        .WithTheme(ScalarTheme.Saturn)
+        .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+    });
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseAuthorization();
 
