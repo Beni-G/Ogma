@@ -17,6 +17,8 @@ public class ItemRepository : IItemRepository
     public async Task<Item?> GetByIdAsync(long id)
     {
         return await _catalogDbContext.Items
+            .Include(i => i.Category)
+            .Include(i => i.ItemType)
             .AsNoTracking()
             .Where(i => i.Id == id)
             .Select(i => i.ToDomain())
@@ -26,6 +28,8 @@ public class ItemRepository : IItemRepository
     public async Task<IEnumerable<Item>> GetAllAsync()
     {
         return await _catalogDbContext.Items
+            .Include(i => i.Category)
+            .Include(i => i.ItemType)
             .AsNoTracking()
             .Select(i => i.ToDomain())
             .ToListAsync();
@@ -40,20 +44,24 @@ public class ItemRepository : IItemRepository
             .ToListAsync();
     }
 
-    public async Task AddAsync(Item item)
+    public async Task<Item> AddAsync(Item item)
     {
-        await _catalogDbContext.Items.AddAsync(item.ToModel());
+        var model = item.ToModel();
+        await _catalogDbContext.Items.AddAsync(model);
         await _catalogDbContext.SaveChangesAsync();
+
+        return await this.GetByIdAsync(model.Id); ;
     }
 
-    public async Task UpdateAsync(Item item)
+    public async Task<bool> UpdateAsync(Item item)
     {
         var model = item.ToModel(); 
 
         _catalogDbContext.Items.Attach(model); 
         _catalogDbContext.Entry(model).State = EntityState.Modified;
 
-        await _catalogDbContext.SaveChangesAsync();
+        var affected = await _catalogDbContext.SaveChangesAsync();
+        return affected > 0;
     }
 
     public async Task DeleteAsync(Item item)
@@ -61,7 +69,7 @@ public class ItemRepository : IItemRepository
         var model = item.ToModel();
 
         _catalogDbContext.Items.Attach(model);
-        _catalogDbContext.Entry(model).State = EntityState.Modified;
+        _catalogDbContext.Items.Remove(model);
 
         await _catalogDbContext.SaveChangesAsync();
     }

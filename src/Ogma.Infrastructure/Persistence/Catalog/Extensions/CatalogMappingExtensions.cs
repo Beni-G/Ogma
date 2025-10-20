@@ -87,11 +87,9 @@ public static class CatalogMappingExtensions
             Code = item.Code,
             Description = item.Description,
             CategoryId = item.Category.Id,
-            Category = item.Category.ToModel(),
             ListPriceAmount = item.ListPrice.Amount,
             ListPriceCurrency = item.ListPrice.Currency,
             ItemTypeId = item.ItemType.Id,
-            ItemType = item.ItemType.ToModel(),
             UnitOfMeasurement = item.UnitOfMeasurement,
             IsActive = item.IsActive
         };
@@ -117,10 +115,6 @@ public static class CatalogMappingExtensions
             ParentCategoryId = category.ParentCategoryId,
             Path = category.Path
         };
-        foreach (var subCategory in category.SubCategories)
-        {
-            modelCategory.SubCategories.Add(subCategory.ToModel());
-        }
         return modelCategory;
     }
 

@@ -29,14 +29,14 @@ public interface IItemRepository
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    Task AddAsync(Item item);
+    Task<Item> AddAsync(Item item);
 
     /// <summary>
     /// Updates an existing item in the repository.
     /// </summary>
     /// <param name="item"></param>
     /// <returns></returns>
-    Task UpdateAsync(Item item);
+    Task<bool> UpdateAsync(Item item);
 
     /// <summary>
     /// Deletes an item from the repository.

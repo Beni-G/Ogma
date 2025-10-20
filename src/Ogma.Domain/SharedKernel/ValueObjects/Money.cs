@@ -9,8 +9,11 @@ public class Money : ValueObject
     public Money(decimal amount, string currency)
     {
         if (string.IsNullOrWhiteSpace(currency))
+        {
             throw new ArgumentException("Currency cannot be null or empty.", nameof(currency));
+        }
 
+        Amount = amount;
         Currency = currency.ToUpperInvariant(); // Normalize currency code
     }
 
@@ -48,7 +51,9 @@ public class Money : ValueObject
     private void EnsureSameCurrency(Money other)
     {
         if (Currency != other.Currency)
+        {
             throw new InvalidOperationException("Cannot operate on Money values with different currencies.");
+        }
     }
 
     protected override IEnumerable<object> GetEqualityComponents()

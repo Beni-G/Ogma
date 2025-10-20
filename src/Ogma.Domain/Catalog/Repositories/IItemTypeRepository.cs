@@ -29,14 +29,14 @@ public interface IItemTypeRepository
     /// </summary>
     /// <param name="itemType"></param>
     /// <returns></returns>
-    Task AddAsync(ItemType itemType);
+    Task<ItemType> AddAsync(ItemType itemType);
 
     /// <summary>
     /// Updates an existing item type in the repository.
     /// </summary>
     /// <param name="itemType"></param>
     /// <returns></returns>
-    Task UpdateAsync(ItemType itemType);
+    Task<bool> UpdateAsync(ItemType itemType);
 
     /// <summary>
     /// Deletes an item type from the repository.
