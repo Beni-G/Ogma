@@ -1,18 +1,22 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using AutoMapper.Extensions.ExpressionMapping;
+using Microsoft.EntityFrameworkCore;
+using Ogma.Domain.Catalog.Entities;
 using Ogma.Domain.Catalog.Repositories;
 using Ogma.Infrastructure.Persistence.Catalog.Contexts;
 using Ogma.Infrastructure.Persistence.Catalog.Extensions;
-using Ogma.Domain.Catalog.Entities;
 using System.Linq.Expressions;
 
 namespace Ogma.Infrastructure.Persistence.Catalog.Repositories;
 public class ItemRepository : IItemRepository
 {
     private readonly CatalogDbContext _catalogDbContext;
+    private readonly IMapper _mapper;
 
-    public ItemRepository(CatalogDbContext catalogDbContext)
+    public ItemRepository(CatalogDbContext catalogDbContext, IMapper mapper)
     {
         _catalogDbContext = catalogDbContext;
+        _mapper = mapper;
     }
     public async Task<Item?> GetByIdAsync(long id)
     {
@@ -22,7 +26,7 @@ public class ItemRepository : IItemRepository
             .AsNoTracking()
             .Where(i => i.Id == id)
             .Select(i => i.ToDomain())
-            .FirstOrDefaultAsync(); 
+            .FirstOrDefaultAsync();
     }
 
     public async Task<IEnumerable<Item>> GetAllAsync()
@@ -37,10 +41,14 @@ public class ItemRepository : IItemRepository
 
     public async Task<IEnumerable<Item>> GetAllAsync(Expression<Func<Item, bool>> predicate)
     {
+        var modelPredicate = _mapper.MapExpression<Expression<Func<Models.Item, bool>>>(predicate);
+
         return await _catalogDbContext.Items
+            .Include(i => i.Category)
+            .Include(i => i.ItemType)
             .AsNoTracking()
+            .Where(modelPredicate)
             .Select(i => i.ToDomain())
-            .Where(predicate)
             .ToListAsync();
     }
 
@@ -55,9 +63,9 @@ public class ItemRepository : IItemRepository
 
     public async Task<bool> UpdateAsync(Item item)
     {
-        var model = item.ToModel(); 
+        var model = item.ToModel();
 
-        _catalogDbContext.Items.Attach(model); 
+        _catalogDbContext.Items.Attach(model);
         _catalogDbContext.Entry(model).State = EntityState.Modified;
 
         var affected = await _catalogDbContext.SaveChangesAsync();
