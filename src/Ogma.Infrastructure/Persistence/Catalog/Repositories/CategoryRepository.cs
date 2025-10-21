@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using AutoMapper.Extensions.ExpressionMapping;
+using Microsoft.EntityFrameworkCore;
 using Ogma.Domain.Catalog.Entities;
 using Ogma.Domain.Catalog.Repositories;
 using Ogma.Infrastructure.Persistence.Catalog.Contexts;
@@ -9,10 +11,12 @@ namespace Ogma.Infrastructure.Persistence.Catalog.Repositories;
 public class CategoryRepository : ICategoryRepository
 {
     private readonly CatalogDbContext _catalogDbContext;
+    private readonly IMapper _mapper;
 
-    public CategoryRepository(CatalogDbContext catalogDbContext)
+    public CategoryRepository(CatalogDbContext catalogDbContext, IMapper mapper)
     {
         _catalogDbContext = catalogDbContext;
+        _mapper = mapper;
     }
 
     public async Task<Category?> GetByIdAsync(long id)
@@ -34,10 +38,12 @@ public class CategoryRepository : ICategoryRepository
 
     public async Task<IEnumerable<Category>> GetAllAsync(Expression<Func<Category, bool>> predicate)
     {
+        var modelPredicate = _mapper.MapExpression<Expression<Func<Models.Category, bool>>>(predicate);
+
         return await _catalogDbContext.Categories
             .AsNoTracking()
+            .Where(modelPredicate)
             .Select(c => c.ToDomain())
-            .Where(predicate)
             .ToListAsync();
     }
 
