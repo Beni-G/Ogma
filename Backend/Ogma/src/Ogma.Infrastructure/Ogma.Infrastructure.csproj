@@ -5,7 +5,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Persistence\CRM\" />
+    <Folder Include="Persistence\Partners\" />
     <Folder Include="Persistence\Orders\" />
   </ItemGroup>
 
