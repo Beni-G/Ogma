@@ -16,7 +16,7 @@ public class ItemType : AggregateRoot<long>
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentNullException("name");
+            throw new ArgumentException("name");
         }
 
         Name = name;
@@ -34,7 +34,7 @@ public class ItemType : AggregateRoot<long>
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentNullException("name");
+            throw new ArgumentException("name");
         }
 
         Name = name;

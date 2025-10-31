@@ -31,6 +31,9 @@ public class Category : AggregateRoot<long>
         {
             throw new ArgumentException("Name cannot be null or empty.", nameof(name));
         }
+
+        ValidatePathConsistency(parentCategoryId, path);
+
         Name = name;
         ParentCategoryId = parentCategoryId;
         Path = path;
@@ -50,6 +53,9 @@ public class Category : AggregateRoot<long>
         {
             throw new ArgumentException("Name cannot be null or empty.", nameof(name));
         }
+
+        ValidatePathConsistency(parentCategoryId, path, id);
+
         Name = name;
         ParentCategoryId = parentCategoryId;
         Path = path;
@@ -87,6 +93,11 @@ public class Category : AggregateRoot<long>
             throw new ArgumentException("Category name is invalid.", nameof(name));
         }
 
+        if (parentCategoryId.HasValue && parentCategoryId.Value == Id)
+        {
+            throw new InvalidOperationException("A category cannot be its own parent.");
+        }
+
         Name = name;
         ParentCategoryId = parentCategoryId;
     }
@@ -110,10 +121,17 @@ public class Category : AggregateRoot<long>
         {
             throw new ArgumentNullException(nameof(subCategory));
         }
+
         if (subCategory.ParentCategoryId != Id)
         {
             throw new InvalidOperationException("Subcategory's parent ID does not match this category's ID.");
         }
+
+        if (_subCategories.Contains(subCategory))
+        {
+            throw new InvalidOperationException("Subcategory already exists in this category.");
+        }
+
         _subCategories.Add(subCategory);
     }
 
@@ -151,6 +169,7 @@ public class Category : AggregateRoot<long>
     /// <param name="newPath"></param>
     public void UpdatePath(string newPath)
     {
+        ValidatePathConsistency(ParentCategoryId, newPath, Id);
         Path = newPath;
     }
 
@@ -198,4 +217,72 @@ public class Category : AggregateRoot<long>
             throw new InvalidOperationException("Max category depth reached.");
         }
     }
+
+    private static void ValidatePathConsistency(long? parentCategoryId, string? path, long? categoryId = null)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+        {
+            return;
+        }
+
+        var ids = ParsePath(path);
+
+        ValidatePathDepth(ids);
+        ValidatePathNoDuplicates(ids);
+        ValidatePathNoSelfReference(ids, categoryId);
+        ValidatePathParentConsistency(ids, parentCategoryId);
+    }
+
+    private static List<long> ParsePath(string path) =>
+        path.Split('/', StringSplitOptions.RemoveEmptyEntries)
+            .Select(long.Parse)
+            .ToList();
+
+    private static void ValidatePathDepth(List<long> ids)
+    {
+        if (ids.Count > MaxDepth)
+        {
+            throw new ArgumentException($"Path exceeds maximum allowed depth of {MaxDepth}.");
+        }
+    }
+
+    private static void ValidatePathNoDuplicates(List<long> ids)
+    {
+        var duplicates = ids.GroupBy(id => id)
+                            .Where(g => g.Count() > 1)
+                            .Select(g => g.Key)
+                            .ToList();
+
+        if (duplicates.Any())
+        {
+            throw new ArgumentException($"Path contains duplicate IDs: {string.Join(", ", duplicates)}.");
+        }
+    }
+
+    private static void ValidatePathNoSelfReference(List<long> ids, long? categoryId)
+    {
+        if (categoryId.HasValue && ids.Contains(categoryId.Value))
+        {
+            throw new ArgumentException($"Path cannot contain the category's own ID ({categoryId.Value}).");
+        }
+    }
+
+    private static void ValidatePathParentConsistency(List<long> ids, long? parentCategoryId)
+    {
+        if (parentCategoryId.HasValue)
+        {
+            var expectedParentId = ids.LastOrDefault();
+            if (expectedParentId != parentCategoryId.Value)
+            {
+                throw new ArgumentException(
+                    $"Inconsistent hierarchy: path ends with {expectedParentId}, " +
+                    $"but parentCategoryId is {parentCategoryId.Value}."
+                );
+            }
+        }
+    }
+
+
+
+
 }

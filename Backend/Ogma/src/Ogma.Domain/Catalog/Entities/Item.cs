@@ -22,16 +22,31 @@ public class Item : AggregateRoot<long>
     /// <exception cref="ArgumentNullException"></exception>
     private Item(ItemParameters itemParameters)
     {
+        if(itemParameters == null)
+        {
+            throw new ArgumentNullException(nameof(itemParameters));
+        }
+
         if (string.IsNullOrWhiteSpace(itemParameters.Name))
         {
             throw new ArgumentException("Name cannot be null or empty.", nameof(itemParameters.Name));
+        }
+
+        if (string.IsNullOrWhiteSpace(itemParameters.Code))
+        {
+            throw new ArgumentException("Code cannot be null or empty.", nameof(itemParameters.Code));
+        }
+
+        if(string.IsNullOrWhiteSpace(itemParameters.UnitOfMeasurement))
+        {
+            throw new ArgumentException("Unit of Measurement cannot be null or empty.", nameof(itemParameters.UnitOfMeasurement));
         }
 
         Name = itemParameters.Name;
         Code = itemParameters.Code;
         Description = itemParameters.Description;
         Category = itemParameters.Category ?? throw new ArgumentNullException(nameof(itemParameters.Category));
-        ListPrice = itemParameters.ListPrice;
+        ListPrice = itemParameters.ListPrice ?? throw new ArgumentNullException(nameof(itemParameters.ListPrice));
         ItemType = itemParameters.ItemType ?? throw new ArgumentNullException(nameof(itemParameters.ItemType));
         UnitOfMeasurement = itemParameters.UnitOfMeasurement;
         IsActive = itemParameters.IsActive;
@@ -46,16 +61,31 @@ public class Item : AggregateRoot<long>
     /// <exception cref="ArgumentNullException"></exception>
     private Item(long id, ItemParameters itemParameters) : base(id)
     {
+        if (itemParameters == null)
+        {
+            throw new ArgumentNullException(nameof(itemParameters));
+        }
+
         if (string.IsNullOrWhiteSpace(itemParameters.Name))
         {
             throw new ArgumentException("Name cannot be null or empty.", nameof(itemParameters.Name));
+        }
+
+        if (string.IsNullOrWhiteSpace(itemParameters.Code))
+        {
+            throw new ArgumentException("Code cannot be null or empty.", nameof(itemParameters.Code));
+        }
+
+        if (string.IsNullOrWhiteSpace(itemParameters.UnitOfMeasurement))
+        {
+            throw new ArgumentException("Unit of Measurement cannot be null or empty.", nameof(itemParameters.UnitOfMeasurement));
         }
 
         Name = itemParameters.Name;
         Code = itemParameters.Code;
         Description = itemParameters.Description;
         Category = itemParameters.Category ?? throw new ArgumentNullException(nameof(itemParameters.Category));
-        ListPrice = itemParameters.ListPrice;
+        ListPrice = itemParameters.ListPrice ?? throw new ArgumentNullException(nameof(itemParameters.ListPrice));
         ItemType = itemParameters.ItemType ?? throw new ArgumentNullException(nameof(itemParameters.ItemType));
         UnitOfMeasurement = itemParameters.UnitOfMeasurement;
         IsActive = itemParameters.IsActive;
@@ -151,12 +181,7 @@ public class Item : AggregateRoot<long>
     /// <exception cref="ArgumentNullException"></exception>
     public void UpdateListPrice(Money newPrice)
     {
-        if (newPrice == null)
-        {
-            throw new ArgumentNullException(nameof(newPrice));
-        }
-
-        ListPrice = newPrice;
+        ListPrice = newPrice ?? throw new ArgumentNullException(nameof(newPrice));
     }
 
     /// <summary>
