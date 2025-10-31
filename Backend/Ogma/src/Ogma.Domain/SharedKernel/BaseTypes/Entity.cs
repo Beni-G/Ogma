@@ -64,6 +64,13 @@ public abstract class Entity<TKey> : IEquatable<Entity<TKey>>
             return true;
         }
 
+        // Use reference equality for new entities (Id is default, e.g., 0 for long)
+        if (EqualityComparer<TKey>.Default.Equals(Id, default(TKey)) &&
+            EqualityComparer<TKey>.Default.Equals(other.Id, default(TKey)))
+        {
+            return ReferenceEquals(this, other);
+        }
+
         return EqualityComparer<TKey>.Default.Equals(Id, other.Id);
     }
 

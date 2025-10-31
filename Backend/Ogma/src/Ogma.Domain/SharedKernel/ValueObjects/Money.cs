@@ -36,6 +36,15 @@ public class Money : ValueObject
         return new Money(Amount * factor, Currency);
     }
 
+    public Money Divide(decimal divisor)
+    {
+        if (divisor == 0)
+        {
+            throw new DivideByZeroException("Cannot divide by zero.");
+        }
+        return new Money(Amount / divisor, Currency);
+    }
+
     public bool IsGreaterThan(Money other)
     {
         EnsureSameCurrency(other);
