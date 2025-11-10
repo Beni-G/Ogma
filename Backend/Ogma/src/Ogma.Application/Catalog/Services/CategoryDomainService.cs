@@ -13,8 +13,7 @@ public class CategoryDomainService : ICategoryDomainService
 
         if (parent.Depth >= Category.MaxDepth)
         {
-            throw new InvalidOperationException(
-                $"Cannot create subcategory beyond maximum depth of {Category.MaxDepth}.");
+            throw new InvalidOperationException($"Cannot create subcategory beyond maximum depth of {Category.MaxDepth}.");
         }
 
         // Prevent circular references

@@ -1,15 +1,9 @@
 ﻿using MediatR;
 using Ogma.Application.Catalog.Dtos;
 using Ogma.Application.Catalog.Extensions;
-using Ogma.Domain.Catalog.Entities;
 using Ogma.Domain.Catalog.Parameters;
 using Ogma.Domain.Catalog.Repositories;
 using Ogma.Domain.SharedKernel.ValueObjects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ogma.Application.Catalog.Commands;
 public class UpdateItemHandler : IRequestHandler<UpdateItemCommand, ItemDto>
@@ -28,6 +22,10 @@ public class UpdateItemHandler : IRequestHandler<UpdateItemCommand, ItemDto>
     public async Task<ItemDto> Handle(UpdateItemCommand command, CancellationToken cancellationToken)
     {
         var existingItem = await _itemRepository.GetByIdAsync(command.Id);
+        if (existingItem == null)
+        {
+            throw new KeyNotFoundException($"Item with Id {command.Id} not found.");
+        }
         var listPrice = new Money(command.ListPrice.Amount, command.ListPrice.Currency);
         var category = await _categoryRepository.GetByIdAsync(command.CategoryId);
         if (category == null)
@@ -54,7 +52,7 @@ public class UpdateItemHandler : IRequestHandler<UpdateItemCommand, ItemDto>
 
         existingItem.UpdateItem(parameters);
         var result = await _itemRepository.UpdateAsync(existingItem);
-        if(!result)
+        if (!result)
         {
             throw new InvalidOperationException($"Update failed for ItemType with ID {command.Id}.");
         }

@@ -33,7 +33,6 @@ public class CreateCategoryHandler : IRequestHandler<CreateCategoryCommand, Cate
 
         var newCategory = Category.Create(command.Name, command.ParentCategoryId);
 
-        // Compute path using domain service
         var path = _categoryDomainService.ComputePath(newCategory, parent);
         newCategory.UpdatePath(path);
 
