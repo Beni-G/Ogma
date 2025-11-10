@@ -38,7 +38,6 @@ public class UpdateCategoryHandler : IRequestHandler<UpdateCategoryCommand, Cate
 
         category.Update(command.Name, command.ParentCategoryId);
 
-        // Compute path using domain service
         var path = _categoryDomainService.ComputePath(category, parent);
         category.UpdatePath(path);
 
