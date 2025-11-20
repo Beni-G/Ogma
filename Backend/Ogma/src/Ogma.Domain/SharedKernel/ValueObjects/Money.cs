@@ -14,7 +14,7 @@ public class Money : ValueObject
         }
 
         Amount = amount;
-        Currency = currency.ToUpperInvariant(); // Normalize currency code
+        Currency = currency.ToUpperInvariant();
     }
 
     public static Money Zero(string currency) => new Money(0, currency);
