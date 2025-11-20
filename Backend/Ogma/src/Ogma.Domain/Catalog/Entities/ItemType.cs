@@ -32,9 +32,14 @@ public class ItemType : AggregateRoot<long>
     /// <exception cref="ArgumentNullException"></exception>
     private ItemType(long id, string name, string description) : base(id)
     {
+        if (id <= 0)
+        {
+            throw new ArgumentException("ID must be a positive number.", nameof(id));
+        }
+
         if (string.IsNullOrWhiteSpace(name))
         {
-            throw new ArgumentException("name");
+            throw new ArgumentException("ItemType name is invalid.", nameof(name));
         }
 
         Name = name;

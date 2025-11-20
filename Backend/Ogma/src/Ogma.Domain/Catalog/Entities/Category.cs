@@ -49,6 +49,11 @@ public class Category : AggregateRoot<long>
     /// <exception cref="ArgumentException"></exception>
     private Category(long id, string name, long? parentCategoryId = null, string? path = null) : base(id)
     {
+        if (id <= 0)
+        {
+            throw new ArgumentException("ID must be a positive number.", nameof(id));
+        }
+
         if (string.IsNullOrWhiteSpace(name))
         {
             throw new ArgumentException("Name cannot be null or empty.", nameof(name));
