@@ -61,6 +61,11 @@ public class Item : AggregateRoot<long>
     /// <exception cref="ArgumentNullException"></exception>
     private Item(long id, ItemParameters itemParameters) : base(id)
     {
+        if (id <= 0)
+        {
+            throw new ArgumentException("ID must be a positive number.", nameof(id));
+        }
+
         if (itemParameters == null)
         {
             throw new ArgumentNullException(nameof(itemParameters));

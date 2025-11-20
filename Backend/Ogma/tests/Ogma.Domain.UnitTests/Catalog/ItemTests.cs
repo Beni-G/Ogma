@@ -238,6 +238,29 @@ public class ItemTests
     }
 
     [Theory]
+    [InlineData(0L)]
+    [InlineData(-1L)]
+    public void Reconstitute_InvalidId_ThrowsArgumentException(long invalidId)
+    {
+        // Arrange
+        var category = Category.Create("Electronics");
+        var itemType = ItemType.Create("Gadget", "A cool gadget");
+        var listPrice = new Money(99.99m, "USD");
+        var itemParameters = new ItemParameters(
+            Name: "Smartphone",
+            Code: "SP001",
+            Category: category,
+            ListPrice: listPrice,
+            ItemType: itemType,
+            UnitOfMeasurement: "Piece",
+            IsActive: true,
+            Description: "A high-end smartphone"
+        );
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => Item.Reconstitute(invalidId, itemParameters));
+    }
+
+    [Theory]
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]

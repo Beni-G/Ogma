@@ -94,6 +94,14 @@ public class CategoryTests
     }
 
     [Theory]
+    [InlineData(0L)]
+    [InlineData(-1L)]
+    public void Reconstitute_InvalidId_ThrowsArgumentException(long invalidId)
+    {
+        Assert.Throws<ArgumentException>(() => Category.Reconstitute(invalidId, "category"));
+    }
+
+    [Theory]
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
