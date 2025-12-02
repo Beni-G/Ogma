@@ -42,6 +42,10 @@ public class PartnerBankAccount : Entity<long>
     /// <exception cref="ArgumentNullException"></exception>
     private PartnerBankAccount(long id, long partnerId, BankAccount bankAccount, bool isDefault = false) : base(id)
     {
+        if (id <= 0)
+        {
+            throw new ArgumentException("ID must be a positive number.", nameof(id));
+        }
         if (partnerId <= 0)
         {
             throw new ArgumentException("Partner ID must be a positive number.", nameof(partnerId));
@@ -75,4 +79,10 @@ public class PartnerBankAccount : Entity<long>
     /// <returns></returns>
     public static PartnerBankAccount Reconstitute(long id, long partnerId, BankAccount bankAccount, bool isDefault = false) =>
         new(id, partnerId, bankAccount, isDefault);
+
+    public void UpdateBankAccount(BankAccount bankAccount, bool isDefault)
+    {
+        BankAccount = bankAccount ?? throw new ArgumentNullException(nameof(bankAccount));
+        IsDefault = isDefault;
+    }
 }

@@ -2,6 +2,7 @@
 using System.Text;
 
 namespace Ogma.Domain.SharedKernel.ValueObjects;
+
 public class BankAccount : ValueObject
 {
     public string Bank { get; }
@@ -11,26 +12,37 @@ public class BankAccount : ValueObject
 
     public BankAccount(string bank, string iban, string currency, string? bic = null)
     {
+        iban = NormaliseIban(iban);
         if (string.IsNullOrWhiteSpace(bank))
         {
-            throw new ArgumentNullException(nameof(bank));
+            throw new ArgumentException(nameof(bank));
         }
         if (string.IsNullOrWhiteSpace(iban))
         {
-            throw new ArgumentNullException(nameof(iban));
+            throw new ArgumentException(nameof(iban));
         }
-        if(!IbanChecksumIsValid(iban))
+        if (!IbanChecksumIsValid(iban))
         {
             throw new ArgumentException("IBAN checksum is invalid.", nameof(iban));
         }
         if (string.IsNullOrWhiteSpace(currency))
         {
-            throw new ArgumentNullException(nameof(currency));
+            throw new ArgumentException(nameof(currency));
         }
         Bank = bank;
         Iban = iban;
         Currency = currency.ToUpperInvariant();
         Bic = bic;
+    }
+
+    private static string NormaliseIban(string iban)
+    {
+        if (string.IsNullOrWhiteSpace(iban))
+        {
+            throw new ArgumentException(nameof(iban));
+        }
+
+        return iban.Replace(" ", "", StringComparison.OrdinalIgnoreCase).ToUpperInvariant();
     }
 
     private static bool IbanChecksumIsValid(string iban)
@@ -83,7 +95,7 @@ public class BankAccount : ValueObject
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return Bank;
-        yield return Iban;  
+        yield return Iban;
         yield return Currency;
         yield return Bic!;
     }

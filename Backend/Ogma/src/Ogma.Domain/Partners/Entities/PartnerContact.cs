@@ -2,11 +2,11 @@
 using Ogma.Domain.SharedKernel.ValueObjects;
 
 namespace Ogma.Domain.Partners.Entities;
+
 public class PartnerContact : Entity<long>
 {
     public long PartnerId { get; private set; }
-    public string FirstName { get; private set; }
-    public string LastName { get; private set; }
+    public PersonName Name { get; private set; }
     public Email? Email { get; private set; }
     public string? Phone { get; private set; }
     public string? Mobile { get; private set; }
@@ -18,8 +18,7 @@ public class PartnerContact : Entity<long>
     /// Creates a new instance of the PartnerContact class with the specified parameters.
     /// </summary>
     /// <param name="partnerId"></param>
-    /// <param name="firstName"></param>
-    /// <param name="lastName"></param>
+    /// <param name="name"></param>
     /// <param name="email"></param>
     /// <param name="phone"></param>
     /// <param name="mobile"></param>
@@ -29,8 +28,7 @@ public class PartnerContact : Entity<long>
     /// <exception cref="ArgumentException"></exception>
     private PartnerContact(
         long partnerId,
-        string firstName,
-        string lastName,
+        PersonName name,
         Email? email = null,
         string? phone = null,
         string? mobile = null,
@@ -42,17 +40,13 @@ public class PartnerContact : Entity<long>
         {
             throw new ArgumentException("Partner ID must be a positive number.", nameof(partnerId));
         }
-        if (string.IsNullOrWhiteSpace(firstName))
+        if (name == null)
         {
-            throw new ArgumentException("First name cannot be null or empty.", nameof(firstName));
+            throw new ArgumentNullException("Name cannot be null.", nameof(name));
         }
-        if (string.IsNullOrWhiteSpace(lastName))
-        {
-            throw new ArgumentException("Last name cannot be null or empty.", nameof(lastName));
-        }
+
         PartnerId = partnerId;
-        FirstName = firstName;
-        LastName = lastName;
+        Name = name;
         Email = email;
         Phone = phone;
         Mobile = mobile;
@@ -66,8 +60,7 @@ public class PartnerContact : Entity<long>
     /// </summary>
     /// <param name="id"></param>
     /// <param name="partnerId"></param>
-    /// <param name="firstName"></param>
-    /// <param name="lastName"></param>
+    /// <param name="name"></param>
     /// <param name="email"></param>
     /// <param name="phone"></param>
     /// <param name="mobile"></param>
@@ -78,8 +71,7 @@ public class PartnerContact : Entity<long>
     private PartnerContact(
         long id,
         long partnerId,
-        string firstName,
-        string lastName,
+        PersonName name,
         Email? email = null,
         string? phone = null,
         string? mobile = null,
@@ -87,21 +79,20 @@ public class PartnerContact : Entity<long>
         string? jobTitle = null,
         bool isPrimary = false) : base(id)
     {
+        if (id <= 0)
+        {
+            throw new ArgumentException("ID must be a positive number.", nameof(id));
+        }
         if (partnerId <= 0)
         {
             throw new ArgumentException("Partner ID must be a positive number.", nameof(partnerId));
         }
-        if (string.IsNullOrWhiteSpace(firstName))
+        if (name == null)
         {
-            throw new ArgumentException("First name cannot be null or empty.", nameof(firstName));
-        }
-        if (string.IsNullOrWhiteSpace(lastName))
-        {
-            throw new ArgumentException("Last name cannot be null or empty.", nameof(lastName));
+            throw new ArgumentNullException("Name cannot be null.", nameof(name));
         }
         PartnerId = partnerId;
-        FirstName = firstName;
-        LastName = lastName;
+        Name = name;
         Email = email;
         Phone = phone;
         Mobile = mobile;
@@ -114,8 +105,7 @@ public class PartnerContact : Entity<long>
     /// Creates a new instance of the PartnerContact class with the specified parameters.
     /// </summary>
     /// <param name="partnerId"></param>
-    /// <param name="firstName"></param>
-    /// <param name="lastName"></param>
+    /// <param name="name"></param>
     /// <param name="email"></param>
     /// <param name="phone"></param>
     /// <param name="mobile"></param>
@@ -125,23 +115,21 @@ public class PartnerContact : Entity<long>
     /// <returns></returns>
     public static PartnerContact Create(
         long partnerId,
-        string firstName,
-        string lastName,
+        PersonName name,
         Email? email = null,
         string? phone = null,
         string? mobile = null,
         string? title = null,
         string? jobTitle = null,
         bool isPrimary = false) =>
-            new(partnerId, firstName, lastName, email, phone, mobile, title, jobTitle, isPrimary);
+            new(partnerId, name, email, phone, mobile, title, jobTitle, isPrimary);
 
     /// <summary>
     /// Reconstitutes an existing PartnerContact instance with the specified parameters.
     /// </summary>
     /// <param name="id"></param>
     /// <param name="partnerId"></param>
-    /// <param name="firstName"></param>
-    /// <param name="lastName"></param>
+    /// <param name="name"></param>
     /// <param name="email"></param>
     /// <param name="phone"></param>
     /// <param name="mobile"></param>
@@ -152,18 +140,53 @@ public class PartnerContact : Entity<long>
     public static PartnerContact Reconstitute(
         long id,
         long partnerId,
-        string firstName,
-        string lastName,
+        PersonName name,
         Email? email = null,
         string? phone = null,
         string? mobile = null,
         string? title = null,
         string? jobTitle = null,
         bool isPrimary = false) =>
-            new(id, partnerId, firstName, lastName, email, phone, mobile, title, jobTitle, isPrimary);
+            new(id, partnerId, name, email, phone, mobile, title, jobTitle, isPrimary);
 
-    /// <summary>
-    /// Returns the full name of the contact by combining the first and last names.
-    /// </summary>
-    public string FullName => $"{FirstName} {LastName}";
+    public void UpdateContactDetails(
+        PersonName name,
+        Email? email = null,
+        string? phone = null,
+        string? mobile = null,
+        string? title = null,
+        string? jobTitle = null,
+        bool isPrimary = false)
+    {
+        UpdateName(name);
+        UpdateEmail(email);
+        UpdatePhone(phone);
+        UpdateMobile(mobile);
+        UpdateTitle(title);
+        UpdateJobTitle(jobTitle);
+        if (isPrimary)
+        {
+            MarkAsPrimary();
+        }
+        else
+        {
+            UnmarkAsPrimary();
+        }
+    }
+
+    private void UpdateName(PersonName name) => Name = name ?? throw new ArgumentNullException("Name cannot be null.", nameof(name));
+
+    private void UpdateEmail(Email? email) => Email = email;
+
+    private void UpdatePhone(string? phone) => Phone = phone;
+
+    private void UpdateMobile(string? mobile) => Mobile = mobile;
+
+    private void UpdateTitle(string? title) => Title = title;
+
+    private void UpdateJobTitle(string? jobTitle) => JobTitle = jobTitle;
+
+    private void MarkAsPrimary() => IsPrimary = true;
+
+    private void UnmarkAsPrimary() => IsPrimary = false;
 }
