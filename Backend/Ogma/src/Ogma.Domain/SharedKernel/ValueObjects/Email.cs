@@ -2,10 +2,15 @@
 using System.Text.RegularExpressions;
 
 namespace Ogma.Domain.SharedKernel.ValueObjects;
-public class Email : ValueObject
+
+public sealed class Email : ValueObject
 {
     private const int MaxLength = 254;
-    private const string Pattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+
+    private static readonly Regex EmailRegex = new(
+        @"^[\w!#$%&'*+/=?`{|}~^-]+(?:\.[\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$",
+        RegexOptions.IgnoreCase | RegexOptions.Compiled,
+        TimeSpan.FromSeconds(1));
 
     public string Value { get; }
 
@@ -15,19 +20,27 @@ public class Email : ValueObject
         {
             throw new ArgumentException("Email cannot be null or empty.", nameof(value));
         }
-        var cleanedValue = value.Trim();
-        if (cleanedValue.Length > MaxLength)
+
+        var trimmed = value.Trim();
+
+        if (trimmed.Length > MaxLength)
         {
-            throw new ArgumentException("Email cannot exceed 254 characters.", nameof(value));
+            throw new ArgumentException($"Email cannot exceed {MaxLength} characters.", nameof(value));
         }
-        if (!Regex.IsMatch(cleanedValue, Pattern))
+
+        // This one blocks bad..dots@example.com 100%
+        if (!EmailRegex.IsMatch(trimmed))
         {
             throw new ArgumentException("Invalid email format.", nameof(value));
         }
-        Value = value.Trim().ToLowerInvariant();
+
+        Value = trimmed.ToLowerInvariant();
     }
+
     protected override IEnumerable<object> GetEqualityComponents()
     {
         yield return Value;
     }
+
+    public override string ToString() => Value;
 }

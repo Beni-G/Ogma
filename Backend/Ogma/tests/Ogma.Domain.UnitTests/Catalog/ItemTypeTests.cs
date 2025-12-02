@@ -20,18 +20,6 @@ public class ItemTypeTests
     }
 
     [Theory]
-    [InlineData(0L)]
-    [InlineData(-1L)]
-    public void Reconstitute_NonPositiveId_ThrowsArgumentException(long invalidId)
-    {
-        // Arrange
-        string name = "TestItem";
-        string description = "A test item type";
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => ItemType.Reconstitute(invalidId, name, description));
-    }
-
-    [Theory]
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
@@ -70,6 +58,18 @@ public class ItemTypeTests
         itemType.Id.Should().Be(id);
         itemType.Name.Should().Be(name);
         itemType.Description.Should().Be(description);
+    }
+
+    [Theory]
+    [InlineData(0L)]
+    [InlineData(-1L)]
+    public void Reconstitute_NonPositiveId_ThrowsArgumentException(long invalidId)
+    {
+        // Arrange
+        string name = "TestItem";
+        string description = "A test item type";
+        // Act & Assert
+        Assert.Throws<ArgumentException>(() => ItemType.Reconstitute(invalidId, name, description));
     }
 
     [Theory]

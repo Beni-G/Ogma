@@ -1,6 +1,7 @@
 ﻿using Ogma.Domain.SharedKernel.BaseTypes;
 
 namespace Ogma.Domain.SharedKernel.ValueObjects;
+
 public class Address : ValueObject
 {
     public string Street { get; }
@@ -8,42 +9,51 @@ public class Address : ValueObject
     public string City { get; }
     public string Region { get; }
     public string PostalCode { get; }
-    public string CountryCode { get; } // ISO 3166-1 alpha-2, e.g., "DE"
-
+    public string CountryCode { get; }
     public string? Building { get; }
     public string? Staircase { get; }
     public string? Floor { get; }
     public string? Apartment { get; }
 
     public Address(
-        string street,
-        string number,
-        string city,
-        string region,
-        string postalCode,
-        string countryCode,
-        string? building = null,
-        string? staircase = null,
-        string? floor = null,
-        string? apartment = null)
+    string street,
+    string number,
+    string city,
+    string region,
+    string postalCode,
+    string countryCode,
+    string? building = null,
+    string? staircase = null,
+    string? floor = null,
+    string? apartment = null)
     {
-        Street = street ?? throw new ArgumentNullException(nameof(street));
-        Number = number ?? throw new ArgumentNullException(nameof(number));
-        City = city ?? throw new ArgumentNullException(nameof(city));
-        Region = region ?? throw new ArgumentNullException(nameof(region));
-        PostalCode = postalCode ?? throw new ArgumentNullException(nameof(postalCode));
+        Street = ValidateRequired(street, nameof(street));
+        Number = ValidateRequired(number, nameof(number));
+        City = ValidateRequired(city, nameof(city));
+        Region = ValidateRequired(region, nameof(region));
+        PostalCode = ValidateRequired(postalCode, nameof(postalCode));
 
-        if (string.IsNullOrWhiteSpace(countryCode) || countryCode.Length != 2)
+        if (string.IsNullOrWhiteSpace(countryCode) || countryCode.Length != 2 || !countryCode.All(char.IsLetter))
         {
-            throw new ArgumentException("Country code must be a 2-letter ISO code.", nameof(countryCode));
+            throw new ArgumentException("Country code must be a valid 2-letter ISO code (e.g. 'US', 'DE').", nameof(countryCode));
         }
 
         CountryCode = countryCode.ToUpperInvariant();
 
-        Building = building;
-        Staircase = staircase;
-        Floor = floor;
-        Apartment = apartment;
+        Building = building?.Trim() ?? null;  
+        Staircase = staircase?.Trim() ?? null;
+        Floor = floor?.Trim() ?? null;
+        Apartment = apartment?.Trim() ?? null;
+    }
+
+    private static string ValidateRequired(string value, string paramName)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new ArgumentException($"Address {paramName} is required and cannot be empty or whitespace.", paramName);
+        }
+
+        return value.Trim();
     }
 
     protected override IEnumerable<object> GetEqualityComponents()
