@@ -140,7 +140,7 @@ public class PartnerTests
         partner.IsNaturalPerson.Should().BeTrue();
         partner.IsActive.Should().BeTrue();
         partner.DisplayName.Should().Be(displayName);
-        partner.MainAddress.Should().BeNull();
+        partner.HQAddress.Should().BeNull();
         partner.Identifiers.Should().BeEquivalentTo(identifiers);
         partner.Roles.Should().BeEquivalentTo(roles);
         partner.BankAccounts.Should().BeEmpty();
@@ -467,7 +467,7 @@ public class PartnerTests
         partner.IsNaturalPerson.Should().BeTrue();
         partner.IsActive.Should().Be(newIsActive);
         partner.DisplayName.Should().Be(newDisplayName);
-        partner.MainAddress.Should().Be(newMainAddress);
+        partner.HQAddress.Should().Be(newMainAddress);
         partner.Identifiers.Should().BeEquivalentTo(newIdentifiers);
         partner.Roles.Should().BeEquivalentTo(newRoles);
         partner.BankAccounts.Should().BeEquivalentTo(newBankAccounts);
@@ -536,7 +536,7 @@ public class PartnerTests
         partner.IsNaturalPerson.Should().BeFalse();
         partner.IsActive.Should().Be(newIsActive);
         partner.DisplayName.Should().Be(newDisplayName);
-        partner.MainAddress.Should().Be(newMainAddress);
+        partner.HQAddress.Should().Be(newMainAddress);
         partner.Identifiers.Should().BeEquivalentTo(newIdentifiers);
         partner.Roles.Should().BeEquivalentTo(newRoles);
         partner.BankAccounts.Should().BeEquivalentTo(newBankAccounts);

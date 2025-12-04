@@ -16,7 +16,7 @@ public class Partner : AggregateRoot<long>
     public bool IsNaturalPerson { get; private set; } = false;
     public bool IsActive { get; private set; }
     public string? DisplayName { get; private set; }
-    public Address? MainAddress { get; private set; }
+    public Address? HQAddress { get; private set; }
     public IReadOnlyCollection<PartnerRoleType> Roles => _roles.AsReadOnly();
     public IReadOnlyCollection<PartnerIdentifier> Identifiers => _identifiers.AsReadOnly();
     public IReadOnlyCollection<PartnerBankAccount> BankAccounts => _bankAccounts.AsReadOnly();
@@ -158,7 +158,7 @@ public class Partner : AggregateRoot<long>
             IsNaturalPerson = isNaturalPerson,
             IsActive = isActive,
             DisplayName = displayName,
-            MainAddress = mainAddress
+            HQAddress = mainAddress
         };
 
         partner.ReplaceIdentifiers(identifiers);
@@ -362,7 +362,7 @@ public class Partner : AggregateRoot<long>
         {
             throw new ArgumentNullException(nameof(newAddress));
         }
-        MainAddress = newAddress;
+        HQAddress = newAddress;
     }
 
     /// <summary>

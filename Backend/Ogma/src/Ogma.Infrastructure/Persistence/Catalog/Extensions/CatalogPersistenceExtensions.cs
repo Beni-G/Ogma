@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using AutoMapper.Extensions.ExpressionMapping;
+﻿using AutoMapper.Extensions.ExpressionMapping;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +8,7 @@ using Ogma.Infrastructure.Persistence.Catalog.MappingProfiles;
 using Ogma.Infrastructure.Persistence.Catalog.Repositories;
 
 namespace Ogma.Infrastructure.Persistence.Catalog.Extensions;
+
 public static class CatalogPersistenceExtensions
 {
     public static IServiceCollection AddCatalogPersistence(this IServiceCollection services, IConfiguration config)
