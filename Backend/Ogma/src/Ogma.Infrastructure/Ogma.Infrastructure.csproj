@@ -5,8 +5,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Persistence\Partners\" />
     <Folder Include="Persistence\Orders\" />
+    <Folder Include="Persistence\Partners\Migrations\" />
   </ItemGroup>
 
   <ItemGroup>

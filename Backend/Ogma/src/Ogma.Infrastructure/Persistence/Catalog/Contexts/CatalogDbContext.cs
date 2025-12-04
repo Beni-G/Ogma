@@ -13,7 +13,11 @@ public class CatalogDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(CatalogDbContext).Assembly);
+        modelBuilder.ApplyConfigurationsFromAssembly(
+            typeof(CatalogDbContext).Assembly,
+            type => type.Namespace is not null
+                    && type.Namespace.StartsWith("Ogma.Infrastructure.Persistence.Catalog", System.StringComparison.Ordinal));
+
         modelBuilder.HasAnnotation("Relational:MigrationHistoryTable", "__CatalogMigrationsHistory");
     }
 

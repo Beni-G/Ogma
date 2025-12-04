@@ -1,6 +1,7 @@
 using Ogma.Api.Middleware;
 using Ogma.Application.Extensions;
 using Ogma.Infrastructure.Persistence.Catalog.Extensions;
+using Ogma.Infrastructure.Persistence.Partners.Extensions;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddCatalogPersistence(builder.Configuration);
+builder.Services.AddPartnersPersistence(builder.Configuration);
 
 builder.Services.AddApplicationLayer();
 

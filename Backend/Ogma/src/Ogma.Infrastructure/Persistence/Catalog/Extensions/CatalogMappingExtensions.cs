@@ -3,6 +3,7 @@
 namespace Ogma.Infrastructure.Persistence.Catalog.Extensions;
 public static class CatalogMappingExtensions
 {
+    #region ToDomain
     /// <summary>
     /// Mapss a Models.Item to a Domain.Catalog.Entities.Item
     /// </summary>
@@ -68,6 +69,10 @@ public static class CatalogMappingExtensions
         return domainItemType;
     }
 
+    #endregion
+
+    #region ToModel
+
     /// <summary>
     /// Mapss a Domain.Catalog.Entities.Item to a Models.Item
     /// </summary>
@@ -96,6 +101,7 @@ public static class CatalogMappingExtensions
         return modelItem;
     }
 
+    
     /// <summary>
     /// Mapss a Domain.Catalog.Entities.Category to a Models.Category
     /// </summary>
@@ -138,4 +144,6 @@ public static class CatalogMappingExtensions
         };
         return modelItemType;
     }
+
+    #endregion
 }
