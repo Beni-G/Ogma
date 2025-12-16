@@ -36,7 +36,7 @@ public class ItemTypeController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateItemType(CreateItemTypeRequest request)
+    public async Task<IActionResult> Create(CreateItemTypeRequest request)
     {
         var command = new CreateItemTypeCommand(request.Name, request.Description);
         var created = await _mediator.Send(command);
@@ -44,7 +44,7 @@ public class ItemTypeController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<ItemTypeResponse>> UpdateItemType(long id, UpdateItemTypeRequest request)
+    public async Task<ActionResult<ItemTypeResponse>> Update(long id, UpdateItemTypeRequest request)
     {
         if(id != request.Id)
         {
@@ -58,7 +58,7 @@ public class ItemTypeController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteItemType(long id)
+    public async Task<IActionResult> Delete(long id)
     {
         await _mediator.Send(new DeleteItemTypeCommand(id));
         return NoContent();

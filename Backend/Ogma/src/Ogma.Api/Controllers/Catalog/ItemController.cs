@@ -40,7 +40,7 @@ public class ItemController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<ItemResponse>> CreateItem(CreateItemRequest request)
+    public async Task<ActionResult<ItemResponse>> Create(CreateItemRequest request)
     {
         var command = new CreateItemCommand(request.Name,
             request.Code,
@@ -56,7 +56,7 @@ public class ItemController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<ItemResponse>> UpdateItem(long id, UpdateItemRequest request)
+    public async Task<ActionResult<ItemResponse>> Update(long id, UpdateItemRequest request)
     {
         if (id != request.Id)
         {
@@ -79,7 +79,7 @@ public class ItemController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteItem(long id)
+    public async Task<IActionResult> Delete(long id)
     {
         await _mediator.Send(new DeleteItemCommand(id));
         return NoContent();

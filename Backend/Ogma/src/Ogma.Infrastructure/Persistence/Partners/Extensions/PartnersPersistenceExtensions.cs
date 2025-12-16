@@ -1,8 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper.Extensions.ExpressionMapping;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using Ogma.Domain.Partners.Repositories;
 using Ogma.Infrastructure.Persistence.Partners.Contexts;
+using Ogma.Infrastructure.Persistence.Partners.MappingProfiles;
+using Ogma.Infrastructure.Persistence.Partners.Repositories;
 
 namespace Ogma.Infrastructure.Persistence.Partners.Extensions;
 
@@ -25,8 +29,15 @@ public static class PartnersPersistenceExtensions
         });
 
         // Repository Registrations.
+        services.AddScoped<IPartnerRoleTypeRepository, PartnerRoleTypeRepository>();
+        services.AddScoped<IPartnerRepository, PartnerRepository>();
 
         // AutoMapper Configuration.
+        services.AddAutoMapper(cfg =>
+        {
+            cfg.AddProfile<DomainToPersistenceProfile>();
+            cfg.AddExpressionMapping();
+        }, AppDomain.CurrentDomain.GetAssemblies());
 
         return services;
     }

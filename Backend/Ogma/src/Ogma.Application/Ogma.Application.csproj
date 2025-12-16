@@ -8,12 +8,6 @@
     <ProjectReference Include="..\Ogma.Domain\Ogma.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Partners\Dtos\" />
-    <Folder Include="Partners\Commands\" />
-    <Folder Include="Partners\Queries\" />
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

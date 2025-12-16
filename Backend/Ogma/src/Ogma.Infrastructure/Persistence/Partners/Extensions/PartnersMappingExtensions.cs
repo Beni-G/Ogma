@@ -1,4 +1,7 @@
-﻿namespace Ogma.Infrastructure.Persistence.Partners.Extensions;
+﻿using Ogma.Domain.Partners.Entities;
+using Ogma.Domain.SharedKernel.ValueObjects;
+
+namespace Ogma.Infrastructure.Persistence.Partners.Extensions;
 
 public static class PartnersMappingExtensions
 {
@@ -10,13 +13,13 @@ public static class PartnersMappingExtensions
     /// <param name="partnerRoleType">The partner role type model to convert. Cannot be null.</param>
     /// <returns>A domain entity representing the specified partner role type.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="partnerRoleType"/> is null.</exception>
-    public static Domain.Partners.Entities.PartnerRoleType ToDomain(this Models.PartnerRoleType partnerRoleType)
+    public static PartnerRoleType ToDomain(this Models.PartnerRoleType partnerRoleType)
     {
         if (partnerRoleType == null)
         {
             throw new ArgumentNullException(nameof(partnerRoleType));
         }
-        var domainPartnerRoleType = Domain.Partners.Entities.PartnerRoleType.Reconstitute(
+        var domainPartnerRoleType = PartnerRoleType.Reconstitute(
             partnerRoleType.Id,
             partnerRoleType.Name,
             partnerRoleType.Code,
@@ -27,18 +30,18 @@ public static class PartnersMappingExtensions
 
     /// <summary>
     /// Converts an <see cref="ValueObjectRecords.AddressRecord"/> instance to its corresponding domain <see
-    /// cref="Domain.SharedKernel.ValueObjects.Address"/> value object.
+    /// cref="Address"/> value object.
     /// </summary>
     /// <param name="addressRecord">The address record to convert. Cannot be <see langword="null"/>.</param>
     /// <returns>A domain address value object containing the data from the specified address record.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="addressRecord"/> is <see langword="null"/>.</exception>
-    public static Domain.SharedKernel.ValueObjects.Address ToDomain(this ValueObjectRecords.AddressRecord addressRecord)
+    public static Address ToDomain(this ValueObjectRecords.AddressRecord addressRecord)
     {
         if (addressRecord == null)
         {
             throw new ArgumentNullException(nameof(addressRecord));
         }
-        var domainAddress = new Domain.SharedKernel.ValueObjects.Address(
+        var domainAddress = new Address(
             street: addressRecord.Street,
             number: addressRecord.Number,
             city: addressRecord.City,
@@ -55,19 +58,19 @@ public static class PartnersMappingExtensions
 
     /// <summary>
     /// Converts a <see cref="ValueObjectRecords.BankAccountRecord"/> instance to its corresponding domain <see
-    /// cref="Domain.SharedKernel.ValueObjects.BankAccount"/> value object.
+    /// cref="BankAccount"/> value object.
     /// </summary>
     /// <param name="bankAccountRecord">The bank account record to convert. Cannot be <see langword="null"/>.</param>
-    /// <returns>A <see cref="Domain.SharedKernel.ValueObjects.BankAccount"/> instance representing the specified bank account
+    /// <returns>A <see cref="BankAccount"/> instance representing the specified bank account
     /// record.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="bankAccountRecord"/> is <see langword="null"/>.</exception>
-    public static Domain.SharedKernel.ValueObjects.BankAccount ToDomain(this ValueObjectRecords.BankAccountRecord bankAccountRecord)
+    public static BankAccount ToDomain(this ValueObjectRecords.BankAccountRecord bankAccountRecord)
     {
         if (bankAccountRecord == null)
         {
             throw new ArgumentNullException(nameof(bankAccountRecord));
         }
-        var domainBankAccount = new Domain.SharedKernel.ValueObjects.BankAccount(
+        var domainBankAccount = new BankAccount(
             bank: bankAccountRecord.Bank,
             iban: bankAccountRecord.Iban,
             currency: bankAccountRecord.Currency,
@@ -78,24 +81,23 @@ public static class PartnersMappingExtensions
 
     /// <summary>
     /// Converts a <see cref="Models.PartnerIdentifier"/> instance to its corresponding domain <see
-    /// cref="Domain.Partners.Entities.PartnerIdentifier"/> representation.
+    /// cref="PartnerIdentifier"/> representation.
     /// </summary>
     /// <param name="partnerIdentifier">The source <see cref="Models.PartnerIdentifier"/> to convert. Cannot be <see langword="null"/>.</param>
-    /// <returns>A <see cref="Domain.Partners.Entities.PartnerIdentifier"/> instance containing the mapped values from the
+    /// <returns>A <see cref="PartnerIdentifier"/> instance containing the mapped values from the
     /// specified model.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="partnerIdentifier"/> is <see langword="null"/>.</exception>
-    public static Domain.Partners.Entities.PartnerIdentifier ToDomain(this Models.PartnerIdentifier partnerIdentifier)
+    public static PartnerIdentifier ToDomain(this Models.PartnerIdentifier partnerIdentifier)
     {
         if (partnerIdentifier == null)
         {
             throw new ArgumentNullException(nameof(partnerIdentifier));
         }
-        var domainPartnerIdentifier = Domain.Partners.Entities.PartnerIdentifier.Reconstitute(
+        var domainPartnerIdentifier = PartnerIdentifier.Reconstitute(
             id: partnerIdentifier.Id,
-            partnerId: partnerIdentifier.PartnerId,
             type: partnerIdentifier.Type,
             value: partnerIdentifier.Value,
-            validityPeriod: new Domain.SharedKernel.ValueObjects.Period(partnerIdentifier.ValidityStart, partnerIdentifier.ValidityEnd),
+            validityPeriod: partnerIdentifier.ValidityStart.HasValue ? new Period(partnerIdentifier.ValidityStart.Value, partnerIdentifier.ValidityEnd) : null,
             isPrimary: partnerIdentifier.IsPrimary
         );
         return domainPartnerIdentifier;
@@ -107,15 +109,14 @@ public static class PartnersMappingExtensions
     /// <param name="partnerBankAccount">The partner bank account model to convert. Cannot be null.</param>
     /// <returns>A domain entity representing the partner bank account with values mapped from the provided model.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="partnerBankAccount"/> is null.</exception>
-    public static Domain.Partners.Entities.PartnerBankAccount ToDomain(this Models.PartnerBankAccount partnerBankAccount)
+    public static PartnerBankAccount ToDomain(this Models.PartnerBankAccount partnerBankAccount)
     {
         if (partnerBankAccount == null)
         {
             throw new ArgumentNullException(nameof(partnerBankAccount));
         }
-        var domainPartnerBankAccount = Domain.Partners.Entities.PartnerBankAccount.Reconstitute(
+        var domainPartnerBankAccount = PartnerBankAccount.Reconstitute(
             id: partnerBankAccount.Id,
-            partnerId: partnerBankAccount.PartnerId,
             bankAccount: partnerBankAccount.BankAccount.ToDomain(),
             isDefault: partnerBankAccount.IsDefault
         );
@@ -124,22 +125,21 @@ public static class PartnersMappingExtensions
 
     /// <summary>
     /// Converts a <see cref="Models.PartnerContact"/> model to its corresponding domain <see
-    /// cref="Domain.Partners.Entities.PartnerContact"/> entity.
+    /// cref="PartnerContact"/> entity.
     /// </summary>
     /// <param name="partnerContact">The partner contact model to convert. Cannot be <see langword="null"/>.</param>
-    /// <returns>A <see cref="Domain.Partners.Entities.PartnerContact"/> entity representing the provided model.</returns>
+    /// <returns>A <see cref="PartnerContact"/> entity representing the provided model.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="partnerContact"/> is <see langword="null"/>.</exception>
-    public static Domain.Partners.Entities.PartnerContact ToDomain(this Models.PartnerContact partnerContact)
+    public static PartnerContact ToDomain(this Models.PartnerContact partnerContact)
     {
         if (partnerContact == null)
         {
             throw new ArgumentNullException(nameof(partnerContact));
         }
-        var domainPartnerContact = Domain.Partners.Entities.PartnerContact.Reconstitute(
+        var domainPartnerContact = PartnerContact.Reconstitute(
             id: partnerContact.Id,
-            partnerId: partnerContact.PartnerId,
-            name: new Domain.SharedKernel.ValueObjects.PersonName(partnerContact.FirstName, partnerContact.LastName),
-            email: new Domain.SharedKernel.ValueObjects.Email(partnerContact.Email),
+            name: new PersonName(partnerContact.FirstName, partnerContact.LastName),
+            email: new Email(partnerContact.Email),
             phone: partnerContact.Phone,
             mobile: partnerContact.Mobile,
             title: partnerContact.Title,
@@ -157,26 +157,26 @@ public static class PartnersMappingExtensions
     /// <param name="partner">The partner model to convert. Cannot be null.</param>
     /// <returns>A domain partner entity that represents the specified model partner.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="partner"/> is null.</exception>
-    public static Domain.Partners.Entities.Partner ToDomain(this Models.Partner partner)
+    public static Partner ToDomain(this Models.Partner partner)
     {
         if (partner == null)
         {
             throw new ArgumentNullException(nameof(partner));
         }
-        var domainPartner = Domain.Partners.Entities.Partner.Reconstitute(
+        var domainPartner = Partner.Reconstitute(
             id: partner.Id,
             individualName: partner.IsNaturalPerson && partner.IndividualFirstName != null && partner.IndividualLastName != null
-                ? new Domain.SharedKernel.ValueObjects.PersonName(partner.IndividualFirstName, partner.IndividualLastName)
+                ? new PersonName(partner.IndividualFirstName, partner.IndividualLastName)
                 : null,
             companyName: partner.IsNaturalPerson ? null : partner.CompanyName,
             isNaturalPerson: partner.IsNaturalPerson,
             isActive: partner.IsActive,
             displayName: partner.DisplayName,
-            mainAddress: partner.HQAddress?.ToDomain(),
-            identifiers: partner.Identifiers?.Select(i => i.ToDomain()).ToList() ?? new List<Domain.Partners.Entities.PartnerIdentifier>(),
-            roles: partner.Roles?.Select(r => r.ToDomain()).ToList() ?? new List<Domain.Partners.Entities.PartnerRoleType>(),
-            bankAccounts: partner.BankAccounts?.Select(b => b.ToDomain()).ToList() ?? new List<Domain.Partners.Entities.PartnerBankAccount>(),
-            contacts: partner.Contacts?.Select(c => c.ToDomain()).ToList() ?? new List<Domain.Partners.Entities.PartnerContact>()
+            hqAddress: partner.HQAddress?.ToDomain(),
+            identifiers: partner.Identifiers?.Select(i => i.ToDomain()).ToList() ?? new List<PartnerIdentifier>(),
+            roles: partner.Roles?.Select(r => r.ToDomain()).ToList() ?? new List<PartnerRoleType>(),
+            bankAccounts: partner.BankAccounts?.Select(b => b.ToDomain()).ToList() ?? new List<PartnerBankAccount>(),
+            contacts: partner.Contacts?.Select(c => c.ToDomain()).ToList() ?? new List<PartnerContact>()
         );
         return domainPartner;
     }
@@ -191,7 +191,7 @@ public static class PartnersMappingExtensions
     /// <param name="partnerRoleType">The domain partner role type entity to convert. Cannot be null.</param>
     /// <returns>A <see cref="Models.PartnerRoleType"/> instance containing the mapped values from the specified domain entity.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="partnerRoleType"/> is null.</exception>
-    public static Models.PartnerRoleType ToModel(this Domain.Partners.Entities.PartnerRoleType partnerRoleType)
+    public static Models.PartnerRoleType ToModel(this PartnerRoleType partnerRoleType)
     {
         if (partnerRoleType == null)
         {
@@ -208,13 +208,13 @@ public static class PartnersMappingExtensions
     }
 
     /// <summary>
-    /// Converts an <see cref="Domain.SharedKernel.ValueObjects.Address"/> instance to its corresponding <see
+    /// Converts an <see cref="Address"/> instance to its corresponding <see
     /// cref="ValueObjectRecords.AddressRecord"/> model representation.
     /// </summary>
     /// <param name="address">The address value object to convert. Cannot be null.</param>
     /// <returns>An <see cref="ValueObjectRecords.AddressRecord"/> containing the data from the specified address.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="address"/> is null.</exception>
-    public static ValueObjectRecords.AddressRecord ToModel(this Domain.SharedKernel.ValueObjects.Address address)
+    public static ValueObjectRecords.AddressRecord ToModel(this Address address)
     {
         if (address == null)
         {
@@ -236,13 +236,13 @@ public static class PartnersMappingExtensions
     }
 
     /// <summary>
-    /// Converts a <see cref="Domain.SharedKernel.ValueObjects.BankAccount"/> instance to its corresponding <see
+    /// Converts a <see cref="BankAccount"/> instance to its corresponding <see
     /// cref="ValueObjectRecords.BankAccountRecord"/> model representation.
     /// </summary>
     /// <param name="bankAccount">The bank account value object to convert. Cannot be <see langword="null"/>.</param>
     /// <returns>A <see cref="ValueObjectRecords.BankAccountRecord"/> that represents the specified bank account.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="bankAccount"/> is <see langword="null"/>.</exception>
-    public static ValueObjectRecords.BankAccountRecord ToModel(this Domain.SharedKernel.ValueObjects.BankAccount bankAccount)
+    public static ValueObjectRecords.BankAccountRecord ToModel(this BankAccount bankAccount)
     {
         if (bankAccount == null)
         {
@@ -263,7 +263,7 @@ public static class PartnersMappingExtensions
     /// <param name="partnerIdentifier">The domain partner identifier to convert. Cannot be null.</param>
     /// <returns>A <see cref="Models.PartnerIdentifier"/> instance containing the mapped values from the specified domain entity.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="partnerIdentifier"/> is null.</exception>
-    public static Models.PartnerIdentifier ToModel(this Domain.Partners.Entities.PartnerIdentifier partnerIdentifier)
+    public static Models.PartnerIdentifier ToModel(this PartnerIdentifier partnerIdentifier)
     {
         if (partnerIdentifier == null)
         {
@@ -272,11 +272,10 @@ public static class PartnersMappingExtensions
         var modelPartnerIdentifier = new Models.PartnerIdentifier
         {
             Id = partnerIdentifier.Id,
-            PartnerId = partnerIdentifier.PartnerId,
             Type = partnerIdentifier.Type,
             Value = partnerIdentifier.Value,
-            ValidityStart = partnerIdentifier.ValidityPeriod.Start,
-            ValidityEnd = partnerIdentifier.ValidityPeriod.End,
+            ValidityStart = partnerIdentifier.ValidityPeriod! != null! ? partnerIdentifier.ValidityPeriod.Start : null,
+            ValidityEnd = partnerIdentifier.ValidityPeriod! != null! ? partnerIdentifier.ValidityPeriod.End : null,
             IsPrimary = partnerIdentifier.IsPrimary
         };
         return modelPartnerIdentifier;
@@ -288,7 +287,7 @@ public static class PartnersMappingExtensions
     /// <param name="partnerBankAccount">The domain partner bank account entity to convert. Cannot be null.</param>
     /// <returns>A <see cref="Models.PartnerBankAccount"/> instance containing the mapped data from the specified domain entity.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="partnerBankAccount"/> is null.</exception>
-    public static Models.PartnerBankAccount ToModel(this Domain.Partners.Entities.PartnerBankAccount partnerBankAccount)
+    public static Models.PartnerBankAccount ToModel(this PartnerBankAccount partnerBankAccount)
     {
         if (partnerBankAccount == null)
         {
@@ -297,7 +296,6 @@ public static class PartnersMappingExtensions
         var modelPartnerBankAccount = new Models.PartnerBankAccount
         {
             Id = partnerBankAccount.Id,
-            PartnerId = partnerBankAccount.PartnerId,
             BankAccount = partnerBankAccount.BankAccount.ToModel(),
             IsDefault = partnerBankAccount.IsDefault
         };
@@ -310,7 +308,7 @@ public static class PartnersMappingExtensions
     /// <param name="partnerContact">The domain partner contact entity to convert. Cannot be null.</param>
     /// <returns>A <see cref="Models.PartnerContact"/> instance containing the mapped data from the specified domain entity.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="partnerContact"/> is null.</exception>
-    public static Models.PartnerContact ToModel(this Domain.Partners.Entities.PartnerContact partnerContact)
+    public static Models.PartnerContact ToModel(this PartnerContact partnerContact)
     {
         if (partnerContact == null)
         {
@@ -319,7 +317,6 @@ public static class PartnersMappingExtensions
         var modelPartnerContact = new Models.PartnerContact
         {
             Id = partnerContact.Id,
-            PartnerId = partnerContact.PartnerId,
             FirstName = partnerContact.Name.FirstName,
             LastName = partnerContact.Name.LastName,
             Email = partnerContact.Email?.Value,
@@ -342,7 +339,7 @@ public static class PartnersMappingExtensions
     /// <param name="partner">The domain partner entity to convert. Cannot be null.</param>
     /// <returns>A <see cref="Models.Partner"/> instance containing the mapped data from the specified domain partner entity.</returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="partner"/> is null.</exception>
-    public static Models.Partner ToModel(this Domain.Partners.Entities.Partner partner)
+    public static Models.Partner ToModel(this Partner partner)
     {
         if (partner == null)
         {

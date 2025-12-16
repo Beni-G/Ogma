@@ -10,7 +10,6 @@ public class PartnerContactTests
     public void Create_ValidParamteres_SetsPropertiesCorrectly()
     {
         // Arrange
-        long partnerId = 1;
         PersonName name = new PersonName("John", "Doe");
         var email = new Email("abc@mail.com");
         string phone = "1234567890";
@@ -20,7 +19,6 @@ public class PartnerContactTests
         bool isPrimary = true;
         // Act
         var contact = PartnerContact.Create(
-            partnerId,
             name,
             email,
             phone,
@@ -42,12 +40,9 @@ public class PartnerContactTests
     public void Create_NullOptionalParameters_SetsPropertiesCorrectly()
     {
         // Arrange
-        long partnerId = 1;
         PersonName name = new PersonName("John", "Doe");
         // Act
-        var contact = PartnerContact.Create(
-            partnerId,
-            name);
+        var contact = PartnerContact.Create(name);
         // Assert
         contact.Name.Should().BeEquivalentTo(name);
         contact.Email.Should().BeNull();
@@ -58,22 +53,11 @@ public class PartnerContactTests
         contact.IsPrimary.Should().BeFalse();
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    public void Create_InvalidPartnerId_ThrowsArgumentException(long invalidPartnerId)
-    {
-        // Arrange
-        PersonName name = new PersonName("John", "Doe");
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => PartnerContact.Create(invalidPartnerId, name));
-    }
-
     [Fact]
     public void Create_NullName_ThrowsArgumentNullException()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => PartnerContact.Create(1L, null));
+        Assert.Throws<ArgumentNullException>(() => PartnerContact.Create(null!));
     }
 
     [Fact]
@@ -81,7 +65,6 @@ public class PartnerContactTests
     {
         // Arrange
         long id = 10;
-        long partnerId = 1;
         PersonName name = new PersonName("John", "Doe");
         var email = new Email("abc@mail.com");
         string phone = "1234567890";
@@ -92,7 +75,6 @@ public class PartnerContactTests
         // Act
         var contact = PartnerContact.Reconstitute(
             id,
-            partnerId,
             name,
             email,
             phone,
@@ -116,12 +98,10 @@ public class PartnerContactTests
     {
         // Arrange
         long id = 10;
-        long partnerId = 1;
         PersonName name = new PersonName("John", "Doe");
         // Act
         var contact = PartnerContact.Reconstitute(
             id,
-            partnerId,
             name);
         // Assert
         contact.Id.Should().Be(id);
@@ -143,33 +123,21 @@ public class PartnerContactTests
         long partnerId = 1;
         PersonName name = new PersonName("John", "Doe");
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => PartnerContact.Reconstitute(invalidId, partnerId, name));
-    }
-
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    public void Reconstitute_InvalidPartnerId_ThrowsArgumentException(long invalidPartnerId)
-    {
-        // Arrange
-        long id = 10;
-        PersonName name = new PersonName("John", "Doe");
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => PartnerContact.Reconstitute(id, invalidPartnerId, name));
+        Assert.Throws<ArgumentException>(() => PartnerContact.Reconstitute(invalidId, name));
     }
 
     [Fact]
     public void Reconstitute_NullName_ThrowsArgumentNullException()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => PartnerContact.Reconstitute(1L, 1L, null));
+        Assert.Throws<ArgumentNullException>(() => PartnerContact.Reconstitute(1L, null));
     }
 
     [Fact]
     public void UpdateDetails_ValidParameters_UpdatesPropertiesCorrectly()
     {
         // Arrange
-        var contact = PartnerContact.Create(1L, new PersonName("John", "Doe"));
+        var contact = PartnerContact.Create(new PersonName("John", "Doe"));
         var newName = new PersonName("Jane", "Smith");
         var newEmail = new Email("abc@mail.com");
         string newPhone = "1234567890";
@@ -201,7 +169,6 @@ public class PartnerContactTests
     {
         // Arrange
         var contact = PartnerContact.Create(
-            1L,
             new PersonName("John", "Doe"),
             new Email("abc@mail.com"),
             "1234567890",
@@ -226,7 +193,7 @@ public class PartnerContactTests
     public void UpdateDetails_NullName_ThrowsArgumentNullException()
     {
         // Arrange
-        var contact = PartnerContact.Create(1L, new PersonName("John", "Doe"));
+        var contact = PartnerContact.Create(new PersonName("John", "Doe"));
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => contact.UpdateContactDetails(null));
     }

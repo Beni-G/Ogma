@@ -10,13 +10,11 @@ public class PartnerBankAccountTests
     public void Create_ValidParameters_SetsPropertiesCorrectly()
     {
         // Arrange
-        var partnerId = 1L;
         var bankAccount = new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX");
         var isDefault = true;
         // Act
-        var partnerBankAccount = PartnerBankAccount.Create(partnerId, bankAccount, isDefault);
+        var partnerBankAccount = PartnerBankAccount.Create(bankAccount, isDefault);
         // Assert
-        partnerBankAccount.PartnerId.Should().Be(partnerId);
         partnerBankAccount.BankAccount.Should().Be(bankAccount);
         partnerBankAccount.IsDefault.Should().BeTrue();
     }
@@ -25,32 +23,19 @@ public class PartnerBankAccountTests
     public void Create__OptionalParameters_SetsPropertiesCorrectly()
     {
         // Arrange
-        var partnerId = 1L;
         var bankAccount = new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX");
         // Act
-        var partnerBankAccount = PartnerBankAccount.Create(partnerId, bankAccount);
+        var partnerBankAccount = PartnerBankAccount.Create(bankAccount);
         // Assert
-        partnerBankAccount.PartnerId.Should().Be(partnerId);
         partnerBankAccount.BankAccount.Should().Be(bankAccount);
         partnerBankAccount.IsDefault.Should().BeFalse();
-    }
-
-    [Theory]
-    [InlineData(0L)]
-    [InlineData(-1L)]
-    public void Create_InvalidPartnerId_ThrowsArgumentException(long invalidPartnerId)
-    {
-        // Arrange
-        var bankAccount = new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX");
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => PartnerBankAccount.Create(invalidPartnerId, bankAccount));
     }
 
     [Fact]
     public void Create_NullBankAccount_ThrowsArgumentNullException()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => PartnerBankAccount.Create(1L, null!));
+        Assert.Throws<ArgumentNullException>(() => PartnerBankAccount.Create(null!));
     }
 
     [Fact]
@@ -58,14 +43,12 @@ public class PartnerBankAccountTests
     {
         // Arrange
         var id = 10L;
-        var partnerId = 1L;
         var bankAccount = new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX");
         var isDefault = true;
         // Act
-        var partnerBankAccount = PartnerBankAccount.Reconstitute(id, partnerId, bankAccount, isDefault);
+        var partnerBankAccount = PartnerBankAccount.Reconstitute(id, bankAccount, isDefault);
         // Assert
         partnerBankAccount.Id.Should().Be(id);
-        partnerBankAccount.PartnerId.Should().Be(partnerId);
         partnerBankAccount.BankAccount.Should().Be(bankAccount);
         partnerBankAccount.IsDefault.Should().BeTrue();
     }
@@ -75,13 +58,11 @@ public class PartnerBankAccountTests
     {
         // Arrange
         var id = 10L;
-        var partnerId = 1L;
         var bankAccount = new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX");
         // Act
-        var partnerBankAccount = PartnerBankAccount.Reconstitute(id, partnerId, bankAccount);
+        var partnerBankAccount = PartnerBankAccount.Reconstitute(id, bankAccount);
         // Assert
         partnerBankAccount.Id.Should().Be(id);
-        partnerBankAccount.PartnerId.Should().Be(partnerId);
         partnerBankAccount.BankAccount.Should().Be(bankAccount);
         partnerBankAccount.IsDefault.Should().BeFalse();
     }
@@ -92,22 +73,9 @@ public class PartnerBankAccountTests
     public void Reconstitute_InvalidId_ThrowsArgumentException(long invalidId)
     {
         // Arrange
-        var partnerId = 1L;
         var bankAccount = new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX");
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => PartnerBankAccount.Reconstitute(invalidId, partnerId, bankAccount));
-    }
-
-    [Theory]
-    [InlineData(0L)]
-    [InlineData(-1L)]
-    public void Reconstitute_InvalidPartnerId_ThrowsArgumentException(long invalidPartnerId)
-    {
-        // Arrange
-        var id = 10L;
-        var bankAccount = new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX");
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => PartnerBankAccount.Reconstitute(id, invalidPartnerId, bankAccount));
+        Assert.Throws<ArgumentException>(() => PartnerBankAccount.Reconstitute(invalidId, bankAccount));
     }
 
     [Fact]
@@ -115,16 +83,15 @@ public class PartnerBankAccountTests
     {
         // Arrange
         var id = 10L;
-        var partnerId = 1L;
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => PartnerBankAccount.Reconstitute(id, partnerId, null!));
+        Assert.Throws<ArgumentNullException>(() => PartnerBankAccount.Reconstitute(id, null!));
     }
 
     [Fact]
     public void UpdateBankAccount_ValidParameters_UpdatesPropertiesCorrectly()
     {
         // Arrange
-        var partnerBankAccount = PartnerBankAccount.Create(1L, new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX"));
+        var partnerBankAccount = PartnerBankAccount.Create(new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX"));
         var newBankAccount = new BankAccount("New Bank", "DE89370400440532013000", "usd", "NEWBDEFFXXX");
         var isDefault = true;
         // Act
@@ -138,7 +105,7 @@ public class PartnerBankAccountTests
     public void UpdateBankAccount_NullBankAccount_ThrowsArgumentNullException()
     {
         // Arrange
-        var partnerBankAccount = PartnerBankAccount.Create(1L, new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX"));
+        var partnerBankAccount = PartnerBankAccount.Create(new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX"));
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => partnerBankAccount.UpdateBankAccount(null!, true));
     }

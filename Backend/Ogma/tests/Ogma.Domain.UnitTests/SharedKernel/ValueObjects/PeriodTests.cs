@@ -9,8 +9,8 @@ public class PeriodTests
     public void Constructor_ValidParameters_SetsPropertiesCorrectly()
     {
         // Arrange
-        var start = new DateTime(2020, 1, 1);
-        var end = new DateTime(2030, 12, 31);
+        var start = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var end = new DateTime(2030, 12, 31, 0, 0, 0, DateTimeKind.Utc);
         // Act
         var period = new Period(start, end);
         // Assert
@@ -22,7 +22,7 @@ public class PeriodTests
     public void Constructor_NullOptionalParameters_SetsPropertiesCorrectly()
     {
         // Arrange
-        var start = new DateTime(2020, 1, 1);
+        var start = new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         // Act
         var period = new Period(start);
         // Assert

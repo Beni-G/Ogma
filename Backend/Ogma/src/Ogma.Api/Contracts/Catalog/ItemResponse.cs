@@ -1,4 +1,5 @@
-﻿using Ogma.Application.Catalog.Dtos;
+﻿using Ogma.Api.Contracts.SharedKernel;
+using Ogma.Application.Catalog.Dtos;
 
 namespace Ogma.Api.Contracts.Catalog;
 

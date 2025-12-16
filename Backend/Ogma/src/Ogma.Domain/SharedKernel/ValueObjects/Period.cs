@@ -9,18 +9,20 @@ public sealed class Period : ValueObject
 
     public Period(DateTime start, DateTime? end = null)
     {
-        if (start == DateTime.MinValue)
+        DateTime utcStart = start.ToUniversalTime();
+        DateTime? utcEnd = end?.ToUniversalTime();
+
+        if (utcStart == DateTime.MinValue)
         {
             throw new ArgumentException("Start date cannot be DateTime.MinValue.", nameof(start));
         }
 
-        if (end < start)
+        if (utcEnd < utcStart)
         {
             throw new ArgumentException("End date cannot be earlier than start date.", nameof(end));
         }
-
-        Start = start;
-        End = end;
+        Start = utcStart;
+        End = utcEnd;
     }
 
     public bool Contains(DateTime date) => date >= Start && (End == null || date <= End);

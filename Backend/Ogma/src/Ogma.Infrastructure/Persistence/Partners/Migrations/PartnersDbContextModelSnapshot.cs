@@ -144,7 +144,7 @@ namespace Ogma.Infrastructure.Persistence.Partners.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("validity_end");
 
-                    b.Property<DateTime>("ValidityStart")
+                    b.Property<DateTime?>("ValidityStart")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("validity_start");
 
@@ -336,8 +336,7 @@ namespace Ogma.Infrastructure.Persistence.Partners.Migrations
 
                     b.Navigation("BankAccounts");
 
-                    b.Navigation("HQAddress")
-                        .IsRequired();
+                    b.Navigation("HQAddress");
                 });
 
             modelBuilder.Entity("Ogma.Infrastructure.Persistence.Partners.Models.PartnerContact", b =>
