@@ -46,7 +46,7 @@ public class CategoryController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<CategoryWithDescendantsResponse>> CreateCategory(CreateCategoryRequest request)
+    public async Task<ActionResult<CategoryWithDescendantsResponse>> Create(CreateCategoryRequest request)
     {
         var command = new CreateCategoryCommand(request.Name, request.ParentCategoryId);
         var created = await _mediator.Send(command);
@@ -54,7 +54,7 @@ public class CategoryController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<CategoryWithDescendantsResponse>> UpdateCategory(long id, UpdateCategoryRequest request)
+    public async Task<ActionResult<CategoryWithDescendantsResponse>> Update(long id, UpdateCategoryRequest request)
     {
         if (id != request.Id)
         {
@@ -68,7 +68,7 @@ public class CategoryController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteItemType(long id)
+    public async Task<IActionResult> Delete(long id)
     {
         await _mediator.Send(new DeleteCategoryCommand(id));
         return NoContent();

@@ -1,4 +1,6 @@
-﻿namespace Ogma.Api.Contracts.Catalog;
+﻿using Ogma.Api.Contracts.SharedKernel;
+
+namespace Ogma.Api.Contracts.Catalog;
 
 public record UpdateItemRequest(long Id,
     string Name,

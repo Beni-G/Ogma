@@ -11,7 +11,7 @@ public class Partner
     public bool IsNaturalPerson { get; set; } = false;
     public bool IsActive { get; set; }
     public string? DisplayName { get; set; }
-    public AddressRecord HQAddress { get; set; }
+    public AddressRecord? HQAddress { get; set; }
     public List<PartnerRoleType> Roles { get; set; } = new();
     public List<PartnerIdentifier> Identifiers { get; set; } = new();
     public List<PartnerBankAccount> BankAccounts { get; set; } = new();

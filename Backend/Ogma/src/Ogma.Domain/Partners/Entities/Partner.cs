@@ -31,7 +31,7 @@ public class Partner : AggregateRoot<long>
     /// <param name="partnerRole">The role to assign to the Partner. Cannot be null.</param>
     /// <returns>A Partner object representing the individual, initialized with the specified name, primary identifier, and role.</returns>
     /// <exception cref="ArgumentNullException">Thrown if individualName, primaryIdentifier, or partnerRole is null.</exception>
-    public static Partner CreateIndividual(PersonName individualName, PartnerIdentifier primaryIdentifier, PartnerRoleType partnerRole)
+    public static Partner CreateIndividual(PersonName individualName, PartnerIdentifier primaryIdentifier, PartnerRoleType partnerRole, Address? hqAddress = null)
     {
         if (individualName == null)
         {
@@ -58,6 +58,7 @@ public class Partner : AggregateRoot<long>
         partner.ReplaceIdentifiers(identifiers);
         var roles = new List<PartnerRoleType> { partnerRole };
         partner.ReplaceRoles(roles);
+        partner.HQAddress = hqAddress;
         return partner;
     }
 
@@ -71,7 +72,7 @@ public class Partner : AggregateRoot<long>
     /// role.</returns>
     /// <exception cref="ArgumentException">Thrown if the name is null, empty, or consists only of white-space characters.</exception>
     /// <exception cref="ArgumentNullException">Thrown if primaryIdentifier or partnerRole is null.</exception>
-    public static Partner CreateLegalEntity(string name, PartnerIdentifier primaryIdentifier, PartnerRoleType partnerRole)
+    public static Partner CreateLegalEntity(string name, PartnerIdentifier primaryIdentifier, PartnerRoleType partnerRole, Address? hqAddress = null)
     {
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -97,6 +98,7 @@ public class Partner : AggregateRoot<long>
         partner.ReplaceIdentifiers(identifiers);
         var roles = new List<PartnerRoleType> { partnerRole };
         partner.ReplaceRoles(roles);
+        partner.HQAddress = hqAddress;
         return partner;
     }
 
@@ -114,7 +116,7 @@ public class Partner : AggregateRoot<long>
     /// name="individualName"/> is provided; otherwise, <see langword="false"/>.</param>
     /// <param name="isActive">Indicates whether the partner is currently active.</param>
     /// <param name="displayName">An optional display name for the partner, used for presentation purposes.</param>
-    /// <param name="mainAddress">The main address associated with the partner, or null if not specified.</param>
+    /// <param name="hqAddress">The main address associated with the partner, or null if not specified.</param>
     /// <param name="identifiers">A collection of identifiers that uniquely identify the partner. Must contain at least one element and cannot be
     /// null.</param>
     /// <param name="roles">A collection of roles assigned to the partner. Must contain at least one element and cannot be null.</param>
@@ -131,7 +133,7 @@ public class Partner : AggregateRoot<long>
         bool isNaturalPerson,
         bool isActive,
         string? displayName,
-        Address? mainAddress,
+        Address? hqAddress,
         IReadOnlyCollection<PartnerIdentifier> identifiers,
         IReadOnlyCollection<PartnerRoleType> roles,
         IReadOnlyCollection<PartnerBankAccount> bankAccounts,
@@ -158,7 +160,7 @@ public class Partner : AggregateRoot<long>
             IsNaturalPerson = isNaturalPerson,
             IsActive = isActive,
             DisplayName = displayName,
-            HQAddress = mainAddress
+            HQAddress = hqAddress
         };
 
         partner.ReplaceIdentifiers(identifiers);
@@ -181,7 +183,7 @@ public class Partner : AggregateRoot<long>
     /// <param name="isActive">A value indicating whether the partner is active. If the value differs from the current state, the partner's
     /// active status is updated.</param>
     /// <param name="displayName">The display name for the partner. If not null, updates the partner's display name.</param>
-    /// <param name="mainAddress">The main address of the partner. If not null, updates the partner's main address.</param>
+    /// <param name="hqAddress">The main address of the partner. If not null, updates the partner's main address.</param>
     /// <param name="identifiers">A collection of identifiers associated with the partner. Must contain at least one identifier. Cannot be null.</param>
     /// <param name="roles">A collection of roles assigned to the partner. Must contain at least one role. Cannot be null.</param>
     /// <param name="bankAccounts">A collection of bank accounts associated with the partner. Cannot be null.</param>
@@ -194,7 +196,7 @@ public class Partner : AggregateRoot<long>
         bool isNaturalPerson,
         bool isActive,
         string? displayName,
-        Address? mainAddress,
+        Address? hqAddress,
         IReadOnlyCollection<PartnerIdentifier> identifiers,
         IReadOnlyCollection<PartnerRoleType> roles,
         IReadOnlyCollection<PartnerBankAccount> bankAccounts,
@@ -219,9 +221,9 @@ public class Partner : AggregateRoot<long>
             UpdateDisplayName(displayName);
         }
 
-        if (mainAddress != null)
+        if (hqAddress! != null!)
         {
-            UpdateMainAddress(mainAddress);
+            UpdateHQAddress(hqAddress);
         }
 
         ReplaceIdentifiers(identifiers);
@@ -352,11 +354,11 @@ public class Partner : AggregateRoot<long>
         _contacts.ReplaceWith(contacts ?? throw new ArgumentNullException());
 
     /// <summary>
-    /// Updates the main address of the partner.
+    /// Updates the headquarters address to the specified value.
     /// </summary>
-    /// <param name="newAddress"></param>
-    /// <exception cref="ArgumentNullException"></exception>
-    private void UpdateMainAddress(Address newAddress)
+    /// <param name="newAddress">The new address to assign as the headquarters address. Cannot be null.</param>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="newAddress"/> is null.</exception>
+    private void UpdateHQAddress(Address newAddress)
     {
         if (newAddress == null)
         {

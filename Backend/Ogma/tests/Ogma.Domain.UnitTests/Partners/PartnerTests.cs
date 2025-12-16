@@ -16,7 +16,7 @@ public class PartnerTests
     {
         // Arrange
         var individualName = new PersonName("Jane", "Doe");
-        var partnerIdentifier = PartnerIdentifier.Create(1L, "SSN", "123-45-6789");
+        var partnerIdentifier = PartnerIdentifier.Create("SSN", "123-45-6789");
         var partnerRole = PartnerRoleType.Create("Customer", "Customer");
         // Act
         var partner = Partner.CreateIndividual(individualName, partnerIdentifier, partnerRole);
@@ -33,7 +33,7 @@ public class PartnerTests
     public void CreateIndividual_NullName_ThrowsArgumentNullException()
     {
         // Arrange
-        var partnerIdentifier = PartnerIdentifier.Create(1L, "SSN", "123-45-6789");
+        var partnerIdentifier = PartnerIdentifier.Create("SSN", "123-45-6789");
         var partnerRole = PartnerRoleType.Create("Customer", "Customer");
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => Partner.CreateIndividual(null!, partnerIdentifier, partnerRole));
@@ -54,7 +54,7 @@ public class PartnerTests
     {
         // Arrange
         var individualName = new PersonName("Jane", "Doe");
-        var partnerIdentifier = PartnerIdentifier.Create(1L, "SSN", "123-45-6789");
+        var partnerIdentifier = PartnerIdentifier.Create("SSN", "123-45-6789");
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => Partner.CreateIndividual(individualName, partnerIdentifier, null!));
     }
@@ -64,7 +64,7 @@ public class PartnerTests
     {
         // Arrange
         var companyName = "Acme Corp";
-        var partnerIdentifier = PartnerIdentifier.Create(1L, "EIN", "12-3456789");
+        var partnerIdentifier = PartnerIdentifier.Create("EIN", "12-3456789");
         var partnerRole = PartnerRoleType.Create("Supplier", "Supplier");
         // Act
         var partner = Partner.CreateLegalEntity(companyName, partnerIdentifier, partnerRole);
@@ -84,7 +84,7 @@ public class PartnerTests
     public void CreateCompany_InvalidName_ThrowsArgumentException(string invalidName)
     {
         // Arrange
-        var partnerIdentifier = PartnerIdentifier.Create(1L, "EIN", "12-3456789");
+        var partnerIdentifier = PartnerIdentifier.Create("EIN", "12-3456789");
         var partnerRole = PartnerRoleType.Create("Supplier", "Supplier");
         // Act & Assert
         Assert.Throws<ArgumentException>(() => Partner.CreateLegalEntity(invalidName!, partnerIdentifier, partnerRole));
@@ -105,7 +105,7 @@ public class PartnerTests
     {
         // Arrange
         var companyName = "Acme Corp";
-        var partnerIdentifier = PartnerIdentifier.Create(1L, "EIN", "12-3456789");
+        var partnerIdentifier = PartnerIdentifier.Create("EIN", "12-3456789");
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => Partner.CreateLegalEntity(companyName, partnerIdentifier, null!));
     }
@@ -123,7 +123,7 @@ public class PartnerTests
         Address? mainAddress = null;
         var identifiers = new List<PartnerIdentifier>
         {
-            PartnerIdentifier.Create(1L, "SSN", "987-65-4321", isPrimary: true)
+            PartnerIdentifier.Create("SSN", "987-65-4321", isPrimary: true)
         };
         var roles = new List<PartnerRoleType>
         {
@@ -161,7 +161,7 @@ public class PartnerTests
         Address? mainAddress = null;
         var identifiers = new List<PartnerIdentifier>
         {
-            PartnerIdentifier.Create(1L, "SSN", "987-65-4321", isPrimary: true)
+            PartnerIdentifier.Create("SSN", "987-65-4321", isPrimary: true)
         };
         var roles = new List<PartnerRoleType>
         {
@@ -186,7 +186,7 @@ public class PartnerTests
         Address? mainAddress = null;
         var identifiers = new List<PartnerIdentifier>
         {
-            PartnerIdentifier.Create(1L, "SSN", "987-65-4321", isPrimary: true)
+            PartnerIdentifier.Create("SSN", "987-65-4321", isPrimary: true)
         };
         var roles = new List<PartnerRoleType>
         {
@@ -209,7 +209,7 @@ public class PartnerTests
         Address? mainAddress = null;
         var identifiers = new List<PartnerIdentifier>
         {
-            PartnerIdentifier.Create(1L, "SSN", "987-65-4321", isPrimary: true)
+            PartnerIdentifier.Create("SSN", "987-65-4321", isPrimary: true)
         };
         var roles = new List<PartnerRoleType>
         {
@@ -234,7 +234,7 @@ public class PartnerTests
         Address? mainAddress = null;
         var identifiers = new List<PartnerIdentifier>
         {
-            PartnerIdentifier.Create(1L, "SSN", "987-65-4321", isPrimary: true)
+            PartnerIdentifier.Create("SSN", "987-65-4321", isPrimary: true)
         };
         var roles = new List<PartnerRoleType>
         {
@@ -259,7 +259,7 @@ public class PartnerTests
         Address? mainAddress = null;
         var identifiers = new List<PartnerIdentifier>
         {
-            PartnerIdentifier.Create(1L, "EIN", "12-3456789", isPrimary: true)
+            PartnerIdentifier.Create("EIN", "12-3456789", isPrimary: true)
         };
         var roles = new List<PartnerRoleType>
         {
@@ -327,7 +327,7 @@ public class PartnerTests
         Address? mainAddress = null;
         var identifiers = new List<PartnerIdentifier>
         {
-            PartnerIdentifier.Create(1L, "SSN", "987-65-4321", isPrimary: true)
+            PartnerIdentifier.Create("SSN", "987-65-4321", isPrimary: true)
         };
         var bankAccounts = new List<PartnerBankAccount>();
         var contacts = new List<PartnerContact>();
@@ -348,7 +348,7 @@ public class PartnerTests
         Address? mainAddress = null;
         var identifiers = new List<PartnerIdentifier>
         {
-            PartnerIdentifier.Create(1L, "SSN", "987-65-4321", isPrimary: true)
+            PartnerIdentifier.Create("SSN", "987-65-4321", isPrimary: true)
         };
         var roles = new List<PartnerRoleType>();
         var bankAccounts = new List<PartnerBankAccount>();
@@ -370,7 +370,7 @@ public class PartnerTests
         Address? mainAddress = null;
         var identifiers = new List<PartnerIdentifier>
         {
-            PartnerIdentifier.Create(1L, "SSN", "987-65-4321", isPrimary: true)
+            PartnerIdentifier.Create("SSN", "987-65-4321", isPrimary: true)
         };
         var roles = new List<PartnerRoleType>
         {
@@ -394,7 +394,7 @@ public class PartnerTests
         Address? mainAddress = null;
         var identifiers = new List<PartnerIdentifier>
         {
-            PartnerIdentifier.Create(1L, "SSN", "987-65-4321", isPrimary: true)
+            PartnerIdentifier.Create("SSN", "987-65-4321", isPrimary: true)
         };
         var roles = new List<PartnerRoleType>
         {
@@ -419,7 +419,7 @@ public class PartnerTests
             new Address("Second St", "123", "City", "State", "12345", "US"),
             new List<PartnerIdentifier>
             {
-                PartnerIdentifier.Create(1L, "SSN", "000-00-0000")
+                PartnerIdentifier.Create("SSN", "000-00-0000")
             },
             new List<PartnerRoleType>
             {
@@ -434,7 +434,7 @@ public class PartnerTests
         bool newIsActive = false;
         List<PartnerIdentifier> newIdentifiers = new()
         {
-            PartnerIdentifier.Create(partner.Id, "SSN", "111-11-1111", isPrimary: true)
+            PartnerIdentifier.Create("SSN", "111-11-1111", isPrimary: true)
         };
         List<PartnerRoleType> newRoles = new()
         {
@@ -443,11 +443,11 @@ public class PartnerTests
         };
         List<PartnerBankAccount> newBankAccounts = new()
         {
-            PartnerBankAccount.Create(partner.Id, new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX"))
+            PartnerBankAccount.Create(new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX"))
         };
         List<PartnerContact> newContacts = new()
         {
-            PartnerContact.Create(partner.Id, new PersonName("Jon", "Snow"))
+            PartnerContact.Create(new PersonName("Jon", "Snow"))
         };
         // Act
         partner.Update(
@@ -488,7 +488,7 @@ public class PartnerTests
             new Address("Strada Foamei", "123", "City", "State", "12345", "RO"),
             new List<PartnerIdentifier>
             {
-                PartnerIdentifier.Create(1L, "CUI", "000-00-0000")
+                PartnerIdentifier.Create("CUI", "000-00-0000")
             },
             new List<PartnerRoleType>
             {
@@ -503,7 +503,7 @@ public class PartnerTests
         bool newIsActive = false;
         List<PartnerIdentifier> newIdentifiers = new()
         {
-            PartnerIdentifier.Create(partner.Id, "CUI", "111-11-1111", isPrimary: true)
+            PartnerIdentifier.Create("CUI", "111-11-1111", isPrimary: true)
         };
         List<PartnerRoleType> newRoles = new()
         {
@@ -512,11 +512,11 @@ public class PartnerTests
         };
         List<PartnerBankAccount> newBankAccounts = new()
         {
-            PartnerBankAccount.Create(partner.Id, new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX"))
+            PartnerBankAccount.Create(new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX"))
         };
         List<PartnerContact> newContacts = new()
         {
-            PartnerContact.Create(partner.Id, new PersonName("Jon", "Snow"))
+            PartnerContact.Create(new PersonName("Jon", "Snow"))
         };
         // Act
         partner.Update(
@@ -557,7 +557,7 @@ public class PartnerTests
             null,
             new List<PartnerIdentifier>()
             {
-                PartnerIdentifier.Create(1L, "Abc", "111-11-1111", isPrimary: true)
+                PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
             new List<PartnerRoleType>()
             {
@@ -576,7 +576,7 @@ public class PartnerTests
             null,
             new List<PartnerIdentifier>()
             {
-                PartnerIdentifier.Create(1L, "Abc", "111-11-1111", isPrimary: true)
+                PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
             new List<PartnerRoleType>()
             {
@@ -604,7 +604,7 @@ public class PartnerTests
             null,
             new List<PartnerIdentifier>()
             {
-                PartnerIdentifier.Create(1L, "Abc", "111-11-1111", isPrimary: true)
+                PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
             new List<PartnerRoleType>()
             {
@@ -623,7 +623,7 @@ public class PartnerTests
             null,
             new List<PartnerIdentifier>()
             {
-                PartnerIdentifier.Create(1L, "Abc", "111-11-1111", isPrimary: true)
+                PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
             new List<PartnerRoleType>()
             {
@@ -651,7 +651,7 @@ public class PartnerTests
             null,
             new List<PartnerIdentifier>()
             {
-                PartnerIdentifier.Create(1L, "Abc", "111-11-1111", isPrimary: true)
+                PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
             new List<PartnerRoleType>()
             {
@@ -670,7 +670,7 @@ public class PartnerTests
                 null,
                 new List<PartnerIdentifier>()
                 {
-                    PartnerIdentifier.Create(1L, "Abc", "111-11-1111", isPrimary: true)
+                    PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
                 },
                 new List<PartnerRoleType>()
                 {
@@ -694,7 +694,7 @@ public class PartnerTests
             null,
             new List<PartnerIdentifier>()
             {
-                PartnerIdentifier.Create(1L, "Abc", "111-11-1111", isPrimary: true)
+                PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
             new List<PartnerRoleType>()
             {
@@ -713,7 +713,7 @@ public class PartnerTests
                 null,
                 new List<PartnerIdentifier>()
                 {
-                    PartnerIdentifier.Create(1L, "Abc", "111-11-1111", isPrimary: true)
+                    PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
                 },
                 new List<PartnerRoleType>()
                 {
@@ -737,7 +737,7 @@ public class PartnerTests
             null,
             new List<PartnerIdentifier>()
             {
-                PartnerIdentifier.Create(1L, "Abc", "111-11-1111", isPrimary: true)
+                PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
             new List<PartnerRoleType>()
             {
@@ -756,7 +756,7 @@ public class PartnerTests
                 null,
                 new List<PartnerIdentifier>()
                 {
-                    PartnerIdentifier.Create(1L, "Abc", "111-11-1111", isPrimary: true)
+                    PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
                 },
                 new List<PartnerRoleType>()
                 {
@@ -780,7 +780,7 @@ public class PartnerTests
             null,
             new List<PartnerIdentifier>()
             {
-                PartnerIdentifier.Create(1L, "Abc", "111-11-1111", isPrimary: true)
+                PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
             new List<PartnerRoleType>()
             {
@@ -799,7 +799,7 @@ public class PartnerTests
                 null,
                 new List<PartnerIdentifier>()
                 {
-                    PartnerIdentifier.Create(1L, "Abc", "111-11-1111", isPrimary: true)
+                    PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
                 },
                 new List<PartnerRoleType>()
                 {
@@ -823,7 +823,7 @@ public class PartnerTests
             null,
             new List<PartnerIdentifier>()
             {
-                PartnerIdentifier.Create(1L, "Abc", "111-11-1111", isPrimary: true)
+                PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
             new List<PartnerRoleType>()
             {
@@ -842,7 +842,7 @@ public class PartnerTests
                 null,
                 new List<PartnerIdentifier>()
                 {
-                    PartnerIdentifier.Create(1L, "Abc", "111-11-1111", isPrimary: true)
+                    PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
                 },
                 new List<PartnerRoleType>()
                 {
@@ -866,7 +866,7 @@ public class PartnerTests
             null,
             new List<PartnerIdentifier>()
             {
-                PartnerIdentifier.Create(1L, "Abc", "111-11-1111", isPrimary: true)
+                PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
             new List<PartnerRoleType>()
             {
@@ -885,7 +885,7 @@ public class PartnerTests
                 null,
                 new List<PartnerIdentifier>()
                 {
-                    PartnerIdentifier.Create(1L, "Abc", "111-11-1111", isPrimary: true)
+                    PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
                 },
                 new List<PartnerRoleType>()
                 {
@@ -909,7 +909,7 @@ public class PartnerTests
             new Address("Second St", "123", "City", "State", "12345", "US"),
             new List<PartnerIdentifier>
             {
-                PartnerIdentifier.Create(1L, "SSN", "000-00-0000")
+                PartnerIdentifier.Create("SSN", "000-00-0000")
             },
             new List<PartnerRoleType>
             {
@@ -958,7 +958,7 @@ public class PartnerTests
             new Address("Second St", "123", "City", "State", "12345", "US"),
             new List<PartnerIdentifier>
             {
-                PartnerIdentifier.Create(1L, "SSN", "000-00-0000")
+                PartnerIdentifier.Create("SSN", "000-00-0000")
             },
             new List<PartnerRoleType>
             {
@@ -973,7 +973,7 @@ public class PartnerTests
         bool newIsActive = false;
         List<PartnerIdentifier> newIdentifiers = new()
         {
-            PartnerIdentifier.Create(1L, "SSN", "000-00-0000")
+            PartnerIdentifier.Create("SSN", "000-00-0000")
         };
         List<PartnerRoleType> newRoles = new();
         List<PartnerBankAccount> newBankAccounts = new();
@@ -1006,7 +1006,7 @@ public class PartnerTests
             new Address("Second St", "123", "City", "State", "12345", "US"),
             new List<PartnerIdentifier>
             {
-                PartnerIdentifier.Create(1L, "SSN", "000-00-0000")
+                PartnerIdentifier.Create("SSN", "000-00-0000")
             },
             new List<PartnerRoleType>
             {
@@ -1050,7 +1050,7 @@ public class PartnerTests
             new Address("Second St", "123", "City", "State", "12345", "US"),
             new List<PartnerIdentifier>
             {
-                PartnerIdentifier.Create(1L, "SSN", "000-00-0000")
+                PartnerIdentifier.Create("SSN", "000-00-0000")
             },
             new List<PartnerRoleType>
             {
@@ -1094,7 +1094,7 @@ public class PartnerTests
             new Address("Second St", "123", "City", "State", "12345", "US"),
             new List<PartnerIdentifier>
             {
-                PartnerIdentifier.Create(1L, "SSN", "000-00-0000")
+                PartnerIdentifier.Create("SSN", "000-00-0000")
             },
             new List<PartnerRoleType>
             {
@@ -1138,7 +1138,7 @@ public class PartnerTests
             new Address("Second St", "123", "City", "State", "12345", "US"),
             new List<PartnerIdentifier>
             {
-                PartnerIdentifier.Create(1L, "SSN", "000-00-0000")
+                PartnerIdentifier.Create("SSN", "000-00-0000")
             },
             new List<PartnerRoleType>
             {
@@ -1188,10 +1188,10 @@ public class PartnerTests
             isNaturalPerson: isNaturalPerson,
             isActive: true,
             displayName: null,
-            mainAddress: null,
+            hqAddress: null,
             identifiers: new List<PartnerIdentifier>()
             {
-                PartnerIdentifier.Create(1L, "Abc", "111-11-1111", isPrimary: true)
+                PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
             roles: new List<PartnerRoleType>()
             {
@@ -1229,10 +1229,10 @@ public class PartnerTests
             isNaturalPerson: isNaturalPerson,
             isActive: true,
             displayName: displayName,
-            mainAddress: null,
+            hqAddress: null,
             identifiers: new List<PartnerIdentifier>()
             {
-                PartnerIdentifier.Create(1L, "Abc", "111-11-1111", isPrimary: true)
+                PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
             roles: new List<PartnerRoleType>()
             {

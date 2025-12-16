@@ -11,7 +11,7 @@ public interface IPartnerRepository
     /// <param name="id">The unique identifier of the partner to retrieve. Must be greater than zero.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the partner entity if found;
     /// otherwise, null.</returns>
-    Task<Partner?> GetByIdAsync(int id);
+    Task<Partner?> GetByIdAsync(long id);
 
     /// <summary>
     /// Asynchronously retrieves all partners from the data source.

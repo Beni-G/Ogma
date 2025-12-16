@@ -10,31 +10,17 @@ public class PartnerIdentifierTests
     public void Create_ValidParameters_SetsPropertiesCorrectly()
     {
         // Arrange
-        long partnerId = 1;
         string type = "TaxID";
         string value = "123-45-6789";
         var validityPeriod = new Period(DateTime.UtcNow, DateTime.UtcNow.AddYears(1));
         bool isPrimary = true;
         // Act
-        var partnerIdentifier = PartnerIdentifier.Create(partnerId, type, value, validityPeriod, isPrimary);
+        var partnerIdentifier = PartnerIdentifier.Create(type, value, validityPeriod, isPrimary);
         // Assert
-        partnerIdentifier.PartnerId.Should().Be(partnerId);
         partnerIdentifier.Type.Should().Be(type);
         partnerIdentifier.Value.Should().Be(value);
         partnerIdentifier.ValidityPeriod.Should().Be(validityPeriod);
         partnerIdentifier.IsPrimary.Should().Be(isPrimary);
-    }
-
-    [Theory]
-    [InlineData(0L)]
-    [InlineData(-1L)]
-    public void Create_InvalidPartnerId_ThrowsArgumentException(long invalidPartnerId)
-    {
-        // Arrange
-        string type = "TaxID";
-        string value = "123-45-6789";
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => PartnerIdentifier.Create(invalidPartnerId, type, value));
     }
 
     [Theory]
@@ -44,10 +30,9 @@ public class PartnerIdentifierTests
     public void Create_NullOrEmptyType_ThrowsArgumentException(string invalidType)
     {
         // Arrange
-        long partnerId = 1;
         string value = "123-45-6789";
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => PartnerIdentifier.Create(partnerId, invalidType, value));
+        Assert.Throws<ArgumentException>(() => PartnerIdentifier.Create(invalidType, value));
     }
 
     [Theory]
@@ -57,23 +42,20 @@ public class PartnerIdentifierTests
     public void Create_NullOrEmptyValue_ThrowsArgumentException(string invalidValue)
     {
         // Arrange
-        long partnerId = 1;
         string type = "TaxID";
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => PartnerIdentifier.Create(partnerId, type, invalidValue));
+        Assert.Throws<ArgumentException>(() => PartnerIdentifier.Create(type, invalidValue));
     }
 
     [Fact]
     public void Create_WithoutValidityPeriod_SetsPropertiesCorrectly()
     {
         // Arrange
-        long partnerId = 1;
         string type = "TaxID";
         string value = "123-45-6789";
         // Act
-        var partnerIdentifier = PartnerIdentifier.Create(partnerId, type, value);
+        var partnerIdentifier = PartnerIdentifier.Create(type, value);
         // Assert
-        partnerIdentifier.PartnerId.Should().Be(partnerId);
         partnerIdentifier.Type.Should().Be(type);
         partnerIdentifier.Value.Should().Be(value);
         partnerIdentifier.ValidityPeriod.Should().BeNull();
@@ -84,12 +66,11 @@ public class PartnerIdentifierTests
     public void Create_WithoutIsPrimary_SetsIsPrimaryToFalse()
     {
         // Arrange
-        long partnerId = 1;
         string type = "TaxID";
         string value = "123-45-6789";
         var validityPeriod = new Period(DateTime.UtcNow, DateTime.UtcNow.AddYears(1));
         // Act
-        var partnerIdentifier = PartnerIdentifier.Create(partnerId, type, value, validityPeriod);
+        var partnerIdentifier = PartnerIdentifier.Create(type, value, validityPeriod);
         // Assert
         partnerIdentifier.IsPrimary.Should().BeFalse();
     }
@@ -99,16 +80,14 @@ public class PartnerIdentifierTests
     {
         // Arrange
         long id = 1;
-        long partnerId = 1;
         string type = "TaxID";
         string value = "123-45-6789";
         var validityPeriod = new Period(DateTime.UtcNow, DateTime.UtcNow.AddYears(1));
         bool isPrimary = true;
         // Act
-        var partnerIdentifier = PartnerIdentifier.Reconstitute(id, partnerId, type, value, validityPeriod, isPrimary);
+        var partnerIdentifier = PartnerIdentifier.Reconstitute(id, type, value, validityPeriod, isPrimary);
         // Assert
         partnerIdentifier.Id.Should().Be(id);
-        partnerIdentifier.PartnerId.Should().Be(partnerId);
         partnerIdentifier.Type.Should().Be(type);
         partnerIdentifier.Value.Should().Be(value);
         partnerIdentifier.ValidityPeriod.Should().Be(validityPeriod);
@@ -121,24 +100,10 @@ public class PartnerIdentifierTests
     public void Reconstitute_InvalidId_ThrowsArgumentException(long invalidId)
     {
         // Arrange
-        long partnerId = 1;
         string type = "TaxID";
         string value = "123-45-6789";
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => PartnerIdentifier.Reconstitute(invalidId, partnerId, type, value));
-    }
-
-    [Theory]
-    [InlineData(0L)]
-    [InlineData(-1L)]
-    public void Reconstitute_InvalidPartnerId_ThrowsArgumentException(long invalidPartnerId)
-    {
-        // Arrange
-        long id = 1;
-        string type = "TaxID";
-        string value = "123-45-6789";
-        // Act & Assert
-        Assert.Throws<ArgumentException>(() => PartnerIdentifier.Reconstitute(id, invalidPartnerId, type, value));
+        Assert.Throws<ArgumentException>(() => PartnerIdentifier.Reconstitute(invalidId, type, value));
     }
 
     [Theory]
@@ -149,10 +114,9 @@ public class PartnerIdentifierTests
     {
         // Arrange
         long id = 1;
-        long partnerId = 1;
         string value = "123-45-6789";
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => PartnerIdentifier.Reconstitute(id, partnerId, invalidType, value));
+        Assert.Throws<ArgumentException>(() => PartnerIdentifier.Reconstitute(id, invalidType, value));
     }
 
     [Theory]
@@ -163,10 +127,9 @@ public class PartnerIdentifierTests
     {
         // Arrange
         long id = 1;
-        long partnerId = 1;
         string type = "TaxID";
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => PartnerIdentifier.Reconstitute(id, partnerId, type, invalidValue));
+        Assert.Throws<ArgumentException>(() => PartnerIdentifier.Reconstitute(id, type, invalidValue));
     }
 
 
@@ -175,14 +138,12 @@ public class PartnerIdentifierTests
     {
         // Arrange
         long id = 1;
-        long partnerId = 1;
         string type = "TaxID";
         string value = "123-45-6789";
         // Act
-        var partnerIdentifier = PartnerIdentifier.Reconstitute(id, partnerId, type, value);
+        var partnerIdentifier = PartnerIdentifier.Reconstitute(id, type, value);
         // Assert
         partnerIdentifier.Id.Should().Be(id);
-        partnerIdentifier.PartnerId.Should().Be(partnerId);
         partnerIdentifier.Type.Should().Be(type);
         partnerIdentifier.Value.Should().Be(value);
         partnerIdentifier.ValidityPeriod.Should().BeNull();
@@ -194,12 +155,11 @@ public class PartnerIdentifierTests
     {
         // Arrange
         long id = 1;
-        long partnerId = 1;
         string type = "TaxID";
         string value = "123-45-6789";
         var validityPeriod = new Period(DateTime.UtcNow, DateTime.UtcNow.AddYears(1));
         // Act
-        var partnerIdentifier = PartnerIdentifier.Reconstitute(id, partnerId, type, value, validityPeriod);
+        var partnerIdentifier = PartnerIdentifier.Reconstitute(id, type, value, validityPeriod);
         // Assert
         partnerIdentifier.IsPrimary.Should().BeFalse();
     }
@@ -208,7 +168,7 @@ public class PartnerIdentifierTests
     public void Update_ValidParameters_UpdatesPropertiesCorrectly()
     {
         // Arrange
-        var partnerIdentifier = PartnerIdentifier.Create(1, "TaxID", "123-45-6789");
+        var partnerIdentifier = PartnerIdentifier.Create("TaxID", "123-45-6789");
         string newType = "BusinessID";
         string newValue = "987-65-4321";
         var newValidityPeriod = new Period(DateTime.UtcNow, DateTime.UtcNow.AddYears(2));
@@ -229,7 +189,7 @@ public class PartnerIdentifierTests
     public void Update_NullOrEmptyType_ThrowsArgumentException(string invalidType)
     {
         // Arrange
-        var partnerIdentifier = PartnerIdentifier.Create(1, "TaxID", "123-45-6789");
+        var partnerIdentifier = PartnerIdentifier.Create("TaxID", "123-45-6789");
         string newValue = "987-65-4321";
         // Act & Assert
         Assert.Throws<ArgumentException>(() => partnerIdentifier.Update(invalidType, newValue));
@@ -242,7 +202,7 @@ public class PartnerIdentifierTests
     public void Update_NullOrEmptyValue_ThrowsArgumentException(string invalidValue)
     {
         // Arrange
-        var partnerIdentifier = PartnerIdentifier.Create(1, "TaxID", "123-45-6789");
+        var partnerIdentifier = PartnerIdentifier.Create("TaxID", "123-45-6789");
         string newType = "BusinessID";
         // Act & Assert
         Assert.Throws<ArgumentException>(() => partnerIdentifier.Update(newType, invalidValue));
@@ -252,7 +212,7 @@ public class PartnerIdentifierTests
     public void Update_WithoutValidityPeriod_SetsValidityPeriodToNull()
     {
         // Arrange
-        var partnerIdentifier = PartnerIdentifier.Create(1, "TaxID", "123-45-6789", new Period(DateTime.UtcNow, DateTime.UtcNow.AddYears(1)));
+        var partnerIdentifier = PartnerIdentifier.Create("TaxID", "123-45-6789", new Period(DateTime.UtcNow, DateTime.UtcNow.AddYears(1)));
         string newType = "BusinessID";
         string newValue = "987-65-4321";
         // Act
@@ -265,7 +225,7 @@ public class PartnerIdentifierTests
     public void Update_WithoutIsPrimary_SetsIsPrimaryToFalse()
     {
         // Arrange
-        var partnerIdentifier = PartnerIdentifier.Create(1, "TaxID", "123-45-6789", isPrimary: true);
+        var partnerIdentifier = PartnerIdentifier.Create("TaxID", "123-45-6789", isPrimary: true);
         string newType = "BusinessID";
         string newValue = "987-65-4321";
         var newValidityPeriod = new Period(DateTime.UtcNow, DateTime.UtcNow.AddYears(2));
@@ -279,7 +239,7 @@ public class PartnerIdentifierTests
     public void MarkAsPrimary_SetsIsPrimaryToTrue()
     {
         // Arrange
-        var partnerIdentifier = PartnerIdentifier.Create(1, "TaxID", "123-45-6789");
+        var partnerIdentifier = PartnerIdentifier.Create("TaxID", "123-45-6789");
         // Act
         partnerIdentifier.MarkAsPrimary();
         // Assert
@@ -290,11 +250,84 @@ public class PartnerIdentifierTests
     public void UnmarkAsPrimary_SetsIsPrimaryToTrue()
     {
         // Arrange
-        var partnerIdentifier = PartnerIdentifier.Create(1, "TaxID", "123-45-6789", isPrimary:true);
+        var partnerIdentifier = PartnerIdentifier.Create("TaxID", "123-45-6789", isPrimary:true);
         // Act
         partnerIdentifier.UnmarkAsPrimary();
         // Assert
         partnerIdentifier.IsPrimary.Should().BeFalse();
+    }
+
+    [Fact]
+    public void IsValidOn_DateWithinValidityPeriod_ReturnsTrue()
+    {
+        // Arrange
+        var validityPeriod = new Period(DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1));
+        var partnerIdentifier = PartnerIdentifier.Create("TaxID", "123-45-6789", validityPeriod);
+        DateTime testDate = DateTime.UtcNow;
+        // Act
+        bool isValid = partnerIdentifier.IsValidOn(testDate);
+        // Assert
+        isValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public void IsValidOn_DateOutsideValidityPeriod_ReturnsFalse()
+    {
+        // Arrange
+        var validityPeriod = new Period(DateTime.UtcNow.AddDays(-10), DateTime.UtcNow.AddDays(-5));
+        var partnerIdentifier = PartnerIdentifier.Create("TaxID", "123-45-6789", validityPeriod);
+        DateTime testDate = DateTime.UtcNow;
+        // Act
+        bool isValid = partnerIdentifier.IsValidOn(testDate);
+        // Assert
+        isValid.Should().BeFalse();
+    }
+
+    [Fact]
+    public void IsValidOn_NoValidityPeriod_ReturnsTrue()
+    {
+        // Arrange
+        var partnerIdentifier = PartnerIdentifier.Create("TaxID", "123-45-6789");
+        DateTime testDate = DateTime.UtcNow;
+        // Act
+        bool isValid = partnerIdentifier.IsValidOn(testDate);
+        // Assert
+        isValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public void IsCurrentlyValid_DateWithinValidityPeriod_ReturnsTrue()
+    {
+        // Arrange
+        var validityPeriod = new Period(DateTime.UtcNow.AddDays(-1), DateTime.UtcNow.AddDays(1));
+        var partnerIdentifier = PartnerIdentifier.Create("TaxID", "123-45-6789", validityPeriod);
+        // Act
+        bool isValid = partnerIdentifier.IsCurrentlyValid();
+        // Assert
+        isValid.Should().BeTrue();
+    }
+
+    [Fact]
+    public void IsCurrentlyValid_DateOutsideValidityPeriod_ReturnsFalse()
+    {
+        // Arrange
+        var validityPeriod = new Period(DateTime.UtcNow.AddDays(-10), DateTime.UtcNow.AddDays(-5));
+        var partnerIdentifier = PartnerIdentifier.Create("TaxID", "123-45-6789", validityPeriod);
+        // Act
+        bool isValid = partnerIdentifier.IsCurrentlyValid();
+        // Assert
+        isValid.Should().BeFalse();
+    }
+
+    [Fact]
+    public void IsCurrentlyValid_NoValidityPeriod_ReturnsTrue()
+    {
+        // Arrange
+        var partnerIdentifier = PartnerIdentifier.Create("TaxID", "123-45-6789");
+        // Act
+        bool isValid = partnerIdentifier.IsCurrentlyValid();
+        // Assert
+        isValid.Should().BeTrue();
     }
 
 }

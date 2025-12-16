@@ -5,7 +5,6 @@ namespace Ogma.Domain.Partners.Entities;
 
 public class PartnerContact : Entity<long>
 {
-    public long PartnerId { get; private set; }
     public PersonName Name { get; private set; }
     public Email? Email { get; private set; }
     public string? Phone { get; private set; }
@@ -17,7 +16,6 @@ public class PartnerContact : Entity<long>
     /// <summary>
     /// Creates a new instance of the PartnerContact class with the specified parameters.
     /// </summary>
-    /// <param name="partnerId"></param>
     /// <param name="name"></param>
     /// <param name="email"></param>
     /// <param name="phone"></param>
@@ -27,7 +25,6 @@ public class PartnerContact : Entity<long>
     /// <param name="isPrimary"></param>
     /// <exception cref="ArgumentException"></exception>
     private PartnerContact(
-        long partnerId,
         PersonName name,
         Email? email = null,
         string? phone = null,
@@ -36,16 +33,11 @@ public class PartnerContact : Entity<long>
         string? jobTitle = null,
         bool isPrimary = false)
     {
-        if (partnerId <= 0)
-        {
-            throw new ArgumentException("Partner ID must be a positive number.", nameof(partnerId));
-        }
         if (name == null)
         {
             throw new ArgumentNullException("Name cannot be null.", nameof(name));
         }
 
-        PartnerId = partnerId;
         Name = name;
         Email = email;
         Phone = phone;
@@ -59,7 +51,6 @@ public class PartnerContact : Entity<long>
     /// Creates a new instance of the PartnerContact class with the specified parameters, including an ID.
     /// </summary>
     /// <param name="id"></param>
-    /// <param name="partnerId"></param>
     /// <param name="name"></param>
     /// <param name="email"></param>
     /// <param name="phone"></param>
@@ -70,7 +61,6 @@ public class PartnerContact : Entity<long>
     /// <exception cref="ArgumentException"></exception>
     private PartnerContact(
         long id,
-        long partnerId,
         PersonName name,
         Email? email = null,
         string? phone = null,
@@ -83,15 +73,11 @@ public class PartnerContact : Entity<long>
         {
             throw new ArgumentException("ID must be a positive number.", nameof(id));
         }
-        if (partnerId <= 0)
-        {
-            throw new ArgumentException("Partner ID must be a positive number.", nameof(partnerId));
-        }
         if (name == null)
         {
             throw new ArgumentNullException("Name cannot be null.", nameof(name));
         }
-        PartnerId = partnerId;
+
         Name = name;
         Email = email;
         Phone = phone;
@@ -104,7 +90,6 @@ public class PartnerContact : Entity<long>
     /// <summary>
     /// Creates a new instance of the PartnerContact class with the specified parameters.
     /// </summary>
-    /// <param name="partnerId"></param>
     /// <param name="name"></param>
     /// <param name="email"></param>
     /// <param name="phone"></param>
@@ -114,7 +99,6 @@ public class PartnerContact : Entity<long>
     /// <param name="isPrimary"></param>
     /// <returns></returns>
     public static PartnerContact Create(
-        long partnerId,
         PersonName name,
         Email? email = null,
         string? phone = null,
@@ -122,13 +106,12 @@ public class PartnerContact : Entity<long>
         string? title = null,
         string? jobTitle = null,
         bool isPrimary = false) =>
-            new(partnerId, name, email, phone, mobile, title, jobTitle, isPrimary);
+            new(name, email, phone, mobile, title, jobTitle, isPrimary);
 
     /// <summary>
     /// Reconstitutes an existing PartnerContact instance with the specified parameters.
     /// </summary>
     /// <param name="id"></param>
-    /// <param name="partnerId"></param>
     /// <param name="name"></param>
     /// <param name="email"></param>
     /// <param name="phone"></param>
@@ -139,7 +122,6 @@ public class PartnerContact : Entity<long>
     /// <returns></returns>
     public static PartnerContact Reconstitute(
         long id,
-        long partnerId,
         PersonName name,
         Email? email = null,
         string? phone = null,
@@ -147,7 +129,7 @@ public class PartnerContact : Entity<long>
         string? title = null,
         string? jobTitle = null,
         bool isPrimary = false) =>
-            new(id, partnerId, name, email, phone, mobile, title, jobTitle, isPrimary);
+            new(id, name, email, phone, mobile, title, jobTitle, isPrimary);
 
     public void UpdateContactDetails(
         PersonName name,

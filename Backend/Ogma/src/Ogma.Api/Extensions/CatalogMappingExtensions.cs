@@ -1,4 +1,5 @@
 ﻿using Ogma.Api.Contracts.Catalog;
+using Ogma.Api.Contracts.SharedKernel;
 using Ogma.Application.Catalog.Dtos;
 using Ogma.Application.SharedKernel.Dtos;
 using Ogma.Domain.Catalog.Entities;
@@ -67,8 +68,5 @@ public static class CatalogMappingExtensions
         entity.UnitOfMeasurement,
         entity.IsActive);
 
-    public static MoneyResponse ToResponse(this Money money) => new MoneyResponse(money.Amount, money.Currency);
-
-    public static MoneyResponse ToResponse(this MoneyDto money) => new MoneyResponse(money.Amount, money.Currency);
 
 }
