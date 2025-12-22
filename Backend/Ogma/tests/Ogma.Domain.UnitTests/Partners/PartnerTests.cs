@@ -11,6 +11,22 @@ namespace Ogma.Domain.UnitTests.Partners;
 
 public class PartnerTests
 {
+    private readonly Address _defaultAddress;
+
+    public PartnerTests()
+    {
+        _defaultAddress = new Address(
+            "Main St.",
+            "1B",
+            "Gotham",
+            "Gotham State",
+            "987654",
+            "US",
+            "Gotham Tower",
+            "D",
+            "99",
+            "99F");
+    }
     [Fact]
     public void CreateIndividual_ValidParameters_SetsPropertiesCorrectly()
     {
@@ -19,7 +35,7 @@ public class PartnerTests
         var partnerIdentifier = PartnerIdentifier.Create("SSN", "123-45-6789");
         var partnerRole = PartnerRoleType.Create("Customer", "Customer");
         // Act
-        var partner = Partner.CreateIndividual(individualName, partnerIdentifier, partnerRole);
+        var partner = Partner.CreateIndividual(individualName, partnerIdentifier, partnerRole, _defaultAddress);
         // Assert
         partner.IndividualName.Should().Be(individualName);
         partner.CompanyName.Should().BeNull();
@@ -27,6 +43,20 @@ public class PartnerTests
         partner.Identifiers.Should().ContainSingle().Which.Should().Be(partnerIdentifier);
         partner.Identifiers.FirstOrDefault()?.IsPrimary.Should().BeTrue();
         partner.Roles.Should().ContainSingle().Which.Should().Be(partnerRole);
+        partner.HQAddress.Should().Be(_defaultAddress);
+    }
+
+    [Fact]
+    public void CreateIndividual_OptionalAddressNotProvided_SetsHQAddressToNull()
+    {
+        // Arrange
+        var individualName = new PersonName("Jane", "Doe");
+        var partnerIdentifier = PartnerIdentifier.Create("SSN", "123-45-6789");
+        var partnerRole = PartnerRoleType.Create("Customer", "Customer");
+        // Act
+        var partner = Partner.CreateIndividual(individualName, partnerIdentifier, partnerRole);
+        // Assert
+        partner.HQAddress.Should().BeNull();
     }
 
     [Fact]
@@ -67,7 +97,7 @@ public class PartnerTests
         var partnerIdentifier = PartnerIdentifier.Create("EIN", "12-3456789");
         var partnerRole = PartnerRoleType.Create("Supplier", "Supplier");
         // Act
-        var partner = Partner.CreateLegalEntity(companyName, partnerIdentifier, partnerRole);
+        var partner = Partner.CreateLegalEntity(companyName, partnerIdentifier, partnerRole, _defaultAddress);
         // Assert
         partner.CompanyName.Should().Be(companyName);
         partner.IndividualName.Should().BeNull();
@@ -75,6 +105,20 @@ public class PartnerTests
         partner.Identifiers.Should().ContainSingle().Which.Should().Be(partnerIdentifier);
         partner.Identifiers.FirstOrDefault()?.IsPrimary.Should().BeTrue();
         partner.Roles.Should().ContainSingle().Which.Should().Be(partnerRole);
+        partner.HQAddress.Should().Be(_defaultAddress);
+    }
+
+    [Fact]
+    public void CreateCompany_OptionalAddressNotProvided_SetsHQAddressToNull()
+    {
+        // Arrange
+        var companyName = "Acme Corp";
+        var partnerIdentifier = PartnerIdentifier.Create("EIN", "12-3456789");
+        var partnerRole = PartnerRoleType.Create("Supplier", "Supplier");
+        // Act
+        var partner = Partner.CreateLegalEntity(companyName, partnerIdentifier, partnerRole);
+        // Assert
+        partner.HQAddress.Should().BeNull();
     }
 
     [Theory]
@@ -120,7 +164,6 @@ public class PartnerTests
         bool isNaturalPerson = true;
         bool isActive = true;
         string? displayName = "Alice S.";
-        Address? mainAddress = null;
         var identifiers = new List<PartnerIdentifier>
         {
             PartnerIdentifier.Create("SSN", "987-65-4321", isPrimary: true)
@@ -132,7 +175,7 @@ public class PartnerTests
         var bankAccounts = new List<PartnerBankAccount>();
         var contacts = new List<PartnerContact>();
         // Act
-        var partner = Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roles, bankAccounts, contacts);
+        var partner = Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, _defaultAddress, identifiers, roles, bankAccounts, contacts);
         // Assert
         partner.Id.Should().Be(id);
         partner.IndividualName.Should().Be(individualName);
@@ -140,7 +183,7 @@ public class PartnerTests
         partner.IsNaturalPerson.Should().BeTrue();
         partner.IsActive.Should().BeTrue();
         partner.DisplayName.Should().Be(displayName);
-        partner.HQAddress.Should().BeNull();
+        partner.HQAddress.Should().Be(_defaultAddress);
         partner.Identifiers.Should().BeEquivalentTo(identifiers);
         partner.Roles.Should().BeEquivalentTo(roles);
         partner.BankAccounts.Should().BeEmpty();
@@ -150,7 +193,7 @@ public class PartnerTests
     [Theory]
     [InlineData(0L)]
     [InlineData(-1L)]
-    public void Reconstitute_Invalid_ThrowsArgumentException(long invalidId)
+    public void Reconstitute_InvalidId_ThrowsArgumentException(long invalidId)
     {
         // Arrange
         var individualName = new PersonName("Alice", "Smith");
@@ -430,7 +473,6 @@ public class PartnerTests
 
         var newIndividualName = new PersonName("New", "Name");
         string newDisplayName = "New Name";
-        Address newMainAddress = new Address("Main St", "123", "City", "State", "12345", "US");
         bool newIsActive = false;
         List<PartnerIdentifier> newIdentifiers = new()
         {
@@ -456,7 +498,7 @@ public class PartnerTests
             true,
             newIsActive,
             newDisplayName,
-            newMainAddress,
+            _defaultAddress,
             newIdentifiers,
             newRoles,
             newBankAccounts,
@@ -467,7 +509,7 @@ public class PartnerTests
         partner.IsNaturalPerson.Should().BeTrue();
         partner.IsActive.Should().Be(newIsActive);
         partner.DisplayName.Should().Be(newDisplayName);
-        partner.HQAddress.Should().Be(newMainAddress);
+        partner.HQAddress.Should().Be(_defaultAddress);
         partner.Identifiers.Should().BeEquivalentTo(newIdentifiers);
         partner.Roles.Should().BeEquivalentTo(newRoles);
         partner.BankAccounts.Should().BeEquivalentTo(newBankAccounts);
@@ -499,7 +541,6 @@ public class PartnerTests
 
         var newCompanyName = "Firma Medie SRL";
         string newDisplayName = "Mediumy";
-        Address newMainAddress = new Address("Strada ingust", "123", "City", "State", "12345", "RO");
         bool newIsActive = false;
         List<PartnerIdentifier> newIdentifiers = new()
         {
@@ -525,7 +566,7 @@ public class PartnerTests
             false,
             newIsActive,
             newDisplayName,
-            newMainAddress,
+            _defaultAddress,
             newIdentifiers,
             newRoles,
             newBankAccounts,
@@ -536,7 +577,7 @@ public class PartnerTests
         partner.IsNaturalPerson.Should().BeFalse();
         partner.IsActive.Should().Be(newIsActive);
         partner.DisplayName.Should().Be(newDisplayName);
-        partner.HQAddress.Should().Be(newMainAddress);
+        partner.HQAddress.Should().Be(_defaultAddress);
         partner.Identifiers.Should().BeEquivalentTo(newIdentifiers);
         partner.Roles.Should().BeEquivalentTo(newRoles);
         partner.BankAccounts.Should().BeEquivalentTo(newBankAccounts);
