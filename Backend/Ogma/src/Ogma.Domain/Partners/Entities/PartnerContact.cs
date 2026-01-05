@@ -105,8 +105,8 @@ public class PartnerContact : Entity<long>
         string? mobile = null,
         string? title = null,
         string? jobTitle = null,
-        bool isPrimary = false) =>
-            new(name, email, phone, mobile, title, jobTitle, isPrimary);
+        bool isPrimary = false) 
+        => new(name, email, phone, mobile, title, jobTitle, isPrimary);
 
     /// <summary>
     /// Reconstitutes an existing PartnerContact instance with the specified parameters.
@@ -128,8 +128,8 @@ public class PartnerContact : Entity<long>
         string? mobile = null,
         string? title = null,
         string? jobTitle = null,
-        bool isPrimary = false) =>
-            new(id, name, email, phone, mobile, title, jobTitle, isPrimary);
+        bool isPrimary = false) 
+        => new(id, name, email, phone, mobile, title, jobTitle, isPrimary);
 
     public void UpdateContactDetails(
         PersonName name,

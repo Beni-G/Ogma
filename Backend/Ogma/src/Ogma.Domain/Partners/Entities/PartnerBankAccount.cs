@@ -44,8 +44,8 @@ public class PartnerBankAccount : Entity<long>
     /// <param name="bankAccount"></param>
     /// <param name="isDefault"></param>
     /// <returns></returns>
-    public static PartnerBankAccount Create(BankAccount bankAccount, bool isDefault = false) =>
-        new(bankAccount, isDefault);
+    public static PartnerBankAccount Create(BankAccount bankAccount, bool isDefault = false) 
+        => new(bankAccount, isDefault);
 
     /// <summary>
     /// Reconstitutes an existing instance of the <see cref="PartnerBankAccount"/> class with the specified ID, partner ID, bank account,
@@ -54,8 +54,8 @@ public class PartnerBankAccount : Entity<long>
     /// <param name="bankAccount"></param>
     /// <param name="isDefault"></param>
     /// <returns></returns>
-    public static PartnerBankAccount Reconstitute(long id, BankAccount bankAccount, bool isDefault = false) =>
-        new(id, bankAccount, isDefault);
+    public static PartnerBankAccount Reconstitute(long id, BankAccount bankAccount, bool isDefault = false) 
+        => new(id, bankAccount, isDefault);
 
     public void UpdateBankAccount(BankAccount bankAccount, bool isDefault)
     {
