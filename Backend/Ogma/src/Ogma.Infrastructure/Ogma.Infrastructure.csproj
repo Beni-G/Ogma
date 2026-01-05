@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <ProjectReference Include="..\Ogma.Application\Ogma.Application.csproj" />
     <ProjectReference Include="..\Ogma.Domain\Ogma.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Persistence\Orders\" />
     <Folder Include="Persistence\Partners\Migrations\" />
   </ItemGroup>
 

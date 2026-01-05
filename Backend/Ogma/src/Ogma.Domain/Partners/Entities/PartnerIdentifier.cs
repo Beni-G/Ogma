@@ -80,8 +80,8 @@ public class PartnerIdentifier : Entity<long>
     /// <param name="isPrimary">A boolean value indicating whether this identifier is the primary one for the partner. <see langword="true"/> if
     /// it is primary; otherwise, <see langword="false"/>.</param>
     /// <returns>A new <see cref="PartnerIdentifier"/> instance initialized with the specified parameters.</returns>
-    public static PartnerIdentifier Create(string type, string value, Period? validityPeriod = null, bool isPrimary = false) =>
-        new(type, value, validityPeriod, isPrimary);
+    public static PartnerIdentifier Create(string type, string value, Period? validityPeriod = null, bool isPrimary = false) 
+        => new(type, value, validityPeriod, isPrimary);
 
     /// <summary>
     /// Reconstitutes a <see cref="PartnerIdentifier"/> instance with the specified parameters.
@@ -92,8 +92,8 @@ public class PartnerIdentifier : Entity<long>
     /// <param name="validityPeriod">The optional validity period for the partner identifier. Defaults to <see langword="null"/> if not specified.</param>
     /// <param name="isPrimary">A value indicating whether this identifier is the primary one. Defaults to <see langword="false"/>.</param>
     /// <returns>A <see cref="PartnerIdentifier"/> instance initialized with the provided parameters.</returns>
-    public static PartnerIdentifier Reconstitute(long id, string type, string value, Period? validityPeriod = null, bool isPrimary = false) =>
-        new(id, type, value, validityPeriod, isPrimary);
+    public static PartnerIdentifier Reconstitute(long id, string type, string value, Period? validityPeriod = null, bool isPrimary = false) 
+        => new(id, type, value, validityPeriod, isPrimary);
 
     /// <summary>
     /// Updates the identifier with the specified type, value, and optional validity period.
