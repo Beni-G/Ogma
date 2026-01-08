@@ -88,6 +88,20 @@ public class OrderLineTests
     }
 
     [Fact]
+    public void Create_PriceWithDifferentCurrencyThanExchangeRate_ShouldThrowArgumentException()
+    {
+        // Arrange
+        var itemId = 1L;
+        var orderedQuantity = 10m;
+        var price = new Money(100m, "USD");
+        var exchangeRate = new ExchangeRate("EUR", "GBP", 0.75m);
+        // Act
+        Action act = () => OrderLine.Create(itemId, orderedQuantity, price, exchangeRate, "Info");
+        // Assert
+        act.Should().Throw<ArgumentException>();
+    }
+
+    [Fact]
     public void Reconstitute_ValidParameters_ShouldCreateInstance()
     {
         // Arrange
@@ -202,6 +216,23 @@ public class OrderLineTests
         Action act = () => OrderLine.Reconstitute(id, itemId, orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
         // Assert
         act.Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
+    public void Reconstitute_PriceWithDifferentCurrencyThanExchangeRate_ShouldThrowArgumentException()
+    {
+        // Arrange
+        var id = 1L;
+        var itemId = 2L;
+        var orderedQuantity = 15m;
+        var cancelledQuantity = 2m;
+        var fullfilledQuantity = 0m;
+        var price = new Money(150m, "USD");
+        var exchangeRate = new ExchangeRate("EUR", "GBP", 0.75m);
+        // Act
+        Action act = () => OrderLine.Reconstitute(id, itemId, orderedQuantity, cancelledQuantity, fullfilledQuantity, price, exchangeRate, "Info");
+        // Assert
+        act.Should().Throw<ArgumentException>();
     }
 
     [Fact]
@@ -339,6 +370,24 @@ public class OrderLineTests
     }
 
     [Fact]
+    public void Update_PriceWithDifferentCurrencyThanExchangeRate_ShouldThrowArgumentException()
+    {
+        // Arrange
+        var orderLine = OrderLine.Create(1L, 10m, new Money(100m, "USD"));
+        var newItemId = 2L;
+        var newOrderedQuantity = 20m;
+        var newCancelledQuantity = 5m;
+        var newFullfilledQuantity = 10m;
+        var newPrice = new Money(150m, "USD");
+        var newExchangeRate = new ExchangeRate("EUR", "GBP", 0.75m);
+        var newAdditionalInfo = "Updated info";
+        // Act
+        Action act = () => orderLine.Update(newItemId, newOrderedQuantity, newCancelledQuantity, newFullfilledQuantity, newPrice, newExchangeRate, newAdditionalInfo);
+        // Assert
+        act.Should().Throw<ArgumentException>();
+    }
+
+    [Fact]
     public void ActiveQuantity_ShowsActiveQuantity()
     {
         // Arrange
@@ -447,4 +496,5 @@ public class OrderLineTests
         lineActiveConvertedValue.Should().Be(expectedActiveValue);
     }
 
+    
 }

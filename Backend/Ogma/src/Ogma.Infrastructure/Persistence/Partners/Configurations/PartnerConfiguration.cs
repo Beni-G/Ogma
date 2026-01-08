@@ -30,6 +30,21 @@ internal class PartnerConfiguration : IEntityTypeConfiguration<Partner>
 
         builder.HasMany(p => p.Roles)
             .WithMany()
-            .UsingEntity(j => j.ToTable("partner_roles"));
+            .UsingEntity(
+                l => l.HasOne(typeof(PartnerRoleType))
+                        .WithMany()
+                        .HasForeignKey("roles_id")
+                        .OnDelete(DeleteBehavior.Restrict), 
+
+                r => r.HasOne(typeof(Partner))
+                        .WithMany()
+                        .HasForeignKey("partner_id")
+                        .OnDelete(DeleteBehavior.Cascade), 
+
+                j =>
+                {
+                    j.ToTable("partner_roles");
+                    j.HasKey("partner_id", "roles_id");
+                });
     }
 }

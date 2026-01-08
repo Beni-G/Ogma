@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Ogma.Infrastructure.Persistence.Partners.Contexts;
@@ -11,9 +12,11 @@ using Ogma.Infrastructure.Persistence.Partners.Contexts;
 namespace Ogma.Infrastructure.Persistence.Partners.Migrations
 {
     [DbContext(typeof(PartnersDbContext))]
-    partial class PartnersDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260106181852_FixPartnersDeleteCascade")]
+    partial class FixPartnersDeleteCascade
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

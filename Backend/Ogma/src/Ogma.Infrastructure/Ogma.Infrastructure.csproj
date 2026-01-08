@@ -6,6 +6,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Persistence\Orders\Migrations\" />
     <Folder Include="Persistence\Partners\Migrations\" />
   </ItemGroup>
 

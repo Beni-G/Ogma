@@ -3,21 +3,21 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
-using Ogma.Domain.Partners.Repositories;
-using Ogma.Infrastructure.Persistence.Partners.Contexts;
-using Ogma.Infrastructure.Persistence.Partners.MappingProfiles;
-using Ogma.Infrastructure.Persistence.Partners.Repositories;
+using Ogma.Domain.Orders.Repositories;
+using Ogma.Infrastructure.Persistence.Orders.Contexts;
+using Ogma.Infrastructure.Persistence.Orders.MappingProfiles;
+using Ogma.Infrastructure.Persistence.Orders.Repositories;
 
-namespace Ogma.Infrastructure.Persistence.Partners.Extensions;
+namespace Ogma.Infrastructure.Persistence.Orders.Extensions;
 
-public static class PartnersPersistenceExtensions
+public static class OrderPersistenceExtensions
 {
-    public static IServiceCollection AddPartnersPersistence(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddOrdersPersistence(this IServiceCollection services, IConfiguration config)
     {
         // Database Context Configuration.
         var connectionString = config.GetConnectionString("PostgresMain");
 
-        services.AddDbContext<PartnersDbContext>(options =>
+        services.AddDbContext<OrdersDbContext>(options =>
         {
             var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
             dataSourceBuilder.EnableDynamicJson();
@@ -29,8 +29,9 @@ public static class PartnersPersistenceExtensions
         });
 
         // Repository Registrations.
-        services.AddScoped<IPartnerRoleTypeRepository, PartnerRoleTypeRepository>();
-        services.AddScoped<IPartnerRepository, PartnerRepository>();
+        services.AddScoped<IOrderTypeRepository, OrderTypeRepository>();
+        services.AddScoped<IOrderStatusRepository, OrderStatusRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
 
         // AutoMapper Configuration.
         services.AddAutoMapper(cfg =>
