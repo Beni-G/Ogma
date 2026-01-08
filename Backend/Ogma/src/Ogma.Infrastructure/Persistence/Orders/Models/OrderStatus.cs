@@ -1,5 +1,6 @@
-﻿namespace Ogma.Infrastructure.Persistence.Catalog.Models;
-public class ItemType
+﻿namespace Ogma.Infrastructure.Persistence.Orders.Models;
+
+public class OrderStatus
 {
     public long Id { get; set; }
     public string Name { get; set; } = default!;

@@ -58,7 +58,7 @@ public class ItemRepository : IItemRepository
         await _catalogDbContext.Items.AddAsync(model);
         await _catalogDbContext.SaveChangesAsync();
 
-        return await this.GetByIdAsync(model.Id); ;
+        return model.ToDomain(); ;
     }
 
     public async Task<bool> UpdateAsync(Item item)

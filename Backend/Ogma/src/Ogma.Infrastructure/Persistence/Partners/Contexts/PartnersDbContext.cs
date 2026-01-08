@@ -21,5 +21,5 @@ public class PartnersDbContext : DbContext
         modelBuilder.HasAnnotation("Relational:MigrationHistoryTable", "__PartnersMigrationsHistory");
     }
 
-    
+
 }

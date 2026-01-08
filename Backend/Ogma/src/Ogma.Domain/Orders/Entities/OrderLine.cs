@@ -27,6 +27,10 @@ public class OrderLine : Entity<long>
         {
             throw new ArgumentNullException(nameof(price));
         }
+        if (price.Currency != exchangeRate?.BaseCurrency && exchangeRate! != null!)
+        {
+            throw new ArgumentException("Price currency must match the exchange rate's base currency.", nameof(price));
+        }
 
         ItemId = itemId;
         OrderedQuantity = orderedQuantity;
@@ -72,6 +76,10 @@ public class OrderLine : Entity<long>
         if (price == null!)
         {
             throw new ArgumentNullException(nameof(price));
+        }
+        if (price.Currency != exchangeRate?.BaseCurrency && exchangeRate! != null!)
+        {
+            throw new ArgumentException("Price currency must match the exchange rate's base currency.", nameof(price));
         }
 
         Id = id;
@@ -174,7 +182,11 @@ public class OrderLine : Entity<long>
         {
             throw new ArgumentNullException(nameof(price));
         }
-        
+        if (price.Currency != exchangeRate?.BaseCurrency && exchangeRate! != null!)
+        {
+            throw new ArgumentException("Price currency must match the exchange rate's base currency.", nameof(price));
+        }
+
         ItemId = itemId;
         OrderedQuantity = orderedQuantity;
         CancelledQuantity = cancelledQuantity;
