@@ -9,8 +9,8 @@ public static class PartnersMappingExtensions
 {
     #region ToDto Methods
 
-    public static PartnerRoleTypeDto ToDto(this PartnerRoleType entity) => 
-        new PartnerRoleTypeDto(entity.Id, entity.Code, entity.Name, entity.Color);
+    public static PartnerRoleTypeDto ToDto(this PartnerRoleType partnerRoleType) => 
+        new (partnerRoleType.Id, partnerRoleType.Code, partnerRoleType.Name, partnerRoleType.Color);
 
     public static PartnerBankAccountDto ToDto(this PartnerBankAccount partnerBankAccount) =>
         new PartnerBankAccountDto(partnerBankAccount.BankAccount.ToDto(), partnerBankAccount.IsDefault);
@@ -66,8 +66,6 @@ public static class PartnersMappingExtensions
 
     public static PartnerIdentifier ToDomain(this PartnerIdentifierDto dto) =>
         PartnerIdentifier.Create(dto.Type, dto.Value, dto.ValidityPeriod?.ToDomain(), dto.IsPrimary);
-
-    // Partner?
 
     #endregion
 }

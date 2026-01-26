@@ -20,7 +20,8 @@ public class CreatePartnerHandler : IRequestHandler<CreatePartnerCommand, Partne
 
     public async Task<PartnerDto> Handle(CreatePartnerCommand command, CancellationToken cancellationToken)
     {
-        var partnerRole = await _partnerRoleTypeRepository.GetByIdAsync(command.RoleId) ?? throw new InvalidOperationException($"Partner role with ID {command.RoleId} not found.");
+        var partnerRole = await _partnerRoleTypeRepository.GetByIdAsync(command.RoleId) 
+            ?? throw new InvalidOperationException($"Partner role with ID {command.RoleId} not found.");
 
         var partner = command.IsNaturalPerson
             ? Partner.CreateIndividual(

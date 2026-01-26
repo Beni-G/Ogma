@@ -1,7 +1,8 @@
 ﻿using FluentAssertions;
 using Ogma.Domain.Orders.Entities;
+using Ogma.Domain.UnitTests.Orders.Helpers;
 
-namespace Ogma.Domain.UnitTests.Orders;
+namespace Ogma.Domain.UnitTests.Orders.Tests;
 
 public class OrderStatusTests
 {
@@ -37,7 +38,7 @@ public class OrderStatusTests
     public void Reconstitute_ValidParameters_ShouldCreateInstance()
     {
         // Arrange
-        var id = 1L;
+        var id = OrdersTestData.NextId();
         var name = "Shipped";
         var description = "Order has been shipped.";
         // Act
@@ -56,7 +57,7 @@ public class OrderStatusTests
     public void Reconstitute_NullOrEmptyName_ShouldThrowArgumentException(string invalidName)
     {
         // Arrange
-        var id = 1L;
+        var id = OrdersTestData.NextId();
         var description = "Order has been shipped.";
         // Act
         Action act = () => OrderStatus.Reconstitute(id, invalidName, description);

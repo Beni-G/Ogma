@@ -53,15 +53,6 @@ namespace Ogma.Infrastructure.Persistence.Orders.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("order_type_id");
 
-                    b.Property<long>("PartnerId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("partner_id");
-
-                    b.Property<string>("PartnerName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("partner_name");
-
                     b.HasKey("Id")
                         .HasName("pk_orders");
 
@@ -72,76 +63,6 @@ namespace Ogma.Infrastructure.Persistence.Orders.Migrations
                         .HasDatabaseName("ix_orders_order_type_id");
 
                     b.ToTable("orders", (string)null);
-                });
-
-            modelBuilder.Entity("Ogma.Infrastructure.Persistence.Orders.Models.OrderLine", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("AdditionalInformation")
-                        .HasColumnType("text")
-                        .HasColumnName("additional_information");
-
-                    b.Property<decimal>("CancelledQuantity")
-                        .HasColumnType("numeric")
-                        .HasColumnName("cancelled_quantity");
-
-                    b.Property<decimal>("ExchangeRate")
-                        .HasColumnType("numeric")
-                        .HasColumnName("exchange_rate");
-
-                    b.Property<string>("ExchangeTargetCurrency")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("exchange_target_currency");
-
-                    b.Property<decimal>("FullfilledQuantity")
-                        .HasColumnType("numeric")
-                        .HasColumnName("fullfilled_quantity");
-
-                    b.Property<string>("ItemCode")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("item_code");
-
-                    b.Property<long>("ItemId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("item_id");
-
-                    b.Property<string>("ItemName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("item_name");
-
-                    b.Property<long>("OrderId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("order_id");
-
-                    b.Property<decimal>("OrderedQuantity")
-                        .HasColumnType("numeric")
-                        .HasColumnName("ordered_quantity");
-
-                    b.Property<decimal>("PriceAmount")
-                        .HasColumnType("numeric")
-                        .HasColumnName("price_amount");
-
-                    b.Property<string>("PriceCurrency")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("price_currency");
-
-                    b.HasKey("Id")
-                        .HasName("pk_order_line");
-
-                    b.HasIndex("OrderId")
-                        .HasDatabaseName("ix_order_line_order_id");
-
-                    b.ToTable("order_line", (string)null);
                 });
 
             modelBuilder.Entity("Ogma.Infrastructure.Persistence.Orders.Models.OrderStatus", b =>
@@ -210,26 +131,132 @@ namespace Ogma.Infrastructure.Persistence.Orders.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_orders_order_types_order_type_id");
 
+                    b.OwnsMany("Ogma.Infrastructure.Persistence.Orders.Models.OrderLine", "OrderLines", b1 =>
+                        {
+                            b1.Property<long>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("bigint")
+                                .HasColumnName("id");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<long>("Id"));
+
+                            b1.Property<string>("AdditionalInformation")
+                                .HasColumnType("text")
+                                .HasColumnName("additional_information");
+
+                            b1.Property<decimal>("CancelledQuantity")
+                                .HasColumnType("numeric")
+                                .HasColumnName("cancelled_quantity");
+
+                            b1.Property<decimal>("ExchangeRate")
+                                .HasColumnType("numeric")
+                                .HasColumnName("exchange_rate");
+
+                            b1.Property<string>("ExchangeTargetCurrency")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("exchange_target_currency");
+
+                            b1.Property<decimal>("FullfilledQuantity")
+                                .HasColumnType("numeric")
+                                .HasColumnName("fullfilled_quantity");
+
+                            b1.Property<long>("OrderId")
+                                .HasColumnType("bigint")
+                                .HasColumnName("order_id");
+
+                            b1.Property<decimal>("OrderedQuantity")
+                                .HasColumnType("numeric")
+                                .HasColumnName("ordered_quantity");
+
+                            b1.Property<decimal>("PriceAmount")
+                                .HasColumnType("numeric")
+                                .HasColumnName("price_amount");
+
+                            b1.Property<string>("PriceCurrency")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("price_currency");
+
+                            b1.HasKey("Id")
+                                .HasName("pk_order_lines");
+
+                            b1.HasIndex("OrderId")
+                                .HasDatabaseName("ix_order_lines_order_id");
+
+                            b1.ToTable("order_lines", (string)null);
+
+                            b1.WithOwner("Order")
+                                .HasForeignKey("OrderId")
+                                .HasConstraintName("fk_order_lines_orders_order_id");
+
+                            b1.OwnsOne("Ogma.Infrastructure.Persistence.Orders.ValueObjectRecords.OrderItem", "OrderItem", b2 =>
+                                {
+                                    b2.Property<long>("OrderLineId")
+                                        .HasColumnType("bigint")
+                                        .HasColumnName("id");
+
+                                    b2.Property<string>("ItemCode")
+                                        .IsRequired()
+                                        .HasColumnType("text")
+                                        .HasColumnName("item_code");
+
+                                    b2.Property<long>("ItemId")
+                                        .HasColumnType("bigint")
+                                        .HasColumnName("item_id");
+
+                                    b2.Property<string>("ItemName")
+                                        .IsRequired()
+                                        .HasColumnType("text")
+                                        .HasColumnName("item_name");
+
+                                    b2.HasKey("OrderLineId");
+
+                                    b2.ToTable("order_lines");
+
+                                    b2.WithOwner()
+                                        .HasForeignKey("OrderLineId")
+                                        .HasConstraintName("fk_order_lines_order_lines_id");
+                                });
+
+                            b1.Navigation("Order");
+
+                            b1.Navigation("OrderItem")
+                                .IsRequired();
+                        });
+
+                    b.OwnsOne("Ogma.Infrastructure.Persistence.Orders.ValueObjectRecords.OrderPartner", "OrderPartner", b1 =>
+                        {
+                            b1.Property<long>("OrderId")
+                                .HasColumnType("bigint")
+                                .HasColumnName("id");
+
+                            b1.Property<long>("PartnerId")
+                                .HasColumnType("bigint")
+                                .HasColumnName("partner_id");
+
+                            b1.Property<string>("PartnerName")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("partner_name");
+
+                            b1.HasKey("OrderId");
+
+                            b1.ToTable("orders");
+
+                            b1.WithOwner()
+                                .HasForeignKey("OrderId")
+                                .HasConstraintName("fk_orders_orders_id");
+                        });
+
+                    b.Navigation("OrderLines");
+
+                    b.Navigation("OrderPartner")
+                        .IsRequired();
+
                     b.Navigation("OrderStatus");
 
                     b.Navigation("OrderType");
-                });
-
-            modelBuilder.Entity("Ogma.Infrastructure.Persistence.Orders.Models.OrderLine", b =>
-                {
-                    b.HasOne("Ogma.Infrastructure.Persistence.Orders.Models.Order", "Order")
-                        .WithMany("OrderLines")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("fk_order_line_orders_order_id");
-
-                    b.Navigation("Order");
-                });
-
-            modelBuilder.Entity("Ogma.Infrastructure.Persistence.Orders.Models.Order", b =>
-                {
-                    b.Navigation("OrderLines");
                 });
 #pragma warning restore 612, 618
         }

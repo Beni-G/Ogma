@@ -1,43 +1,54 @@
-﻿using Ogma.Domain.Orders.Entities;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Ogma.Domain.Orders.Entities;
 using Ogma.Domain.Orders.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+using Ogma.Infrastructure.Persistence.Orders.Contexts;
+using Ogma.Infrastructure.Persistence.Orders.Extensions;
 
 namespace Ogma.Infrastructure.Persistence.Orders.Repositories;
 
 public class OrderStatusRepository : IOrderStatusRepository
 {
-    public Task<OrderStatus> AddAsync(OrderStatus orderType)
+    private readonly OrdersDbContext _ordersDbContext;
+    private readonly IMapper _mapper;
+
+    public OrderStatusRepository(OrdersDbContext ordersDbContext, IMapper mapper)
     {
-        throw new NotImplementedException();
+        _ordersDbContext = ordersDbContext;
+        _mapper = mapper;
     }
 
-    public Task DeleteAsync(OrderStatus orderType)
+    public async Task<OrderStatus?> GetByIdAsync(long id)
     {
-        throw new NotImplementedException();
+        var orderStatus = await _ordersDbContext.OrderStatuses
+            .AsNoTracking()
+            .FirstOrDefaultAsync(os => os.Id == id);
+        return orderStatus?.ToDomain();
     }
 
-    public Task<IEnumerable<OrderStatus>> GetAllAsync()
+    public async Task<OrderStatus> AddAsync(OrderStatus orderStatus)
     {
-        throw new NotImplementedException();
+        var model = orderStatus.ToModel();
+        await _ordersDbContext.OrderStatuses.AddAsync(model);
+        await _ordersDbContext.SaveChangesAsync();
+        return model.ToDomain();
     }
 
-    public Task<IEnumerable<OrderStatus>> GetAllAsync(Expression<Func<OrderStatus, bool>> predicate)
+    public async Task<bool> UpdateAsync(OrderStatus orderStatus)
     {
-        throw new NotImplementedException();
+        var model = orderStatus.ToModel();
+        _ordersDbContext.OrderStatuses.Attach(model);
+        _ordersDbContext.Entry(model).State = EntityState.Modified;
+
+        var affected = await _ordersDbContext.SaveChangesAsync();
+        return affected > 0;
     }
 
-    public Task<OrderStatus?> GetByIdAsync(long id)
+    public async Task DeleteAsync(OrderStatus orderStatus)
     {
-        throw new NotImplementedException();
-    }
-
-    public Task<bool> UpdateAsync(OrderStatus orderType)
-    {
-        throw new NotImplementedException();
+        var model = orderStatus.ToModel();
+        _ordersDbContext.OrderStatuses.Attach(model);
+        _ordersDbContext.OrderStatuses.Remove(model);
+        await _ordersDbContext.SaveChangesAsync();
     }
 }

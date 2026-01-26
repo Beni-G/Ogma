@@ -1,43 +1,52 @@
-﻿using Ogma.Domain.Orders.Entities;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Ogma.Domain.Orders.Entities;
 using Ogma.Domain.Orders.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
+using Ogma.Infrastructure.Persistence.Orders.Contexts;
+using Ogma.Infrastructure.Persistence.Orders.Extensions;
 
 namespace Ogma.Infrastructure.Persistence.Orders.Repositories;
 
 public class OrderTypeRepository : IOrderTypeRepository
 {
-    public Task<OrderType> AddAsync(OrderType orderType)
+    private readonly OrdersDbContext _ordersDbContext;
+    private readonly IMapper _mapper;
+    public OrderTypeRepository(OrdersDbContext ordersDbContext, IMapper mapper)
     {
-        throw new NotImplementedException();
+        _ordersDbContext = ordersDbContext;
+        _mapper = mapper;
+    }
+    public async Task<OrderType?> GetByIdAsync(long id)
+    {
+        var orderType = await _ordersDbContext.OrderTypes
+            .AsNoTracking()
+            .FirstOrDefaultAsync(ot => ot.Id == id);
+        return orderType?.ToDomain();
     }
 
-    public Task DeleteAsync(OrderType orderType)
+    public async Task<OrderType> AddAsync(OrderType orderType)
     {
-        throw new NotImplementedException();
+        var model = orderType.ToModel();
+        await _ordersDbContext.OrderTypes.AddAsync(model);
+        await _ordersDbContext.SaveChangesAsync();
+        return model.ToDomain();
     }
 
-    public Task<IEnumerable<OrderType>> GetAllAsync()
+    public async Task<bool> UpdateAsync(OrderType orderType)
     {
-        throw new NotImplementedException();
+        var model = orderType.ToModel();
+        _ordersDbContext.OrderTypes.Attach(model);
+        _ordersDbContext.Entry(model).State = EntityState.Modified;
+
+        var affected = await _ordersDbContext.SaveChangesAsync();
+        return affected > 0;
     }
 
-    public Task<IEnumerable<OrderType>> GetAllAsync(Expression<Func<OrderType, bool>> predicate)
+    public async Task DeleteAsync(OrderType orderType)
     {
-        throw new NotImplementedException();
-    }
-
-    public Task<OrderType?> GetByIdAsync(long id)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<bool> UpdateAsync(OrderType orderType)
-    {
-        throw new NotImplementedException();
+        var model = orderType.ToModel();
+        _ordersDbContext.OrderTypes.Attach(model);
+        _ordersDbContext.OrderTypes.Remove(model);
+        await _ordersDbContext.SaveChangesAsync();
     }
 }

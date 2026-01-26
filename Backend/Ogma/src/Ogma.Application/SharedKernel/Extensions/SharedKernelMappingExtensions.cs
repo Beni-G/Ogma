@@ -24,11 +24,13 @@ public static class SharedKernelMappingExtensions
     public static BankAccountDto ToDto(this BankAccount bankAccount) =>
         new BankAccountDto(bankAccount.Bank, bankAccount.Iban, bankAccount.Currency, bankAccount.Bic);
 
-    public static MoneyDto ToDto(this Money money) => new MoneyDto(money.Amount, money.Currency);
+    public static MoneyDto ToDto(this Money money) => new (money.Amount, money.Currency);
 
-    public static PeriodDto ToDto(this Period period) => new PeriodDto(period.Start, period.End);
+    public static PeriodDto ToDto(this Period period) => new (period.Start, period.End);
 
-    public static PersonNameDto ToDto(this PersonName personName) => new PersonNameDto(personName.FirstName, personName.LastName);
+    public static PersonNameDto ToDto(this PersonName personName) => new (personName.FirstName, personName.LastName);
+
+    public static ExchangeRateDto ToDto(this ExchangeRate exchangeRate) => new (exchangeRate.BaseCurrency, exchangeRate.TargetCurrency, exchangeRate.Rate);
 
     #endregion
 
@@ -50,13 +52,15 @@ public static class SharedKernelMappingExtensions
     }
 
     public static BankAccount ToDomain(this BankAccountDto bankAccountDto) =>
-        new BankAccount(bankAccountDto.Bank, bankAccountDto.Iban, bankAccountDto.Currency, bankAccountDto.Bic);
+        new (bankAccountDto.Bank, bankAccountDto.Iban, bankAccountDto.Currency, bankAccountDto.Bic);
 
-    public static Money ToDomain(this MoneyDto moneyDto) => new Money(moneyDto.Amount, moneyDto.Currency);
+    public static Money ToDomain(this MoneyDto moneyDto) => new (moneyDto.Amount, moneyDto.Currency);
 
-    public static Period ToDomain(this PeriodDto periodDto) => new Period(periodDto.Start, periodDto.End);
+    public static Period ToDomain(this PeriodDto periodDto) => new (periodDto.Start, periodDto.End);
 
-    public static PersonName ToDomain(this PersonNameDto personNameDto) => new PersonName(personNameDto.FirstName, personNameDto.LastName);
+    public static PersonName ToDomain(this PersonNameDto personNameDto) => new (personNameDto.FirstName, personNameDto.LastName);
+
+    public static ExchangeRate ToDomain(this ExchangeRateDto exchangeRateDto) => new (exchangeRateDto.BaseCurrency, exchangeRateDto.TargetCurrency, exchangeRateDto.Rate);
 
     #endregion
 }

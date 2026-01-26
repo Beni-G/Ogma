@@ -1,5 +1,4 @@
 ﻿using Ogma.Domain.Orders.Entities;
-using System.Linq.Expressions;
 
 namespace Ogma.Domain.Orders.Repositories;
 
@@ -11,22 +10,6 @@ public interface IOrderTypeRepository
     /// <param name="id">The unique identifier of the order to retrieve.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the order if found; otherwise, null.</returns>
     Task<OrderType?> GetByIdAsync(long id);
-
-    /// <summary>
-    /// Asynchronously retrieves all available order types.
-    /// </summary>
-    /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of all
-    /// order types.</returns>
-    Task<IEnumerable<OrderType>> GetAllAsync();
-
-    /// <summary>
-    /// Asynchronously retrieves all order types that satisfy the specified filter criteria.
-    /// </summary>
-    /// <param name="predicate">An expression used to filter the order types. Only order types for which the predicate evaluates to <see
-    /// langword="true"/> are included in the result. Cannot be null.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of order
-    /// types matching the filter. If no order types match, the collection is empty.</returns>
-    Task<IEnumerable<OrderType>> GetAllAsync(Expression<Func<OrderType, bool>> predicate);
 
     /// <summary>
     /// Asynchronously adds a new order type to the system.

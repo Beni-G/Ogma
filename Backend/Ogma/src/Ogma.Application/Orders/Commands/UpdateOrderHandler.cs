@@ -1,0 +1,86 @@
+﻿using MediatR;
+using Ogma.Application.Orders.Dtos;
+using Ogma.Application.Orders.Ports;
+using Ogma.Application.SharedKernel.Extensions;
+using Ogma.Domain.Orders.Entities;
+using Ogma.Domain.Orders.Repositories;
+using Ogma.Domain.Orders.ValueObjects;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Ogma.Application.Orders.Commands;
+
+public class UpdateOrderHandler : IRequestHandler<UpdateOrderCommand, OrderDto>
+{
+    private readonly IOrderRepository _orderRepository;
+    private readonly IOrderReader _orderReader;
+    private readonly IOrderTypeReader _orderTypeReader;
+    private readonly IOrderStatusReader _orderStatusReader;
+    private readonly ICatalogItemReader _catalogItemReader;
+    private readonly IPartnerReader _partnerReader;
+
+    public UpdateOrderHandler(
+        IOrderRepository orderRepository,
+        IOrderReader orderReader,
+        IOrderTypeReader orderTypeReader,
+        IOrderStatusReader orderStatusReader,
+        ICatalogItemReader catalogItemReader,
+        IPartnerReader partnerReader)
+    {
+        _orderRepository = orderRepository;
+        _orderReader = orderReader;
+        _orderTypeReader = orderTypeReader;
+        _orderStatusReader = orderStatusReader;
+        _catalogItemReader = catalogItemReader;
+        _partnerReader = partnerReader;
+    }
+    public async Task<OrderDto> Handle(UpdateOrderCommand command, CancellationToken cancellationToken)
+    {
+        var existingOrder = await _orderRepository.GetByIdAsync(command.Id)
+            ?? throw new KeyNotFoundException($"Order with ID {command.Id} not found.");
+        var partner = await _partnerReader.GetByIdAsync(command.PartnerId)
+            ?? throw new KeyNotFoundException($"Partner with ID {command.PartnerId} not found.");
+        var itemIds = command.OrderLines.Select(ol => ol.ItemId).Distinct();
+        var itemsLookup = await _catalogItemReader.GetByIdsAsync(itemIds);
+
+        existingOrder.Update(
+            new OrderPartner(command.PartnerId, partner.PartnerName),
+            command.OrderNumber,
+            command.OrderDate,
+            command.OrderTypeId,
+            command.OrderStatusId,
+            command.AdditionalInformation!);
+
+        existingOrder.ClearOrderLines();
+
+        foreach (var orderLine in command.OrderLines)
+        {
+            var item = itemsLookup.TryGetValue(orderLine.ItemId, out var catalogItem)
+                ? catalogItem
+                : throw new KeyNotFoundException($"Item with ID {orderLine.ItemId} not found");
+            var updatedOrderLine = OrderLine.Reconstitute(
+                orderLine.Id,
+                new OrderItem(item.ItemId, item.ItemName, item.ItemCode),
+               orderLine.OrderedQuantity,
+               orderLine.CancelledQuantity,
+               orderLine.FullfilledQuantity,
+               orderLine.Price.ToDomain(),
+               orderLine.ExchangeRate?.ToDomain(),
+               orderLine.AdditionalInformation);
+            existingOrder.AddOrderLine(updatedOrderLine);
+        }
+
+        var result = await _orderRepository.UpdateAsync(existingOrder);
+        if (!result)
+        {
+            throw new InvalidOperationException($"Failed to update Order with ID {command.Id}.");
+        }
+
+        return await _orderReader.GetByIdAsync(command.Id)
+            ?? throw new InvalidOperationException($"Failed to retrieve updated Order with ID {command.Id}.");
+
+    }
+}
