@@ -17,5 +17,31 @@ internal class OrderConfiguration : IEntityTypeConfiguration<Order>
                 .WithMany()
                 .HasForeignKey(o => o.OrderStatusId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+        builder.OwnsOne(o => o.OrderPartner, partnerBuilder =>
+        {
+            partnerBuilder.Property(p => p.PartnerId)
+                .HasColumnName("partner_id");
+
+            partnerBuilder.Property(p => p.PartnerName)
+                .HasColumnName("partner_name");
+        });
+
+        builder.OwnsMany(o => o.OrderLines, lineBuilder =>
+        {
+            lineBuilder.ToTable("order_lines");
+            lineBuilder.HasKey(ol => ol.Id);
+            lineBuilder.OwnsOne(ol => ol.OrderItem, itemBuilder =>
+            {
+                itemBuilder.Property(i => i.ItemId)
+                    .HasColumnName("item_id");
+
+                itemBuilder.Property(i => i.ItemName)
+                    .HasColumnName("item_name");
+
+                itemBuilder.Property(i => i.ItemCode)
+                    .HasColumnName("item_code");
+            });
+        });
     }
 }

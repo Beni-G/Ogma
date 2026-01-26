@@ -1,13 +1,13 @@
-﻿namespace Ogma.Infrastructure.Persistence.Orders.Models;
+﻿using Ogma.Infrastructure.Persistence.Orders.ValueObjectRecords;
+
+namespace Ogma.Infrastructure.Persistence.Orders.Models;
 
 public class OrderLine
 {
     public long Id { get; set; }
     public long OrderId { get; set; }
-    public Order Order { get; set; }
-    public long ItemId { get; set; }
-    public string ItemName { get; set; } = default!;
-    public string ItemCode { get; set; } = default!;
+    public Order Order { get; set; } = default!;
+    public OrderItem OrderItem { get; set; } = default!;
     public decimal OrderedQuantity { get; set; }
     public decimal CancelledQuantity { get; set; }
     public decimal FullfilledQuantity { get; set; }

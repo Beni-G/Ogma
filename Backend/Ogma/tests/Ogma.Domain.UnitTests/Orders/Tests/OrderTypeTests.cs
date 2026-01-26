@@ -1,7 +1,8 @@
 ﻿using FluentAssertions;
 using Ogma.Domain.Orders.Entities;
+using Ogma.Domain.UnitTests.Orders.Helpers;
 
-namespace Ogma.Domain.UnitTests.Orders;
+namespace Ogma.Domain.UnitTests.Orders.Tests;
 
 public class OrderTypeTests
 {
@@ -35,7 +36,7 @@ public class OrderTypeTests
     public void Reconstitute_ValidParameters_ShouldCreateOrderType()
     {
         // Arrange
-        var id = 1L;
+        var id = OrdersTestData.NextId();
         var code = "OT003";
         var description = "Reconstituted Order Type";
         // Act
@@ -66,7 +67,7 @@ public class OrderTypeTests
     public void Reconstitute_InvalidCode_ShouldThrowArgumentException(string invalidCode)
     {
         // Arrange
-        var id = 1L;
+        var id = OrdersTestData.NextId();
         var description = "Invalid Code Order Type";
         // Act & Assert
         Assert.Throws<ArgumentException>(() => OrderType.Reconstitute(id, invalidCode, description));

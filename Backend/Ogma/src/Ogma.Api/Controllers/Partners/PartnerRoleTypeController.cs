@@ -55,7 +55,6 @@ public class PartnerRoleTypeController : ControllerBase
 
         var command = new UpdatePartnerRoleTypeCommand(request.Id, request.Code, request.Name, request.Color);
         var updated = await _mediator.Send(command);
-
         return Ok(updated.ToResponse());
     }
 

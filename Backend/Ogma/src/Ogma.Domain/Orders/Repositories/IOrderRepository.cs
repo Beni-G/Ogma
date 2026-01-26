@@ -1,5 +1,4 @@
 ﻿using Ogma.Domain.Orders.Entities;
-using System.Linq.Expressions;
 
 namespace Ogma.Domain.Orders.Repositories;
 
@@ -12,22 +11,6 @@ public interface IOrderRepository
     /// <returns>A task that represents the asynchronous operation. The task result contains the <see cref="Order"/> if found;
     /// otherwise, <see langword="null"/>.</returns>
     Task<Order?> GetByIdAsync(long id);
-
-    /// <summary>
-    /// Asynchronously retrieves all orders from the data source.
-    /// </summary>
-    /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of all
-    /// orders. If no orders exist, the collection will be empty.</returns>
-    Task<IEnumerable<Order>> GetAllAsync();
-
-    /// <summary>
-    /// Asynchronously retrieves all orders that match the specified filter criteria.
-    /// </summary>
-    /// <param name="predicate">An expression used to filter the orders to be retrieved. Only orders for which the predicate evaluates to <see
-    /// langword="true"/> will be included in the result. Cannot be null.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of <see
-    /// cref="Order"/> objects that satisfy the filter. If no orders match, the collection will be empty.</returns>
-    Task<IEnumerable<Order>> GetAllAsync(Expression<Func<Order, bool>> predicate);
 
     /// <summary>
     /// Asynchronously adds a new order to the system.

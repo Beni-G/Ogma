@@ -1,25 +1,28 @@
 ﻿using FluentAssertions;
 using Ogma.Domain.Orders.Entities;
 using Ogma.Domain.SharedKernel.ValueObjects;
+using Ogma.Domain.UnitTests.Orders.Helpers;
 
-namespace Ogma.Domain.UnitTests.Orders;
+namespace Ogma.Domain.UnitTests.Orders.Tests;
 
 public class OrderTests
 {
+
+
     [Fact]
     public void Create_ValidParameters_ShouldCreateInstance()
     {
         // Arrange
-        var partnerId = 1L;
+        var orderPartner = OrdersTestData.CreateOrderPartner();
         var orderNumber = "123";
         var orderDate = DateTime.Now;
-        var orderTypeId = 1L;
-        var orderStatusId = 1L;
+        var orderTypeId = OrdersTestData.NextId();
+        var orderStatusId = OrdersTestData.NextId();
         // Act
-        var order = Order.Create(partnerId, orderNumber, orderDate, orderTypeId, orderStatusId);
+        var order = Order.Create(orderPartner, orderNumber, orderDate, orderTypeId, orderStatusId);
         // Assert
         order.Should().NotBeNull();
-        order.PartnerId.Should().Be(partnerId);
+        order.OrderPartner.Should().Be(orderPartner);
         order.OrderNumber.Should().Be(orderNumber);
         order.OrderDate.Should().Be(orderDate);
         order.OrderTypeId.Should().Be(orderTypeId);
@@ -32,17 +35,17 @@ public class OrderTests
     public void Create_WithOptionalParameters_ShouldCreateInstance()
     {
         // Arrange
-        var partnerId = 1L;
+        var orderPartner = OrdersTestData.CreateOrderPartner();
         var orderNumber = "123";
         var orderDate = DateTime.Now;
-        var orderTypeId = 1L;
-        var orderStatusId = 1L;
+        var orderTypeId = OrdersTestData.NextId();
+        var orderStatusId = OrdersTestData.NextId();
         var additionalInformation = "Test order";
         // Act
-        var order = Order.Create(partnerId, orderNumber, orderDate, orderTypeId, orderStatusId, additionalInformation);
+        var order = Order.Create(orderPartner, orderNumber, orderDate, orderTypeId, orderStatusId, additionalInformation);
         // Assert
         order.Should().NotBeNull();
-        order.PartnerId.Should().Be(partnerId);
+        order.OrderPartner.Should().Be(orderPartner);
         order.OrderNumber.Should().Be(orderNumber);
         order.OrderDate.Should().Be(orderDate);
         order.OrderTypeId.Should().Be(orderTypeId);
@@ -51,20 +54,18 @@ public class OrderTests
         order.AdditionalInformation.Should().Be(additionalInformation);
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    public void Create_InvalidPartnerId_ShouldThrowArgumentException(long invalidPartnerId)
+    [Fact]
+    public void Create_NullOrderPartner_ShouldThrowArgumentNullException()
     {
         // Arrange
         var orderNumber = "123";
         var orderDate = DateTime.Now;
-        var orderTypeId = 1L;
-        var orderStatusId = 1L;
+        var orderTypeId = OrdersTestData.NextId();
+        var orderStatusId = OrdersTestData.NextId();
         // Act
-        Action act = () => Order.Create(invalidPartnerId, orderNumber, orderDate, orderTypeId, orderStatusId);
+        Action act = () => Order.Create(null!, orderNumber, orderDate, orderTypeId, orderStatusId);
         // Assert
-        act.Should().Throw<ArgumentException>();
+        act.Should().Throw<ArgumentNullException>();
     }
 
     [Theory]
@@ -74,12 +75,12 @@ public class OrderTests
     public void Create_NullOrEmptyOrderNumber_ShouldThrowArgumentException(string invalidOrderNumber)
     {
         // Arrange
-        var partnerId = 1L;
+        var orderPartner = OrdersTestData.CreateOrderPartner();
         var orderDate = DateTime.Now;
-        var orderTypeId = 1L;
-        var orderStatusId = 1L;
+        var orderTypeId = OrdersTestData.NextId();
+        var orderStatusId = OrdersTestData.NextId();
         // Act
-        Action act = () => Order.Create(partnerId, invalidOrderNumber, orderDate, orderTypeId, orderStatusId);
+        Action act = () => Order.Create(orderPartner, invalidOrderNumber, orderDate, orderTypeId, orderStatusId);
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -88,13 +89,13 @@ public class OrderTests
     public void Create_InvalidOrderDate_ShouldThrowArgumentException()
     {
         // Arrange
-        var partnerId = 1L;
+        var orderPartner = OrdersTestData.CreateOrderPartner();
         var orderNumber = "123";
         var invalidOrderDate = DateTime.MinValue;
-        var orderTypeId = 1L;
-        var orderStatusId = 1L;
+        var orderTypeId = OrdersTestData.NextId();
+        var orderStatusId = OrdersTestData.NextId();
         // Act
-        Action act = () => Order.Create(partnerId, orderNumber, invalidOrderDate, orderTypeId, orderStatusId);
+        Action act = () => Order.Create(orderPartner, orderNumber, invalidOrderDate, orderTypeId, orderStatusId);
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -105,12 +106,12 @@ public class OrderTests
     public void Create_InvalidOrderTypeId_ShouldThrowArgumentException(long invalidOrderTypeId)
     {
         // Arrange
-        var partnerId = 1L;
+        var orderPartner = OrdersTestData.CreateOrderPartner();
         var orderNumber = "123";
         var orderDate = DateTime.Now;
-        var orderStatusId = 1L;
+        var orderStatusId = OrdersTestData.NextId();
         // Act
-        Action act = () => Order.Create(partnerId, orderNumber, orderDate, invalidOrderTypeId, orderStatusId);
+        Action act = () => Order.Create(orderPartner, orderNumber, orderDate, invalidOrderTypeId, orderStatusId);
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -121,12 +122,12 @@ public class OrderTests
     public void Create_InvalidOrderStatusId_ShouldThrowArgumentException(long invalidOrderStatusId)
     {
         // Arrange
-        var partnerId = 1L;
+        var orderPartner = OrdersTestData.CreateOrderPartner();
         var orderNumber = "123";
         var orderDate = DateTime.Now;
-        var orderTypeId = 1L;
+        var orderTypeId = OrdersTestData.NextId();
         // Act
-        Action act = () => Order.Create(partnerId, orderNumber, orderDate, orderTypeId, invalidOrderStatusId);
+        Action act = () => Order.Create(orderPartner, orderNumber, orderDate, orderTypeId, invalidOrderStatusId);
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -135,18 +136,18 @@ public class OrderTests
     public void Reconstitute_ValidParameters_ShouldCreateInstance()
     {
         // Arrange
-        var id = 1L;
-        var partnerId = 1L;
+        var id = OrdersTestData.NextId();
+        var orderPartner = OrdersTestData.CreateOrderPartner();
         var orderNumber = "123";
         var orderDate = DateTime.Now;
-        var orderTypeId = 1L;
-        var orderStatusId = 1L;
+        var orderTypeId = OrdersTestData.NextId();
+        var orderStatusId = OrdersTestData.NextId();
         // Act
-        var order = Order.Reconstitute(id, partnerId, orderNumber, orderDate, orderTypeId, orderStatusId);
+        var order = Order.Reconstitute(id, orderPartner, orderNumber, orderDate, orderTypeId, orderStatusId);
         // Assert
         order.Should().NotBeNull();
         order.Id.Should().Be(id);
-        order.PartnerId.Should().Be(partnerId);
+        order.OrderPartner.Should().Be(orderPartner);
         order.OrderNumber.Should().Be(orderNumber);
         order.OrderDate.Should().Be(orderDate);
         order.OrderTypeId.Should().Be(orderTypeId);
@@ -159,24 +160,29 @@ public class OrderTests
     public void Reconstitute_WithOptionalParameters_ShouldCreateInstance()
     {
         // Arrange
-        var id = 1L;
-        var partnerId = 1L;
+        var id = OrdersTestData.NextId();
+        var orderPartner = OrdersTestData.CreateOrderPartner();
         var orderNumber = "123";
         var orderDate = DateTime.Now;
-        var orderTypeId = 1L;
-        var orderStatusId = 1L;
+        var orderTypeId = OrdersTestData.NextId();
+        var orderStatusId = OrdersTestData.NextId();
         var additionalInformation = "Test order";
+        var orderLines = new List<OrderLine>()
+        {
+            OrderLine.Create(OrdersTestData.CreateOrderItem(), 10m, new Money(10m, "eur")),
+            OrderLine.Create(OrdersTestData.CreateOrderItem(), 20m, new Money(5m, "eur"))
+        };
         // Act
-        var order = Order.Reconstitute(id, partnerId, orderNumber, orderDate, orderTypeId, orderStatusId, additionalInformation);
+        var order = Order.Reconstitute(id, orderPartner, orderNumber, orderDate, orderTypeId, orderStatusId, additionalInformation, orderLines);
         // Assert
         order.Should().NotBeNull();
         order.Id.Should().Be(id);
-        order.PartnerId.Should().Be(partnerId);
+        order.OrderPartner.Should().Be(orderPartner);
         order.OrderNumber.Should().Be(orderNumber);
         order.OrderDate.Should().Be(orderDate);
         order.OrderTypeId.Should().Be(orderTypeId);
         order.OrderStatusId.Should().Be(orderStatusId);
-        order.OrderLines.Should().BeEmpty();
+        order.OrderLines.Should().BeEquivalentTo(orderLines);
         order.AdditionalInformation.Should().Be(additionalInformation);
     }
 
@@ -186,46 +192,44 @@ public class OrderTests
     public void Reconstitute_InvalidId_ShouldThrowArgumentException(long invalidId)
     {
         // Arrange
-        var partnerId = 1L;
+        var orderPartner = OrdersTestData.CreateOrderPartner();
         var orderNumber = "123";
         var orderDate = DateTime.Now;
-        var orderTypeId = 1L;
-        var orderStatusId = 1L;
+        var orderTypeId = OrdersTestData.NextId();
+        var orderStatusId = OrdersTestData.NextId();
         // Act
-        Action act = () => Order.Reconstitute(invalidId, partnerId, orderNumber, orderDate, orderTypeId, orderStatusId);
+        Action act = () => Order.Reconstitute(invalidId, orderPartner, orderNumber, orderDate, orderTypeId, orderStatusId);
         // Assert
         act.Should().Throw<ArgumentException>();
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    public void Reconstitute_InvalidPartnerId_ShouldThrowArgumentException(long invalidPartnerId)
+    [Fact]
+    public void Reconstitute_NullOrderPartner_ShouldThrowArgumentNullException()
     {
         // Arrange
-        var id = 1L;
+        var id = OrdersTestData.NextId();
         var orderNumber = "123";
         var orderDate = DateTime.Now;
-        var orderTypeId = 1L;
-        var orderStatusId = 1L;
+        var orderTypeId = OrdersTestData.NextId();
+        var orderStatusId = OrdersTestData.NextId();
         // Act
-        Action act = () => Order.Reconstitute(id, invalidPartnerId, orderNumber, orderDate, orderTypeId, orderStatusId);
+        Action act = () => Order.Reconstitute(id, null!, orderNumber, orderDate, orderTypeId, orderStatusId);
         // Assert
-        act.Should().Throw<ArgumentException>();
+        act.Should().Throw<ArgumentNullException>();
     }
 
     [Fact]
     public void Reconstitute_NullOrEmptyOrderNumber_ShouldThrowArgumentException()
     {
         // Arrange
-        var id = 1L;
-        var partnerId = 1L;
+        var id = OrdersTestData.NextId();
+        var orderPartner = OrdersTestData.CreateOrderPartner();
         var invalidOrderNumber = "";
         var orderDate = DateTime.Now;
-        var orderTypeId = 1L;
-        var orderStatusId = 1L;
+        var orderTypeId = OrdersTestData.NextId();
+        var orderStatusId = OrdersTestData.NextId();
         // Act
-        Action act = () => Order.Reconstitute(id, partnerId, invalidOrderNumber, orderDate, orderTypeId, orderStatusId);
+        Action act = () => Order.Reconstitute(id, orderPartner, invalidOrderNumber, orderDate, orderTypeId, orderStatusId);
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -234,14 +238,14 @@ public class OrderTests
     public void Reconstitute_InvalidOrderDate_ShouldThrowArgumentException()
     {
         // Arrange
-        var id = 1L;
-        var partnerId = 1L;
+        var id = OrdersTestData.NextId();
+        var orderPartner = OrdersTestData.CreateOrderPartner();
         var orderNumber = "123";
         var invalidOrderDate = DateTime.MinValue;
-        var orderTypeId = 1L;
-        var orderStatusId = 1L;
+        var orderTypeId = OrdersTestData.NextId();
+        var orderStatusId = OrdersTestData.NextId();
         // Act
-        Action act = () => Order.Reconstitute(id, partnerId, orderNumber, invalidOrderDate, orderTypeId, orderStatusId);
+        Action act = () => Order.Reconstitute(id, orderPartner, orderNumber, invalidOrderDate, orderTypeId, orderStatusId);
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -252,13 +256,13 @@ public class OrderTests
     public void Reconstitute_InvalidOrderTypeId_ShouldThrowArgumentException(long invalidOrderTypeId)
     {
         // Arrange
-        var id = 1L;
-        var partnerId = 1L;
+        var id = OrdersTestData.NextId();
+        var orderPartner = OrdersTestData.CreateOrderPartner();
         var orderNumber = "123";
         var orderDate = DateTime.Now;
-        var orderStatusId = 1L;
+        var orderStatusId = OrdersTestData.NextId();
         // Act
-        Action act = () => Order.Reconstitute(id, partnerId, orderNumber, orderDate, invalidOrderTypeId, orderStatusId);
+        Action act = () => Order.Reconstitute(id, orderPartner, orderNumber, orderDate, invalidOrderTypeId, orderStatusId);
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -269,13 +273,13 @@ public class OrderTests
     public void Reconstitute_InvalidOrderStatusId_ShouldThrowArgumentException(long invalidOrderStatusId)
     {
         // Arrange
-        var id = 1L;
-        var partnerId = 1L;
+        var id = OrdersTestData.NextId();
+        var orderPartner = OrdersTestData.CreateOrderPartner();
         var orderNumber = "123";
         var orderDate = DateTime.Now;
-        var orderTypeId = 1L;
+        var orderTypeId = OrdersTestData.NextId();
         // Act
-        Action act = () => Order.Reconstitute(id, partnerId, orderNumber, orderDate, orderTypeId, invalidOrderStatusId);
+        Action act = () => Order.Reconstitute(id, orderPartner, orderNumber, orderDate, orderTypeId, invalidOrderStatusId);
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -284,14 +288,14 @@ public class OrderTests
     public void AddOrderLine_ValidParameters_ShouldAddOrderLine()
     {
         // Arrange
-        var order = Order.Create(1L, "123", DateTime.Now, 1L, 1L);
-        var orderLine = OrderLine.Create(1L, 2, new Money(10m, "eur"));
+        var order = Order.Create(OrdersTestData.CreateOrderPartner(), "123", DateTime.Now, 1L, 1L);
+        var orderLine = OrderLine.Create(OrdersTestData.CreateOrderItem(), 2, new Money(10m, "eur"));
         // Act
         order.AddOrderLine(orderLine);
         // Assert
         order.OrderLines.Should().HaveCount(1);
         var addedOrderLine = order.OrderLines.First();
-        addedOrderLine.ItemId.Should().Be(orderLine.ItemId);
+        addedOrderLine.OrderItem.ItemId.Should().Be(orderLine.OrderItem.ItemId);
         addedOrderLine.OrderedQuantity.Should().Be(orderLine.OrderedQuantity);
         addedOrderLine.Price.Should().Be(orderLine.Price);
     }
@@ -300,7 +304,7 @@ public class OrderTests
     public void AddOrderLine_NullOrderLine_ShouldThrowArgumentNullException()
     {
         // Arrange
-        var order = Order.Create(1L, "123", DateTime.Now, 1L, 1L);
+        var order = Order.Create(OrdersTestData.CreateOrderPartner(), "123", DateTime.Now, 1L, 1L);
         // Act
         Action act = () => order.AddOrderLine(null!);
         // Assert
@@ -311,8 +315,8 @@ public class OrderTests
     public void AddOrderLine_DuplicateOrderLine_ShouldThrowInvalidOperationException()
     {
         // Arrange
-        var order = Order.Create(1L, "123", DateTime.Now, 1L, 1L);
-        var orderLine = OrderLine.Create(1L, 2, new Money(10m, "eur"));
+        var order = Order.Create(OrdersTestData.CreateOrderPartner(), "123", DateTime.Now, 1L, 1L);
+        var orderLine = OrderLine.Create(OrdersTestData.CreateOrderItem(), 2m, new Money(10m, "eur"));
         order.AddOrderLine(orderLine);
         // Act
         Action act = () => order.AddOrderLine(orderLine);
@@ -324,9 +328,9 @@ public class OrderTests
     public void AddOrderLine_WithDifferentCurrency_ShouldThrowInvalidOperationException()
     {
         // Arrange
-        var order = Order.Create(1L, "123", DateTime.Now, 1L, 1L);
-        var orderLine1 = OrderLine.Create(1L, 2, new Money(10m, "eur"));
-        var orderLine2 = OrderLine.Create(2L, 3, new Money(15m, "usd"));
+        var order = Order.Create(OrdersTestData.CreateOrderPartner(), "123", DateTime.Now, 1L, 1L);
+        var orderLine1 = OrderLine.Create(OrdersTestData.CreateOrderItem(), 2, new Money(10m, "eur"));
+        var orderLine2 = OrderLine.Create(OrdersTestData.CreateOrderItem(), 3, new Money(15m, "usd"));
         order.AddOrderLine(orderLine1);
         // Act
         Action act = () => order.AddOrderLine(orderLine2);
@@ -338,9 +342,9 @@ public class OrderTests
     public void AddOrderLine_WithDifferenceConversionRate_ShouldThrowInvalidOperationException()
     {
         // Arrange
-        var order = Order.Create(1L, "123", DateTime.Now, 1L, 1L);
-        var orderLine1 = OrderLine.Create(1L, 2, new Money(10m, "eur"), new ExchangeRate("eur", "ron", 5m));
-        var orderLine2 = OrderLine.Create(2L, 3, new Money(15m, "usd"), new ExchangeRate("usd", "gbp", 1.2m));
+        var order = Order.Create(OrdersTestData.CreateOrderPartner(), "123", DateTime.Now, 1L, 1L);
+        var orderLine1 = OrderLine.Create(OrdersTestData.CreateOrderItem(), 2, new Money(10m, "eur"), new ExchangeRate("eur", "ron", 5m));
+        var orderLine2 = OrderLine.Create(OrdersTestData.CreateOrderItem(), 3, new Money(15m, "usd"), new ExchangeRate("usd", "gbp", 1.2m));
         order.AddOrderLine(orderLine1);
         // Act
         Action act = () => order.AddOrderLine(orderLine2);
@@ -352,8 +356,8 @@ public class OrderTests
     public void RemoveOrderLine_ExistingOrderLine_ShouldRemoveOrderLine()
     {
         // Arrange
-        var order = Order.Create(1L, "123", DateTime.Now, 1L, 1L);
-        var orderLine = OrderLine.Reconstitute(1L, 1L, 2, 0, 0, new Money(10m, "eur"));
+        var order = Order.Create(OrdersTestData.CreateOrderPartner(), "123", DateTime.Now, 1L, 1L);
+        var orderLine = OrderLine.Reconstitute(1L, OrdersTestData.CreateOrderItem(), 2, 0, 0, new Money(10m, "eur"));
         order.AddOrderLine(orderLine);
         // Act
         order.RemoveOrderLine(1L);
@@ -365,8 +369,8 @@ public class OrderTests
     public void RemoveOrderLine_NonExistingOrderLine_ShouldThrowInvalidOperationException()
     {
         // Arrange
-        var order = Order.Create(1L, "123", DateTime.Now, 1L, 1L);
-        var orderLine = OrderLine.Reconstitute(1L, 1L, 2, 0, 0, new Money(10m, "eur"));
+        var order = Order.Create(OrdersTestData.CreateOrderPartner(), "123", DateTime.Now, 1L, 1L);
+        var orderLine = OrderLine.Reconstitute(1L, OrdersTestData.CreateOrderItem(), 2, 0, 0, new Money(10m, "eur"));
         order.AddOrderLine(orderLine);
         // Act
         Action act = () => order.RemoveOrderLine(2L);
@@ -378,9 +382,9 @@ public class OrderTests
     public void ClearOrderLines_ShouldRemoveAllOrderLines()
     {
         // Arrange
-        var order = Order.Create(1L, "123", DateTime.Now, 1L, 1L);
-        var orderLine1 = OrderLine.Reconstitute(1L, 1L, 2, 0, 0, new Money(10m, "eur"));
-        var orderLine2 = OrderLine.Reconstitute(2L, 2L, 3, 0, 0, new Money(15m, "eur"));
+        var order = Order.Create(OrdersTestData.CreateOrderPartner(), "123", DateTime.Now, 1L, 1L);
+        var orderLine1 = OrderLine.Reconstitute(1L, OrdersTestData.CreateOrderItem(), 2, 0, 0, new Money(10m, "eur"));
+        var orderLine2 = OrderLine.Reconstitute(2L, OrdersTestData.CreateOrderItem(), 3, 0, 0, new Money(15m, "eur"));
         order.AddOrderLine(orderLine1);
         order.AddOrderLine(orderLine2);
         // Act
@@ -393,17 +397,17 @@ public class OrderTests
     public void Update_ValidParameters_ShouldUpdateProperties()
     {
         // Arrange
-        var order = Order.Create(1L, "123", DateTime.Now, 1L, 1L);
-        var newPartnerId = 2L;
+        var order = Order.Create(OrdersTestData.CreateOrderPartner(), "123", DateTime.Now, 1L, 1L);
+        var newOrderPartner = OrdersTestData.CreateOrderPartner();
         var newOrderNumber = "456";
         var newOrderDate = DateTime.Now.AddDays(1);
         var newOrderTypeId = 2L;
         var newOrderStatusId = 2L;
         var newAdditionalInformation = "Updated order";
         // Act
-        order.Update(newPartnerId, newOrderNumber, newOrderDate, newOrderTypeId, newOrderStatusId, newAdditionalInformation);
+        order.Update(newOrderPartner, newOrderNumber, newOrderDate, newOrderTypeId, newOrderStatusId, newAdditionalInformation);
         // Assert
-        order.PartnerId.Should().Be(newPartnerId);
+        order.OrderPartner.Should().Be(newOrderPartner);
         order.OrderNumber.Should().Be(newOrderNumber);
         order.OrderDate.Should().Be(newOrderDate);
         order.OrderTypeId.Should().Be(newOrderTypeId);
@@ -411,22 +415,20 @@ public class OrderTests
         order.AdditionalInformation.Should().Be(newAdditionalInformation);
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    public void Update_InvalidPartnerId_ShouldThrowArgumentException(long invalidPartnerId)
+    [Fact]
+    public void Update_NullOrderPartner_ShouldThrowArgumentNullException()
     {
         // Arrange
-        var order = Order.Create(1L, "123", DateTime.Now, 1L, 1L);
+        var order = Order.Create(OrdersTestData.CreateOrderPartner(), "123", DateTime.Now, 1L, 1L);
         var newOrderNumber = "456";
         var newOrderDate = DateTime.Now.AddDays(1);
         var newOrderTypeId = 2L;
         var newOrderStatusId = 2L;
         var additionalInformation = "Updated order";
         // Act
-        Action act = () => order.Update(invalidPartnerId, newOrderNumber, newOrderDate, newOrderTypeId, newOrderStatusId, additionalInformation);
+        Action act = () => order.Update(null!, newOrderNumber, newOrderDate, newOrderTypeId, newOrderStatusId, additionalInformation);
         // Assert
-        act.Should().Throw<ArgumentException>();
+        act.Should().Throw<ArgumentNullException>();
     }
 
     [Theory]
@@ -435,14 +437,14 @@ public class OrderTests
     public void Update_InvalidOrderTypeId_ShouldThrowArgumentException(long invalidOrderTypeId)
     {
         // Arrange
-        var order = Order.Create(1L, "123", DateTime.Now, 1L, 1L);
-        var newPartnerId = 2L;
+        var order = Order.Create(OrdersTestData.CreateOrderPartner(), "123", DateTime.Now, 1L, 1L);
+        var newOrderPartner = OrdersTestData.CreateOrderPartner();
         var newOrderNumber = "456";
         var newOrderDate = DateTime.Now.AddDays(1);
         var newOrderStatusId = 2L;
         var additionalInformation = "Updated order";
         // Act
-        Action act = () => order.Update(newPartnerId, newOrderNumber, newOrderDate, invalidOrderTypeId, newOrderStatusId, additionalInformation);
+        Action act = () => order.Update(newOrderPartner, newOrderNumber, newOrderDate, invalidOrderTypeId, newOrderStatusId, additionalInformation);
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -454,14 +456,14 @@ public class OrderTests
     public void Update_NullOrEmptyOrderNumber_ShouldThrowArgumentException(string invalidOrderNumber)
     {
         // Arrange
-        var order = Order.Create(1L, "123", DateTime.Now, 1L, 1L);
-        var newPartnerId = 2L;
+        var order = Order.Create(OrdersTestData.CreateOrderPartner(), "123", DateTime.Now, 1L, 1L);
+        var newOrderPartner = OrdersTestData.CreateOrderPartner();
         var newOrderDate = DateTime.Now.AddDays(1);
         var newOrderTypeId = 2L;
         var newOrderStatusId = 2L;
         var additionalInformation = "Updated order";
         // Act
-        Action act = () => order.Update(newPartnerId, invalidOrderNumber, newOrderDate, newOrderTypeId, newOrderStatusId, additionalInformation);
+        Action act = () => order.Update(newOrderPartner, invalidOrderNumber, newOrderDate, newOrderTypeId, newOrderStatusId, additionalInformation);
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -470,15 +472,15 @@ public class OrderTests
     public void Update_InvalidOrderDate_ShouldThrowArgumentException()
     {
         // Arrange
-        var order = Order.Create(1L, "123", DateTime.Now, 1L, 1L);
-        var newPartnerId = 2L;
+        var order = Order.Create(OrdersTestData.CreateOrderPartner(), "123", DateTime.Now, 1L, 1L);
+        var newOrderPartner = OrdersTestData.CreateOrderPartner();
         var newOrderNumber = "456";
         var invalidOrderDate = DateTime.MinValue;
         var newOrderTypeId = 2L;
         var newOrderStatusId = 2L;
         var additionalInformation = "Updated order";
         // Act
-        Action act = () => order.Update(newPartnerId, newOrderNumber, invalidOrderDate, newOrderTypeId, newOrderStatusId, additionalInformation);
+        Action act = () => order.Update(newOrderPartner, newOrderNumber, invalidOrderDate, newOrderTypeId, newOrderStatusId, additionalInformation);
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -489,14 +491,14 @@ public class OrderTests
     public void Update_InvalidOrderStatusId_ShouldThrowArgumentException(long invalidOrderStatusId)
     {
         // Arrange
-        var order = Order.Create(1L, "123", DateTime.Now, 1L, 1L);
-        var newPartnerId = 2L;
+        var order = Order.Create(OrdersTestData.CreateOrderPartner(), "123", DateTime.Now, 1L, 1L);
+        var newOrderPartner = OrdersTestData.CreateOrderPartner();
         var newOrderNumber = "456";
         var newOrderDate = DateTime.Now.AddDays(1);
         var newOrderTypeId = 2L;
         var additionalInformation = "Updated order";
         // Act
-        Action act = () => order.Update(newPartnerId, newOrderNumber, newOrderDate, newOrderTypeId, invalidOrderStatusId, additionalInformation);
+        Action act = () => order.Update(newOrderPartner, newOrderNumber, newOrderDate, newOrderTypeId, invalidOrderStatusId, additionalInformation);
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -505,9 +507,9 @@ public class OrderTests
     public void GetTotalConvertedAmount_WithOrderLines_ShouldReturnTotalAmount()
     {
         // Arrange
-        var order = Order.Create(1L, "123", DateTime.Now, 1L, 1L);
-        var orderLine1 = OrderLine.Create(1L, 2, new Money(10m, "eur"), new ExchangeRate("eur", "ron", 5m));
-        var orderLine2 = OrderLine.Create(2L, 3, new Money(15m, "eur"), new ExchangeRate("eur", "ron", 5m));
+        var order = Order.Create(OrdersTestData.CreateOrderPartner(), "123", DateTime.Now, 1L, 1L);
+        var orderLine1 = OrderLine.Create(OrdersTestData.CreateOrderItem(), 2, new Money(10m, "eur"), new ExchangeRate("eur", "ron", 5m));
+        var orderLine2 = OrderLine.Create(OrdersTestData.CreateOrderItem(), 3, new Money(15m, "eur"), new ExchangeRate("eur", "ron", 5m));
         order.AddOrderLine(orderLine1);
         order.AddOrderLine(orderLine2);
         // Act
@@ -522,7 +524,7 @@ public class OrderTests
     public void GetTotalConvertedAmount_NoOrderLines_ShouldReturnNull()
     {
         // Arrange
-        var order = Order.Create(1L, "123", DateTime.Now, 1L, 1L);
+        var order = Order.Create(OrdersTestData.CreateOrderPartner(), "123", DateTime.Now, 1L, 1L);
         // Act
         var totalAmount = order.GetTotalConvertedAmount();
         // Assert

@@ -1,8 +1,9 @@
 ﻿using FluentAssertions;
 using Ogma.Domain.Orders.Entities;
 using Ogma.Domain.SharedKernel.ValueObjects;
+using Ogma.Domain.UnitTests.Orders.Helpers;
 
-namespace Ogma.Domain.UnitTests.Orders;
+namespace Ogma.Domain.UnitTests.Orders.Tests;
 
 public class OrderLineTests
 {
@@ -10,14 +11,14 @@ public class OrderLineTests
     public void Create_ValidParameters_ShouldCreateInstance()
     {
         // Arrange
-        var itemId = 1L;
         var orderedQuantity = 10m;
         var price = new Money(100m, "USD");
+        var orderItem = OrdersTestData.CreateOrderItem();
         // Act
-        var orderLine = OrderLine.Create(itemId, orderedQuantity, price);
+        var orderLine = OrderLine.Create(orderItem, orderedQuantity, price);
         // Assert
         orderLine.Should().NotBeNull();
-        orderLine.ItemId.Should().Be(itemId);
+        orderLine.OrderItem.Should().Be(orderItem);
         orderLine.OrderedQuantity.Should().Be(orderedQuantity);
         orderLine.Price.Should().Be(price);
         orderLine.CancelledQuantity.Should().Be(0);
@@ -30,16 +31,16 @@ public class OrderLineTests
     public void Create_ValidParametersWithExchangeRateAndAdditionalInfo_ShouldCreateInstance()
     {
         // Arrange
-        var itemId = 1L;
+        var orderItem = OrdersTestData.CreateOrderItem();
         var orderedQuantity = 10m;
         var price = new Money(100m, "USD");
         var exchangeRate = new ExchangeRate("USD", "EUR", 0.85m);
         var additionalInfo = "Special instructions";
         // Act
-        var orderLine = OrderLine.Create(itemId, orderedQuantity, price, exchangeRate, additionalInfo);
+        var orderLine = OrderLine.Create(orderItem, orderedQuantity, price, exchangeRate, additionalInfo);
         // Assert
         orderLine.Should().NotBeNull();
-        orderLine.ItemId.Should().Be(itemId);
+        orderLine.OrderItem.Should().Be(orderItem);
         orderLine.OrderedQuantity.Should().Be(orderedQuantity);
         orderLine.Price.Should().Be(price);
         orderLine.ExchangeRate.Should().Be(exchangeRate);
@@ -52,37 +53,35 @@ public class OrderLineTests
     public void Create_InvalidOrderedQuantity_ShouldThrowArgumentException(decimal invalidQuantity)
     {
         // Arrange
-        var itemId = 1L;
+        var orderItem = OrdersTestData.CreateOrderItem();
         var price = new Money(100m, "USD");
         // Act
-        Action act = () => OrderLine.Create(itemId, invalidQuantity, price);
+        Action act = () => OrderLine.Create(orderItem, invalidQuantity, price);
         // Assert
         act.Should().Throw<ArgumentException>();
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    public void Create_InvalidItemId_ShouldThrowArgumentException(long invalidItemId)
+    [Fact]
+    public void Create_NullOrderItem_ShouldThrowArgumentNullException()
     {
         // Arrange
         var orderedQuantity = 10m;
         var price = new Money(100m, "USD");
         // Act
-        Action act = () => OrderLine.Create(invalidItemId, orderedQuantity, price);
+        Action act = () => OrderLine.Create(null!, orderedQuantity, price);
         // Assert
-        act.Should().Throw<ArgumentException>();
+        act.Should().Throw<ArgumentNullException>();
     }
 
     [Fact]
     public void Create_NullPrice_ShouldThrowArgumentNullException()
     {
         // Arrange
-        var itemId = 1L;
+        var orderItem = OrdersTestData.CreateOrderItem();
         var orderedQuantity = 10m;
         Money price = null!;
         // Act
-        Action act = () => OrderLine.Create(itemId, orderedQuantity, price);
+        Action act = () => OrderLine.Create(orderItem, orderedQuantity, price);
         // Assert
         act.Should().Throw<ArgumentNullException>();
     }
@@ -91,12 +90,12 @@ public class OrderLineTests
     public void Create_PriceWithDifferentCurrencyThanExchangeRate_ShouldThrowArgumentException()
     {
         // Arrange
-        var itemId = 1L;
+        var orderItem = OrdersTestData.CreateOrderItem();
         var orderedQuantity = 10m;
         var price = new Money(100m, "USD");
         var exchangeRate = new ExchangeRate("EUR", "GBP", 0.75m);
         // Act
-        Action act = () => OrderLine.Create(itemId, orderedQuantity, price, exchangeRate, "Info");
+        Action act = () => OrderLine.Create(orderItem, orderedQuantity, price, exchangeRate, "Info");
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -105,18 +104,18 @@ public class OrderLineTests
     public void Reconstitute_ValidParameters_ShouldCreateInstance()
     {
         // Arrange
-        var id = 1L;
-        var itemId = 2L;
+        var id = OrdersTestData.NextId();
+        var orderItem = OrdersTestData.CreateOrderItem();
         var orderedQuantity = 15m;
         var cancelledQuantity = 2m;
         var fullfilledQuantity = 0m;
         var price = new Money(150m, "USD");
         // Act
-        var orderLine = OrderLine.Reconstitute(id, itemId, orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
+        var orderLine = OrderLine.Reconstitute(id, orderItem, orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
         // Assert
         orderLine.Should().NotBeNull();
         orderLine.Id.Should().Be(id);
-        orderLine.ItemId.Should().Be(itemId);
+        orderLine.OrderItem.Should().Be(orderItem);
         orderLine.OrderedQuantity.Should().Be(orderedQuantity);
         orderLine.Price.Should().Be(price);
         orderLine.CancelledQuantity.Should().Be(cancelledQuantity);
@@ -129,8 +128,8 @@ public class OrderLineTests
     public void Reconstitute_ValidParametersWithExchangeRateAndAdditionalInfo_ShouldCreateInstance()
     {
         // Arrange
-        var id = 1L;
-        var itemId = 2L;
+        var id = OrdersTestData.NextId();
+        var orderItem = OrdersTestData.CreateOrderItem();
         var orderedQuantity = 15m;
         var cancelledQuantity = 2m;
         var fullfilledQuantity = 0m;
@@ -138,11 +137,11 @@ public class OrderLineTests
         var exchangeRate = new ExchangeRate("USD", "EUR", 0.85m);
         var additionalInfo = "Handle with care";
         // Act
-        var orderLine = OrderLine.Reconstitute(id, itemId, orderedQuantity, cancelledQuantity, fullfilledQuantity, price, exchangeRate, additionalInfo);
+        var orderLine = OrderLine.Reconstitute(id, orderItem, orderedQuantity, cancelledQuantity, fullfilledQuantity, price, exchangeRate, additionalInfo);
         // Assert
         orderLine.Should().NotBeNull();
         orderLine.Id.Should().Be(id);
-        orderLine.ItemId.Should().Be(itemId);
+        orderLine.OrderItem.Should().Be(orderItem);
         orderLine.OrderedQuantity.Should().Be(orderedQuantity);
         orderLine.CancelledQuantity.Should().Be(cancelledQuantity);
         orderLine.FullfilledQuantity.Should().Be(fullfilledQuantity);
@@ -151,38 +150,34 @@ public class OrderLineTests
         orderLine.AdditionalInformation.Should().Be(additionalInfo);
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    public void Reconstitute_InvalidId_ShouldThrowArgumentException(long invalidId)
+    [Fact]
+    public void Reconstitute_InvalidId_ShouldThrowArgumentException()
     {
         // Arrange
-        var itemId = 2L;
+        var orderItem = OrdersTestData.CreateOrderItem();
         var orderedQuantity = 15m;
         var cancelledQuantity = 2m;
         var fullfilledQuantity = 0m;
         var price = new Money(150m, "USD");
         // Act
-        Action act = () => OrderLine.Reconstitute(invalidId, itemId, orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
+        Action act = () => OrderLine.Reconstitute(-1, orderItem, orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
         // Assert
         act.Should().Throw<ArgumentException>();
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-1)]
-    public void Reconstitute_InvalidItemId_ShouldThrowArgumentException(long invalidItemId)
+    [Fact]
+    public void Reconstitute_NullOrderItem_ShouldThrowArgumentNullException()
     {
         // Arrange
-        var id = 1L;
+        var id = OrdersTestData.NextId();
         var orderedQuantity = 15m;
         var cancelledQuantity = 2m;
         var fullfilledQuantity = 0m;
         var price = new Money(150m, "USD");
         // Act
-        Action act = () => OrderLine.Reconstitute(id, invalidItemId, orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
+        Action act = () => OrderLine.Reconstitute(id, null!, orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
         // Assert
-        act.Should().Throw<ArgumentException>();
+        act.Should().Throw<ArgumentNullException>();
     }
 
     [Theory]
@@ -191,13 +186,13 @@ public class OrderLineTests
     public void Reconstitute_InvalidOrderedQuantity_ShouldThrowArgumentException(decimal invalidQuantity)
     {
         // Arrange
-        var id = 1L;
-        var itemId = 2L;
+        var id = OrdersTestData.NextId();
+        var orderItem = OrdersTestData.CreateOrderItem();
         var cancelledQuantity = 2m;
         var fullfilledQuantity = 0m;
         var price = new Money(150m, "USD");
         // Act
-        Action act = () => OrderLine.Reconstitute(id, itemId, invalidQuantity, cancelledQuantity, fullfilledQuantity, price);
+        Action act = () => OrderLine.Reconstitute(id, orderItem, invalidQuantity, cancelledQuantity, fullfilledQuantity, price);
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -206,14 +201,14 @@ public class OrderLineTests
     public void Reconstitute_NullPrice_ShouldThrowArgumentNullException()
     {
         // Arrange
-        var id = 1L;
-        var itemId = 2L;
+        var id = OrdersTestData.NextId();
+        var orderItem = OrdersTestData.CreateOrderItem();
         var orderedQuantity = 15m;
         var cancelledQuantity = 2m;
         var fullfilledQuantity = 0m;
         Money price = null!;
         // Act
-        Action act = () => OrderLine.Reconstitute(id, itemId, orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
+        Action act = () => OrderLine.Reconstitute(id, orderItem, orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
         // Assert
         act.Should().Throw<ArgumentNullException>();
     }
@@ -222,15 +217,15 @@ public class OrderLineTests
     public void Reconstitute_PriceWithDifferentCurrencyThanExchangeRate_ShouldThrowArgumentException()
     {
         // Arrange
-        var id = 1L;
-        var itemId = 2L;
+        var id = OrdersTestData.NextId();
+        var orderItem = OrdersTestData.CreateOrderItem();
         var orderedQuantity = 15m;
         var cancelledQuantity = 2m;
         var fullfilledQuantity = 0m;
         var price = new Money(150m, "USD");
         var exchangeRate = new ExchangeRate("EUR", "GBP", 0.75m);
         // Act
-        Action act = () => OrderLine.Reconstitute(id, itemId, orderedQuantity, cancelledQuantity, fullfilledQuantity, price, exchangeRate, "Info");
+        Action act = () => OrderLine.Reconstitute(id, orderItem, orderedQuantity, cancelledQuantity, fullfilledQuantity, price, exchangeRate, "Info");
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -239,8 +234,9 @@ public class OrderLineTests
     public void Update_ValidParameters_ShouldUpdateProperties()
     {
         // Arrange
-        var orderLine = OrderLine.Create(1L, 10m, new Money(100m, "USD"));
-        var newItemId = 2L;
+        var orderItem = OrdersTestData.CreateOrderItem();
+        var orderLine = OrderLine.Create(orderItem, 10m, new Money(100m, "USD"));
+        var newOrderItem = OrdersTestData.CreateOrderItem();
         var newOrderedQuantity = 20m;
         var newCancelledQuantity = 5m;
         var newFullfilledQuantity = 10m;
@@ -248,9 +244,9 @@ public class OrderLineTests
         var newExchangeRate = new ExchangeRate("USD", "EUR", 0.85m);
         var newAdditionalInfo = "Updated info";
         // Act
-        orderLine.Update(newItemId, newOrderedQuantity, newCancelledQuantity, newFullfilledQuantity, newPrice, newExchangeRate, newAdditionalInfo);
+        orderLine.Update(newOrderItem, newOrderedQuantity, newCancelledQuantity, newFullfilledQuantity, newPrice, newExchangeRate, newAdditionalInfo);
         // Assert
-        orderLine.ItemId.Should().Be(newItemId);
+        orderLine.OrderItem.Should().Be(newOrderItem);
         orderLine.OrderedQuantity.Should().Be(newOrderedQuantity);
         orderLine.CancelledQuantity.Should().Be(newCancelledQuantity);
         orderLine.FullfilledQuantity.Should().Be(newFullfilledQuantity);
@@ -259,13 +255,12 @@ public class OrderLineTests
         orderLine.AdditionalInformation.Should().Be(newAdditionalInfo);
     }
 
-    [Theory]
-    [InlineData(0)]
-    [InlineData(-2)]
-    public void Update_InvalidItemId_ShouldThrowArgumentException(long invalidItemId)
+    [Fact]
+    public void Update_NullOrderItem_ShouldThrowArgumentNullException()
     {
         // Arrange
-        var orderLine = OrderLine.Create(1L, 10m, new Money(100m, "USD"));
+        var orderItem = OrdersTestData.CreateOrderItem();
+        var orderLine = OrderLine.Create(orderItem, 10m, new Money(100m, "USD"));
         var newOrderedQuantity = 20m;
         var newCancelledQuantity = 5m;
         var newFullfilledQuantity = 10m;
@@ -273,9 +268,9 @@ public class OrderLineTests
         var newExchangeRate = new ExchangeRate("USD", "EUR", 0.85m);
         var newAdditionalInfo = "Updated info";
         // Act
-        Action act = () => orderLine.Update(invalidItemId, newOrderedQuantity, newCancelledQuantity, newFullfilledQuantity, newPrice, newExchangeRate, newAdditionalInfo);
+        Action act = () => orderLine.Update(null!, newOrderedQuantity, newCancelledQuantity, newFullfilledQuantity, newPrice, newExchangeRate, newAdditionalInfo);
         // Assert
-        act.Should().Throw<ArgumentException>();
+        act.Should().Throw<ArgumentNullException>();
     }
 
     [Theory]
@@ -284,15 +279,16 @@ public class OrderLineTests
     public void Update_InvalidOrderedQuantity_ShouldThrowArgumentException(decimal invalidQuantity)
     {
         // Arrange
-        var orderLine = OrderLine.Create(1L, 10m, new Money(100m, "USD"));
-        var newItemId = 2L;
+        var orderItem = OrdersTestData.CreateOrderItem();
+        var orderLine = OrderLine.Create(orderItem, 10m, new Money(100m, "USD"));
+        var newOrderItem = OrdersTestData.CreateOrderItem();
         var newCancelledQuantity = 5m;
         var newFullfilledQuantity = 10m;
         var newPrice = new Money(150m, "USD");
         var newExchangeRate = new ExchangeRate("USD", "EUR", 0.85m);
         var newAdditionalInfo = "Updated info";
         // Act
-        Action act = () => orderLine.Update(newItemId, invalidQuantity, newCancelledQuantity, newFullfilledQuantity, newPrice, newExchangeRate, newAdditionalInfo);
+        Action act = () => orderLine.Update(newOrderItem, invalidQuantity, newCancelledQuantity, newFullfilledQuantity, newPrice, newExchangeRate, newAdditionalInfo);
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -301,8 +297,9 @@ public class OrderLineTests
     public void Update_InvalidCancelledQuantity_ShouldThrowArgumentException()
     {
         // Arrange
-        var orderLine = OrderLine.Create(1L, 10m, new Money(100m, "USD"));
-        var newItemId = 2L;
+        var orderItem = OrdersTestData.CreateOrderItem();
+        var orderLine = OrderLine.Create(orderItem, 10m, new Money(100m, "USD"));
+        var newOrderItem = OrdersTestData.CreateOrderItem();
         var newOrderedQuantity = 20m;
         var newCancelledQuantity = -1m;
         var newFullfilledQuantity = 10m;
@@ -310,7 +307,7 @@ public class OrderLineTests
         var newExchangeRate = new ExchangeRate("USD", "EUR", 0.85m);
         var newAdditionalInfo = "Updated info";
         // Act
-        Action act = () => orderLine.Update(newItemId, newOrderedQuantity, newCancelledQuantity, newFullfilledQuantity, newPrice, newExchangeRate, newAdditionalInfo);
+        Action act = () => orderLine.Update(newOrderItem, newOrderedQuantity, newCancelledQuantity, newFullfilledQuantity, newPrice, newExchangeRate, newAdditionalInfo);
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -319,8 +316,9 @@ public class OrderLineTests
     public void Update_InvalidFullfilledQuantity_ShouldThrowArgumentException()
     {
         // Arrange
-        var orderLine = OrderLine.Create(1L, 10m, new Money(100m, "USD"));
-        var newItemId = 2L;
+        var orderItem = OrdersTestData.CreateOrderItem();
+        var orderLine = OrderLine.Create(orderItem, 10m, new Money(100m, "USD"));
+        var newOrderItem = OrdersTestData.CreateOrderItem();
         var newOrderedQuantity = 20m;
         var newCancelledQuantity = 5m;
         var newFullfilledQuantity = -2m;
@@ -328,7 +326,7 @@ public class OrderLineTests
         var newExchangeRate = new ExchangeRate("USD", "EUR", 0.85m);
         var newAdditionalInfo = "Updated info";
         // Act
-        Action act = () => orderLine.Update(newItemId, newOrderedQuantity, newCancelledQuantity, newFullfilledQuantity, newPrice, newExchangeRate, newAdditionalInfo);
+        Action act = () => orderLine.Update(newOrderItem, newOrderedQuantity, newCancelledQuantity, newFullfilledQuantity, newPrice, newExchangeRate, newAdditionalInfo);
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -337,8 +335,9 @@ public class OrderLineTests
     public void Update_FulfilledAndCancelledExceedOrdered_ShouldThrowInvalidOperationException()
     {
         // Arrange
-        var orderLine = OrderLine.Create(1L, 10m, new Money(100m, "USD"));
-        var newItemId = 2L;
+        var orderItem = OrdersTestData.CreateOrderItem();
+        var orderLine = OrderLine.Create(orderItem, 10m, new Money(100m, "USD"));
+        var newOrderItem = OrdersTestData.CreateOrderItem();
         var newOrderedQuantity = 20m;
         var newCancelledQuantity = 10m;
         var newFullfilledQuantity = 15m;
@@ -346,7 +345,7 @@ public class OrderLineTests
         var newExchangeRate = new ExchangeRate("USD", "EUR", 0.85m);
         var newAdditionalInfo = "Updated info";
         // Act
-        Action act = () => orderLine.Update(newItemId, newOrderedQuantity, newCancelledQuantity, newFullfilledQuantity, newPrice, newExchangeRate, newAdditionalInfo);
+        Action act = () => orderLine.Update(newOrderItem, newOrderedQuantity, newCancelledQuantity, newFullfilledQuantity, newPrice, newExchangeRate, newAdditionalInfo);
         // Assert
         act.Should().Throw<InvalidOperationException>();
     }
@@ -355,8 +354,7 @@ public class OrderLineTests
     public void Update_NullPrice_ShouldThrowArgumentNullException()
     {
         // Arrange
-        var orderLine = OrderLine.Create(1L, 10m, new Money(100m, "USD"));
-        var newItemId = 2L;
+        var orderLine = OrderLine.Create(OrdersTestData.CreateOrderItem(), 10m, new Money(100m, "USD"));
         var newOrderedQuantity = 20m;
         var newCancelledQuantity = 5m;
         var newFullfilledQuantity = 10m;
@@ -364,7 +362,7 @@ public class OrderLineTests
         var newExchangeRate = new ExchangeRate("USD", "EUR", 0.85m);
         var newAdditionalInfo = "Updated info";
         // Act
-        Action act = () => orderLine.Update(newItemId, newOrderedQuantity, newCancelledQuantity, newFullfilledQuantity, newPrice, newExchangeRate, newAdditionalInfo);
+        Action act = () => orderLine.Update(OrdersTestData.CreateOrderItem(), newOrderedQuantity, newCancelledQuantity, newFullfilledQuantity, newPrice, newExchangeRate, newAdditionalInfo);
         // Assert
         act.Should().Throw<ArgumentNullException>();
     }
@@ -373,8 +371,7 @@ public class OrderLineTests
     public void Update_PriceWithDifferentCurrencyThanExchangeRate_ShouldThrowArgumentException()
     {
         // Arrange
-        var orderLine = OrderLine.Create(1L, 10m, new Money(100m, "USD"));
-        var newItemId = 2L;
+        var orderLine = OrderLine.Create(OrdersTestData.CreateOrderItem(), 10m, new Money(100m, "USD"));
         var newOrderedQuantity = 20m;
         var newCancelledQuantity = 5m;
         var newFullfilledQuantity = 10m;
@@ -382,7 +379,7 @@ public class OrderLineTests
         var newExchangeRate = new ExchangeRate("EUR", "GBP", 0.75m);
         var newAdditionalInfo = "Updated info";
         // Act
-        Action act = () => orderLine.Update(newItemId, newOrderedQuantity, newCancelledQuantity, newFullfilledQuantity, newPrice, newExchangeRate, newAdditionalInfo);
+        Action act = () => orderLine.Update(OrdersTestData.CreateOrderItem(), newOrderedQuantity, newCancelledQuantity, newFullfilledQuantity, newPrice, newExchangeRate, newAdditionalInfo);
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -391,14 +388,13 @@ public class OrderLineTests
     public void ActiveQuantity_ShowsActiveQuantity()
     {
         // Arrange
-        var id = 1L;
-        var itemId = 2L;
+        var id = OrdersTestData.NextId();
         var orderedQuantity = 15m;
         var cancelledQuantity = 2m;
         var fullfilledQuantity = 3m;
         var activeQuantityExpected = orderedQuantity - cancelledQuantity - fullfilledQuantity;
         var price = new Money(150m, "USD");
-        var orderLine = OrderLine.Reconstitute(id, itemId, orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
+        var orderLine = OrderLine.Reconstitute(id, OrdersTestData.CreateOrderItem(), orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
         // Act & Assert
         orderLine.ActiveQuantity.Should().Be(activeQuantityExpected);
     }
@@ -407,14 +403,13 @@ public class OrderLineTests
     public void ConvertedPrice_ShouldConvertPriceUsingExchangeRate()
     {
         // Arrange
-        var id = 1L;
-        var itemId = 2L;
+        var id = OrdersTestData.NextId();
         var orderedQuantity = 15m;
         var cancelledQuantity = 2m;
         var fullfilledQuantity = 3m;
         var price = new Money(150m, "USD");
         var exchangeRate = new ExchangeRate("USD", "EUR", 0.8m);
-        var orderLine = OrderLine.Reconstitute(id, itemId, orderedQuantity, cancelledQuantity, fullfilledQuantity, price, exchangeRate, "Info");
+        var orderLine = OrderLine.Reconstitute(id, OrdersTestData.CreateOrderItem(), orderedQuantity, cancelledQuantity, fullfilledQuantity, price, exchangeRate, "Info");
         var expectedConvertedAmount = price.Amount * exchangeRate.Rate;
         // Act
         var convertedPrice = orderLine.ConvertedPrice;
@@ -428,13 +423,12 @@ public class OrderLineTests
     public void ConvertedPrice_NoExchangeRate_ShouldBePrice()
     {
         // Arrange
-        var id = 1L;
-        var itemId = 2L;
+        var id = OrdersTestData.NextId();
         var orderedQuantity = 15m;
         var cancelledQuantity = 2m;
         var fullfilledQuantity = 3m;
         var price = new Money(150m, "USD");
-        var orderLine = OrderLine.Reconstitute(id, itemId, orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
+        var orderLine = OrderLine.Reconstitute(id, OrdersTestData.CreateOrderItem(), orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
         // Act
         var convertedPrice = orderLine.ConvertedPrice;
         // Assert
@@ -445,13 +439,12 @@ public class OrderLineTests
     public void LineActiveValue_ShowsActiveValue()
     {
         // Arrange
-        var id = 1L;
-        var itemId = 2L;
+        var id = OrdersTestData.NextId();
         var orderedQuantity = 15m;
         var cancelledQuantity = 2m;
         var fullfilledQuantity = 3m;
         var price = new Money(150m, "USD");
-        var orderLine = OrderLine.Reconstitute(id, itemId, orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
+        var orderLine = OrderLine.Reconstitute(id, OrdersTestData.CreateOrderItem(), orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
         var expectedActiveValue = new Money(orderLine.ActiveQuantity * price.Amount, orderLine.ConvertedPrice.Currency);
         // Act
         var lineActiveValue = orderLine.LineActiveValue;
@@ -463,14 +456,13 @@ public class OrderLineTests
     public void LineActiveConvertedValue_WithExchangeRate_ShowsActiveValueForConvertedPrice()
     {
         // Arrange
-        var id = 1L;
-        var itemId = 2L;
+        var id = OrdersTestData.NextId();
         var orderedQuantity = 15m;
         var cancelledQuantity = 2m;
         var fullfilledQuantity = 3m;
         var price = new Money(150m, "USD");
         var exchangeRate = new ExchangeRate("USD", "EUR", 0.8m);
-        var orderLine = OrderLine.Reconstitute(id, itemId, orderedQuantity, cancelledQuantity, fullfilledQuantity, price, exchangeRate, "Info");
+        var orderLine = OrderLine.Reconstitute(id, OrdersTestData.CreateOrderItem(), orderedQuantity, cancelledQuantity, fullfilledQuantity, price, exchangeRate, "Info");
         var expectedActiveValue = new Money(orderLine.ActiveQuantity * orderLine.ConvertedPrice!.Amount, orderLine.ConvertedPrice.Currency);
         // Act
         var lineActiveConvertedValue = orderLine.LineActiveConvertedValue;
@@ -482,13 +474,12 @@ public class OrderLineTests
     public void LineActiveConvertedValue_NoExchangeRate_ShowsActiveValueForOriginalPrice()
     {
         // Arrange
-        var id = 1L;
-        var itemId = 2L;
+        var id = OrdersTestData.NextId();
         var orderedQuantity = 15m;
         var cancelledQuantity = 2m;
         var fullfilledQuantity = 3m;
         var price = new Money(150m, "USD");
-        var orderLine = OrderLine.Reconstitute(id, itemId, orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
+        var orderLine = OrderLine.Reconstitute(id, OrdersTestData.CreateOrderItem(), orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
         var expectedActiveValue = new Money(orderLine.ActiveQuantity * price.Amount, price.Currency);
         // Act
         var lineActiveConvertedValue = orderLine.LineActiveConvertedValue;
@@ -496,5 +487,5 @@ public class OrderLineTests
         lineActiveConvertedValue.Should().Be(expectedActiveValue);
     }
 
-    
+
 }
