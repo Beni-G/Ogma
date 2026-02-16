@@ -5,9 +5,11 @@ public record ItemDto(long Id,
     string Name, 
     string Code, 
     string Description,
-    CategoryWithAncestorsDto Category, 
+    long CategoryId,
+    CategoryDto? Category, 
     MoneyDto ListPrice, 
-    ItemTypeDto ItemType, 
+    long ItemTypeId,
+    ItemTypeDto? ItemType, 
     string UnitOfMeasurement, 
     bool IsActive);
 

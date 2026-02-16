@@ -13,4 +13,5 @@ public record PartnerResponse(
     IReadOnlyList<PartnerRoleTypeResponse> Roles,
     IReadOnlyList<PartnerIdentifierResponse> Identifiers,
     IReadOnlyList<PartnerBankAccountResponse> BankAccounts,
-    IReadOnlyList<PartnerContactResponse> Contacts);
+    IReadOnlyList<PartnerContactResponse> Contacts
+);

@@ -5,6 +5,7 @@ using Ogma.Domain.Catalog.Entities;
 using Ogma.Domain.Catalog.Repositories;
 
 namespace Ogma.Application.Catalog.Commands;
+
 public class CreateItemTypeHandler : IRequestHandler<CreateItemTypeCommand, ItemTypeDto>
 {
     private readonly IItemTypeRepository _itemTypeRepository;

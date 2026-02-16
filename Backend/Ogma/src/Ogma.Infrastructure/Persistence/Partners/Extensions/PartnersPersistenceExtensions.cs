@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using Ogma.Application.Partners.Ports;
 using Ogma.Domain.Partners.Repositories;
+using Ogma.Infrastructure.Persistence.Partners.Adapters;
 using Ogma.Infrastructure.Persistence.Partners.Contexts;
 using Ogma.Infrastructure.Persistence.Partners.MappingProfiles;
 using Ogma.Infrastructure.Persistence.Partners.Repositories;
@@ -29,7 +31,9 @@ public static class PartnersPersistenceExtensions
         });
 
         // Repository Registrations.
+        services.AddScoped<IPartnerRoleTypeReader, PartnerRoleTypeReader>();
         services.AddScoped<IPartnerRoleTypeRepository, PartnerRoleTypeRepository>();
+        services.AddScoped<IPartnerReader, PartnerReader>();
         services.AddScoped<IPartnerRepository, PartnerRepository>();
 
         // AutoMapper Configuration.

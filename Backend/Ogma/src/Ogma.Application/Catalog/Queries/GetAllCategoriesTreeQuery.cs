@@ -2,5 +2,5 @@
 using Ogma.Application.Catalog.Dtos;
 
 namespace Ogma.Application.Catalog.Queries;
-public record GetAllCategoriesTreeQuery : IRequest<List<CategoryWithDescendantsDto>>;
+public record GetAllCategoriesTreeQuery : IRequest<List<CategoryDto>>;
 

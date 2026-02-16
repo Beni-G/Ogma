@@ -1,22 +1,15 @@
 ﻿using MediatR;
 using Ogma.Application.Catalog.Dtos;
-using Ogma.Application.Catalog.Extensions;
-using Ogma.Domain.Catalog.Repositories;
+using Ogma.Application.Catalog.Ports;
 
 namespace Ogma.Application.Catalog.Queries;
-public class GetAllCategoriesFlatHandler : IRequestHandler<GetAllCategoriesFlatQuery, List<CategoryWithDescendantsDto>>
+
+public class GetAllCategoriesFlatHandler : IRequestHandler<GetAllCategoriesFlatQuery, List<CategoryDto>>
 {
-    private readonly ICategoryRepository _categoryRepository;
+    private readonly ICategoryReader _categoryReader;
 
-    public GetAllCategoriesFlatHandler(ICategoryRepository categoryRepository)
-    {
-        _categoryRepository = categoryRepository;
-    }
+    public GetAllCategoriesFlatHandler(ICategoryReader categoryReader) => _categoryReader = categoryReader;
 
-    public async Task<List<CategoryWithDescendantsDto>> Handle(GetAllCategoriesFlatQuery query, CancellationToken cancellationToken)
-    {
-        return (await _categoryRepository.GetAllAsync())
-            .Select(c => c.ToDtoWithDescendants())
-            .ToList();
-    }
+    public async Task<List<CategoryDto>> Handle(GetAllCategoriesFlatQuery query, CancellationToken cancellationToken) =>
+        (await _categoryReader.GetAllAsync()).ToList();
 }

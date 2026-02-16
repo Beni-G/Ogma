@@ -7,7 +7,7 @@ using Ogma.Domain.Catalog.Services;
 
 namespace Ogma.Application.Catalog.Commands;
 
-public class UpdateCategoryHandler : IRequestHandler<UpdateCategoryCommand, CategoryWithDescendantsDto>
+public class UpdateCategoryHandler : IRequestHandler<UpdateCategoryCommand, CategoryDto>
 {
     private readonly ICategoryRepository _categoryRepository;
     private readonly ICategoryDomainService _categoryDomainService;
@@ -18,22 +18,16 @@ public class UpdateCategoryHandler : IRequestHandler<UpdateCategoryCommand, Cate
         _categoryDomainService = categoryDomainService;
     }
 
-    public async Task<CategoryWithDescendantsDto> Handle(UpdateCategoryCommand command, CancellationToken cancellationToken)
+    public async Task<CategoryDto> Handle(UpdateCategoryCommand command, CancellationToken cancellationToken)
     {
-        var category = await _categoryRepository.GetByIdAsync(command.Id);
-        if (category == null)
-        {
-            throw new KeyNotFoundException($"Category with ID {command.Id} was not found.");
-        }
+        var category = await _categoryRepository.GetByIdAsync(command.Id)
+            ?? throw new KeyNotFoundException($"Category with ID {command.Id} was not found.");
 
         Category? parent = null;
         if (command.ParentCategoryId.HasValue)
         {
-            parent = await _categoryRepository.GetByIdAsync(command.ParentCategoryId.Value);
-            if (parent == null)
-            {
-                throw new KeyNotFoundException($"Parent category with ID {command.ParentCategoryId.Value} was not found.");
-            }
+            parent = await _categoryRepository.GetByIdAsync(command.ParentCategoryId.Value)
+                ?? throw new KeyNotFoundException($"Parent category with ID {command.ParentCategoryId.Value} was not found.");
         }
 
         category.Update(command.Name, command.ParentCategoryId);
@@ -47,6 +41,6 @@ public class UpdateCategoryHandler : IRequestHandler<UpdateCategoryCommand, Cate
             throw new InvalidOperationException($"Update failed for category with ID {category.Id}.");
         }
 
-        return category.ToDtoWithDescendants();
+        return category.ToDto();
     }
 }

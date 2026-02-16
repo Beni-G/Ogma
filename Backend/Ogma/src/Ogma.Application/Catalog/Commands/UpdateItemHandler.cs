@@ -1,54 +1,50 @@
 ﻿using MediatR;
 using Ogma.Application.Catalog.Dtos;
 using Ogma.Application.Catalog.Extensions;
+using Ogma.Application.Catalog.Ports;
 using Ogma.Domain.Catalog.Parameters;
 using Ogma.Domain.Catalog.Repositories;
 using Ogma.Domain.SharedKernel.ValueObjects;
 
 namespace Ogma.Application.Catalog.Commands;
+
 public class UpdateItemHandler : IRequestHandler<UpdateItemCommand, ItemDto>
 {
     private readonly IItemRepository _itemRepository;
-    private readonly IItemTypeRepository _itemTypeRepository;
-    private readonly ICategoryRepository _categoryRepository;
+    private readonly IItemReader _itemReader;
+    private readonly IItemTypeReader _itemTypeReader;
+    private readonly ICategoryReader _categoryReader;
 
-    public UpdateItemHandler(IItemRepository itemRepository, IItemTypeRepository itemTypeRepository, ICategoryRepository categoryRepository)
+    public UpdateItemHandler(IItemRepository itemRepository, IItemReader itemReader, IItemTypeReader itemTypeReader, ICategoryReader categoryReader)
     {
         _itemRepository = itemRepository;
-        _itemTypeRepository = itemTypeRepository;
-        _categoryRepository = categoryRepository;
+        _itemReader = itemReader;
+        _itemTypeReader = itemTypeReader;
+        _categoryReader = categoryReader;
     }
 
     public async Task<ItemDto> Handle(UpdateItemCommand command, CancellationToken cancellationToken)
     {
-        var existingItem = await _itemRepository.GetByIdAsync(command.Id);
-        if (existingItem == null)
-        {
-            throw new KeyNotFoundException($"Item with Id {command.Id} not found.");
-        }
-        var listPrice = new Money(command.ListPrice.Amount, command.ListPrice.Currency);
-        var category = await _categoryRepository.GetByIdAsync(command.CategoryId);
-        if (category == null)
-        {
-            throw new KeyNotFoundException($"Category with Id {command.CategoryId} not found.");
-        }
-        var categoryAncestors = await _categoryRepository.GetAncestorsAsync(category.Id);
+        var existingItem = await _itemRepository.GetByIdAsync(command.Id)
+            ?? throw new KeyNotFoundException($"Item with Id {command.Id} not found.");
 
-        var itemType = await _itemTypeRepository.GetByIdAsync(command.ItemTypeId);
+        var category = await _categoryReader.GetByIdAsync(command.CategoryId)
+            ?? throw new KeyNotFoundException($"Category with Id {command.CategoryId} not found.");
+        var categoryAncestors = await _categoryReader.GetAncestorsAsync(category.Id);
+        category.ToEnrichedDto(categoryAncestors);
 
-        if (itemType == null)
-        {
-            throw new KeyNotFoundException($"ItemType with Id {command.ItemTypeId} not found.");
-        }
+        var itemType = await _itemTypeReader.GetByIdAsync(command.ItemTypeId)
+            ?? throw new KeyNotFoundException($"ItemType with Id {command.ItemTypeId} not found.");
 
         var parameters = new ItemParameters(command.Name,
             command.Code,
-            category,
-            listPrice,
-            itemType,
+            command.CategoryId,
+            new Money(command.ListPrice.Amount, command.ListPrice.Currency),
+            command.ItemTypeId,
             command.UnitOfMeasurement,
             command.IsActive,
-            command.Description);
+            command.Description
+        );
 
         existingItem.UpdateItem(parameters);
         var result = await _itemRepository.UpdateAsync(existingItem);
@@ -57,6 +53,21 @@ public class UpdateItemHandler : IRequestHandler<UpdateItemCommand, ItemDto>
             throw new InvalidOperationException($"Update failed for ItemType with ID {command.Id}.");
         }
 
-        return existingItem.ToDto(categoryAncestors);
+        var updatedItem = await _itemReader.GetByIdAsync(command.Id)
+            ?? throw new InvalidOperationException($"Failed to retrieve updated Order with ID {command.Id}.");
+
+        return new ItemDto(
+            updatedItem.Id,
+            updatedItem.Name,
+            updatedItem.Code,
+            updatedItem.Description,
+            updatedItem.CategoryId,
+            category,
+            updatedItem.ListPrice,
+            updatedItem.ItemTypeId,
+            itemType,
+            updatedItem.UnitOfMeasurement,
+            updatedItem.IsActive
+        );
     }
 }

@@ -1,23 +1,17 @@
 ﻿using AutoMapper;
-using AutoMapper.Extensions.ExpressionMapping;
 using Microsoft.EntityFrameworkCore;
 using Ogma.Domain.Catalog.Entities;
 using Ogma.Domain.Catalog.Repositories;
 using Ogma.Infrastructure.Persistence.Catalog.Contexts;
 using Ogma.Infrastructure.Persistence.Catalog.Extensions;
-using System.Linq.Expressions;
 
 namespace Ogma.Infrastructure.Persistence.Catalog.Repositories;
+
 public class CategoryRepository : ICategoryRepository
 {
     private readonly CatalogDbContext _catalogDbContext;
-    private readonly IMapper _mapper;
 
-    public CategoryRepository(CatalogDbContext catalogDbContext, IMapper mapper)
-    {
-        _catalogDbContext = catalogDbContext;
-        _mapper = mapper;
-    }
+    public CategoryRepository(CatalogDbContext catalogDbContext) => _catalogDbContext = catalogDbContext;
 
     public async Task<Category?> GetByIdAsync(long id)
     {
@@ -26,86 +20,6 @@ public class CategoryRepository : ICategoryRepository
             .Where(c => c.Id == id)
             .Select(c => c.ToDomain())
             .FirstOrDefaultAsync();
-    }
-
-    public async Task<IEnumerable<Category>> GetAllAsync()
-    {
-        return await _catalogDbContext.Categories
-            .AsNoTracking()
-            .Select(c => c.ToDomain())
-            .ToListAsync();
-    }
-
-    public async Task<IEnumerable<Category>> GetAllAsync(Expression<Func<Category, bool>> predicate)
-    {
-        var modelPredicate = _mapper.MapExpression<Expression<Func<Models.Category, bool>>>(predicate);
-
-        return await _catalogDbContext.Categories
-            .AsNoTracking()
-            .Where(modelPredicate)
-            .Select(c => c.ToDomain())
-            .ToListAsync();
-    }
-
-    public async Task<IEnumerable<Category>> GetAllCategoriesTreeAsync()
-    {
-        return await _catalogDbContext.Categories
-            .Include(c => c.SubCategories)
-            .ThenInclude(sc => sc.SubCategories)
-            .ThenInclude(ssc => ssc.SubCategories)
-            .ThenInclude(sssc => sssc.SubCategories)
-            .AsNoTracking()
-            .Where(c => c.ParentCategoryId == null)
-            .Select(c => c.ToDomain())
-            .ToListAsync();
-    }
-
-    public async Task<IEnumerable<Category>> GetChildrenAsync(long ParentCategoryId)
-    {
-        return await _catalogDbContext.Categories
-            .AsNoTracking()
-            .Where(c => c.ParentCategoryId == ParentCategoryId)
-            .Select(c => c.ToDomain())
-            .ToListAsync();
-    }
-
-    public async Task<IEnumerable<Category>> GetDescendantsAsync(long rootId)
-    {
-        var result = new List<Category>();
-        await CollectDescendantsAsync(rootId, result);
-        return result;
-    }
-
-    public async Task<IEnumerable<Category>> GetAncestorsAsync(long leafId)
-    {
-        var categoryModel = await _catalogDbContext.Categories
-        .AsNoTracking()
-        .FirstOrDefaultAsync(c => c.Id == leafId);
-
-        if (categoryModel is null)
-        {
-            throw new InvalidOperationException($"Category with ID {categoryModel.Id} was not found.");
-        }
-
-        var ids = categoryModel.Path?.Split('/')
-            .Select(long.Parse)
-            .ToList() ?? new();
-
-        if (!ids.Any())
-        {
-            return [];
-        }
-
-        var models = await _catalogDbContext.Categories
-            .Where(c => ids.Contains(c.Id))
-            .ToListAsync();
-
-        var ordered = models
-            .OrderBy(m => ids.IndexOf(m.Id))
-            .Select(m => m.ToDomain())
-            .ToList();
-
-        return ordered;
     }
 
     public async Task<Category> AddAsync(Category category)
@@ -208,6 +122,34 @@ public class CategoryRepository : ICategoryRepository
         _catalogDbContext.Categories.Attach(model);
         _catalogDbContext.Categories.Remove(model);
         await _catalogDbContext.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Asynchronously retrieves all descendant categories of the specified root category.
+    /// </summary>
+    /// <param name="rootId">The identifier of the root category for which to retrieve all descendant categories.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of all descendant
+    /// categories of the specified root category. The collection is empty if the root category has no descendants.</returns>
+    private async Task<IEnumerable<Category>> GetDescendantsAsync(long rootId)
+    {
+        var result = new List<Category>();
+        await CollectDescendantsAsync(rootId, result);
+        return result;
+    }
+
+    /// <summary>
+    /// Asynchronously retrieves all categories that are direct children of the specified parent category.
+    /// </summary>
+    /// <param name="ParentCategoryId">The unique identifier of the parent category whose child categories are to be retrieved.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains a collection of categories that are
+    /// direct children of the specified parent category. The collection is empty if no child categories are found.</returns>
+    private async Task<IEnumerable<Category>> GetChildrenAsync(long ParentCategoryId)
+    {
+        return await _catalogDbContext.Categories
+            .AsNoTracking()
+            .Where(c => c.ParentCategoryId == ParentCategoryId)
+            .Select(c => c.ToDomain())
+            .ToListAsync();
     }
 
     /// <summary>

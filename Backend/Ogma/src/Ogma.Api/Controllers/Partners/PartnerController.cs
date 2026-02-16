@@ -63,7 +63,7 @@ public class PartnerController : ControllerBase
                     request.HQAddress.Floor,
                     request.HQAddress.Apartment)
                 : null,
-            new PartnerIdentifierDto(
+            new CreatePartnerIdentifierDto(
                 request.Identifier.Type,
                 request.Identifier.Value,
                 request.Identifier.ValidityPeriod != null
@@ -103,6 +103,7 @@ public class PartnerController : ControllerBase
                     request.HQAddress.Apartment)
                 : null,
             request.Identifiers.Select(idt => new PartnerIdentifierDto(
+                idt.Id,
                 idt.Type,
                 idt.Value,
                 idt.ValidityPeriod != null
@@ -111,6 +112,7 @@ public class PartnerController : ControllerBase
                 idt.IsPrimary)).ToList(),
             request.RoleIds,
             request.BankAccounts.Select(ba => new PartnerBankAccountDto(
+                ba.Id,
                 new BankAccountDto(
                     ba.BankAccount.Bank,
                     ba.BankAccount.Iban,
@@ -118,6 +120,7 @@ public class PartnerController : ControllerBase
                     ba.BankAccount.Bic),
                 ba.IsDefault)).ToList(),
             request.Contacts.Select(c => new PartnerContactDto(
+                c.Id,
                 new PersonNameDto(c.Name.FirstName, c.Name.LastName),
                 c.Email,
                 c.Phone,

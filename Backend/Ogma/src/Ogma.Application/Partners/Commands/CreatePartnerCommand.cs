@@ -9,6 +9,6 @@ public record CreatePartnerCommand(
     string? CompanyName,
     bool IsNaturalPerson,
     AddressDto? HQAddress,
-    PartnerIdentifierDto Identifier,
+    CreatePartnerIdentifierDto Identifier,
     long RoleId) : IRequest<PartnerDto>;
 

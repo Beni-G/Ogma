@@ -2,4 +2,4 @@
 
 namespace Ogma.Api.Contracts.Partners;
 
-public record PartnerBankAccountResponse(BankAccountResponse BankAccount, bool IsDefault);
+public record PartnerBankAccountResponse(long Id, BankAccountResponse BankAccount, bool IsDefault);

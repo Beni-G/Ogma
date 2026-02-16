@@ -5,11 +5,6 @@ using Ogma.Application.SharedKernel.Extensions;
 using Ogma.Domain.Orders.Entities;
 using Ogma.Domain.Orders.Repositories;
 using Ogma.Domain.Orders.ValueObjects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ogma.Application.Orders.Commands;
 

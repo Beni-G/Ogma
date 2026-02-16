@@ -1,4 +1,4 @@
-﻿using Ogma.Infrastructure.Persistence.Partners.ValueObjectRecords;
+﻿using Ogma.Infrastructure.Persistence.SharedKernel.ValueObjectRecords;
 
 namespace Ogma.Infrastructure.Persistence.Partners.Models;
 

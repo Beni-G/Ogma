@@ -13,13 +13,14 @@ public static class PartnerMappingExtensions
         new PartnerRoleTypeResponse(partnerRoleType.Id, partnerRoleType.Code, partnerRoleType.Name, partnerRoleType.Color);
 
     public static PartnerBankAccountResponse ToResponse(this PartnerBankAccount partnerBankAccount) =>
-        new PartnerBankAccountResponse(partnerBankAccount.BankAccount.ToResponse(), partnerBankAccount.IsDefault);
+        new PartnerBankAccountResponse(partnerBankAccount.Id, partnerBankAccount.BankAccount.ToResponse(), partnerBankAccount.IsDefault);
 
     public static PartnerBankAccountResponse ToResponse(this PartnerBankAccountDto partnerBankAccount) =>
-        new PartnerBankAccountResponse(partnerBankAccount.BankAccount.ToResponse(), partnerBankAccount.IsDefault);
+        new PartnerBankAccountResponse(partnerBankAccount.Id, partnerBankAccount.BankAccount.ToResponse(), partnerBankAccount.IsDefault);
 
     public static PartnerIdentifierResponse ToResponse(this PartnerIdentifier partnerIdentifier) =>
         new PartnerIdentifierResponse(
+            partnerIdentifier.Id,
             partnerIdentifier.Type,
             partnerIdentifier.Value,
             partnerIdentifier.ValidityPeriod?.ToResponse(),
@@ -27,6 +28,7 @@ public static class PartnerMappingExtensions
 
     public static PartnerIdentifierResponse ToResponse(this PartnerIdentifierDto partnerIdentifier) =>
         new PartnerIdentifierResponse(
+            partnerIdentifier.Id,
             partnerIdentifier.Type,
             partnerIdentifier.Value,
             partnerIdentifier.ValidityPeriod?.ToResponse(),
@@ -34,6 +36,7 @@ public static class PartnerMappingExtensions
 
     public static PartnerContactResponse ToResponse(this PartnerContact partnerContact) =>
         new PartnerContactResponse(
+            partnerContact.Id,
             partnerContact.Name.ToResponse(),
             partnerContact.Email?.Value,
             partnerContact.Phone,
@@ -44,6 +47,7 @@ public static class PartnerMappingExtensions
 
     public static PartnerContactResponse ToResponse(this PartnerContactDto partnerContact) =>
         new PartnerContactResponse(
+            partnerContact.Id,
             partnerContact.Name.ToResponse(),
             partnerContact.Email,
             partnerContact.Phone,
@@ -51,20 +55,6 @@ public static class PartnerMappingExtensions
             partnerContact.Title,
             partnerContact.JobTitle,
             partnerContact.IsPrimary);
-
-    public static PartnerResponse ToResponse(this Partner partner) =>
-        new PartnerResponse(
-            partner.Id,
-            partner.IndividualName?.ToResponse(),
-            partner.CompanyName,
-            partner.IsNaturalPerson,
-            partner.IsActive,
-            partner.DisplayName,
-            partner.HQAddress?.ToResponse(),
-            partner.Roles.Select(r => r.ToResponse()).ToList(),
-            partner.Identifiers.Select(i => i.ToResponse()).ToList(),
-            partner.BankAccounts.Select(b => b.ToResponse()).ToList(),
-            partner.Contacts.Select(c => c.ToResponse()).ToList());
 
     public static PartnerResponse ToResponse(this PartnerDto partner) =>
         new PartnerResponse(

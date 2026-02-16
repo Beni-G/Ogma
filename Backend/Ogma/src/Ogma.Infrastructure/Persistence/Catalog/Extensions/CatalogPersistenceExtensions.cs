@@ -2,7 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Ogma.Application.Catalog.Ports;
 using Ogma.Domain.Catalog.Repositories;
+using Ogma.Infrastructure.Persistence.Catalog.Adapters;
 using Ogma.Infrastructure.Persistence.Catalog.Contexts;
 using Ogma.Infrastructure.Persistence.Catalog.MappingProfiles;
 using Ogma.Infrastructure.Persistence.Catalog.Repositories;
@@ -22,8 +24,11 @@ public static class CatalogPersistenceExtensions
 
         // Repository Registrations.
         services.AddScoped<IItemRepository, ItemRepository>();
-        services.AddScoped<IItemTypeRepository, ItemTypeRepository>();
+        services.AddScoped<IItemReader, ItemReader>();
+        services.AddScoped<Domain.Catalog.Repositories.IItemTypeRepository, ItemTypeRepository>();
+        services.AddScoped<Application.Catalog.Ports.IItemTypeReader, ItemTypeReader>();
         services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<ICategoryReader, CategoryReader>();
 
         // AutoMapper Configuration.
         services.AddAutoMapper(cfg =>
