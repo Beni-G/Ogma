@@ -8,9 +8,9 @@ public class Item : AggregateRoot<long>
     public string Name { get; private set; }
     public string Code { get; private set; }
     public string Description { get; private set; }
-    public Category Category { get; private set; }
+    public long CategoryId { get; private set; }
     public Money ListPrice { get; private set; }
-    public ItemType ItemType { get; private set; }
+    public long ItemTypeId { get; private set; }
     public string UnitOfMeasurement { get; private set; }
     public bool IsActive { get; private set; }
 
@@ -37,7 +37,17 @@ public class Item : AggregateRoot<long>
             throw new ArgumentException("Code cannot be null or empty.", nameof(itemParameters.Code));
         }
 
-        if(string.IsNullOrWhiteSpace(itemParameters.UnitOfMeasurement))
+        if (itemParameters.CategoryId <= 0)
+        {
+            throw new ArgumentException("Category ID must be a positive number.", nameof(itemParameters.CategoryId));
+        }
+
+        if (itemParameters.ItemTypeId <= 0)
+        {
+            throw new ArgumentException("Item Type ID must be a positive number.", nameof(itemParameters.ItemTypeId));
+        }
+
+        if (string.IsNullOrWhiteSpace(itemParameters.UnitOfMeasurement))
         {
             throw new ArgumentException("Unit of Measurement cannot be null or empty.", nameof(itemParameters.UnitOfMeasurement));
         }
@@ -45,9 +55,9 @@ public class Item : AggregateRoot<long>
         Name = itemParameters.Name;
         Code = itemParameters.Code;
         Description = itemParameters.Description;
-        Category = itemParameters.Category ?? throw new ArgumentNullException(nameof(itemParameters.Category));
+        CategoryId = itemParameters.CategoryId;
         ListPrice = itemParameters.ListPrice ?? throw new ArgumentNullException(nameof(itemParameters.ListPrice));
-        ItemType = itemParameters.ItemType ?? throw new ArgumentNullException(nameof(itemParameters.ItemType));
+        ItemTypeId = itemParameters.ItemTypeId;
         UnitOfMeasurement = itemParameters.UnitOfMeasurement;
         IsActive = itemParameters.IsActive;
     }
@@ -81,6 +91,16 @@ public class Item : AggregateRoot<long>
             throw new ArgumentException("Code cannot be null or empty.", nameof(itemParameters.Code));
         }
 
+        if (itemParameters.CategoryId <= 0)
+        {
+            throw new ArgumentException("Category ID must be a positive number.", nameof(itemParameters.CategoryId));
+        }
+
+        if (itemParameters.ItemTypeId <= 0)
+        {
+            throw new ArgumentException("Item Type ID must be a positive number.", nameof(itemParameters.ItemTypeId));
+        }
+
         if (string.IsNullOrWhiteSpace(itemParameters.UnitOfMeasurement))
         {
             throw new ArgumentException("Unit of Measurement cannot be null or empty.", nameof(itemParameters.UnitOfMeasurement));
@@ -89,9 +109,9 @@ public class Item : AggregateRoot<long>
         Name = itemParameters.Name;
         Code = itemParameters.Code;
         Description = itemParameters.Description;
-        Category = itemParameters.Category ?? throw new ArgumentNullException(nameof(itemParameters.Category));
+        CategoryId = itemParameters.CategoryId;
         ListPrice = itemParameters.ListPrice ?? throw new ArgumentNullException(nameof(itemParameters.ListPrice));
-        ItemType = itemParameters.ItemType ?? throw new ArgumentNullException(nameof(itemParameters.ItemType));
+        ItemTypeId = itemParameters.ItemTypeId;
         UnitOfMeasurement = itemParameters.UnitOfMeasurement;
         IsActive = itemParameters.IsActive;
     }
@@ -125,9 +145,9 @@ public class Item : AggregateRoot<long>
         UpdateName(itemParameters.Name);
         UpdateCode(itemParameters.Code);
         UpdateDescription(itemParameters.Description);
-        UpdateCategory(itemParameters.Category);
+        UpdateCategoryId(itemParameters.CategoryId);
         UpdateListPrice(itemParameters.ListPrice);
-        UpdateItemType(itemParameters.ItemType);
+        UpdateItemTypeId(itemParameters.ItemTypeId);
         UpdateUnitOfMeasurement(itemParameters.UnitOfMeasurement);
         if (itemParameters.IsActive)
         {
@@ -174,9 +194,18 @@ public class Item : AggregateRoot<long>
     /// <param name="description"></param>
     public void UpdateDescription(string description) => Description = description;
 
-    public void UpdateCategory(Category category)
+    /// <summary>
+    /// Updates the category identifier associated with the current instance.
+    /// </summary>
+    /// <param name="categoryId">The unique identifier of the category to assign. Must be a positive number.</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="categoryId"/> is less than or equal to zero.</exception>
+    public void UpdateCategoryId(long categoryId)
     {
-        Category = category ?? throw new ArgumentNullException(nameof(category));
+        if (categoryId <= 0)
+        {
+            throw new ArgumentException("Category ID must be a positive number.", nameof(categoryId));
+        }
+        CategoryId = categoryId;
     }
 
     /// <summary>
@@ -190,20 +219,24 @@ public class Item : AggregateRoot<long>
     }
 
     /// <summary>
-    /// Updates the item type of the item.
+    /// Updates the item type identifier for the current instance.
     /// </summary>
-    /// <param name="itemType"></param>
-    /// <exception cref="ArgumentNullException"></exception>
-    public void UpdateItemType(ItemType itemType)
+    /// <param name="itemTypeId">The unique identifier of the item type to assign. Must be a positive number.</param>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="itemTypeId"/> is less than or equal to zero.</exception>
+    public void UpdateItemTypeId(long itemTypeId)
     {
-        ItemType = itemType ?? throw new ArgumentNullException(nameof(itemType));
+        if (itemTypeId <= 0)
+        {
+            throw new ArgumentException("ItemType Id must be a positive number.", nameof(itemTypeId));
+        }
+        ItemTypeId = itemTypeId;
     }
 
     /// <summary>
-    /// Updates the unit of measurement for the item.
+    /// Updates the unit of measurement used by the current instance.
     /// </summary>
-    /// <param name="unitOfMeasurement"></param>
-    /// <exception cref="ArgumentException"></exception>
+    /// <param name="unitOfMeasurement">The new unit of measurement to assign. Cannot be null, empty, or consist only of white-space characters.</param>
+    /// <exception cref="ArgumentException">Thrown if <paramref name="unitOfMeasurement"/> is null, empty, or consists only of white-space characters.</exception>
     public void UpdateUnitOfMeasurement(string unitOfMeasurement)
     {
         if (string.IsNullOrWhiteSpace(unitOfMeasurement))
@@ -214,12 +247,14 @@ public class Item : AggregateRoot<long>
     }
 
     /// <summary>
-    /// Deactivates the item, setting its active state to false.
+    /// Deactivates the current instance, setting its active state to false.
     /// </summary>
+    /// <remarks>After calling this method, the instance will no longer be considered active. This may affect
+    /// its availability for further operations that require an active state.</remarks>
     public void Deactivate() => IsActive = false;
 
     /// <summary>
-    /// Activates the item, setting its active state to true.
+    /// Activates the current instance by setting its active state to true.
     /// </summary>
     public void Activate() => IsActive = true;
 }

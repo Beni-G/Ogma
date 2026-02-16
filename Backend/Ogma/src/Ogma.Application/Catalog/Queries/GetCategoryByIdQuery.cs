@@ -2,4 +2,4 @@
 using Ogma.Application.Catalog.Dtos;
 
 namespace Ogma.Application.Catalog.Queries;
-public record GetCategoryByIdQuery(long Id) : IRequest<CategoryWithDescendantsDto>;
+public record GetCategoryByIdQuery(long Id) : IRequest<CategoryDto>;

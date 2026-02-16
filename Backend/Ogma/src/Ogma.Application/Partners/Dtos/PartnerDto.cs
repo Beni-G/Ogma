@@ -13,4 +13,5 @@ public record PartnerDto(
     IReadOnlyList<PartnerRoleTypeDto> Roles,
     IReadOnlyList<PartnerIdentifierDto> Identifiers,
     IReadOnlyList<PartnerBankAccountDto> BankAccounts,
-    IReadOnlyList<PartnerContactDto> Contacts);
+    IReadOnlyList<PartnerContactDto> Contacts
+);

@@ -1,7 +1,7 @@
 ﻿using Ogma.Domain.Catalog.Entities;
-using System.Linq.Expressions;
 
 namespace Ogma.Domain.Catalog.Repositories;
+
 public interface IItemRepository
 {
     /// <summary>
@@ -10,19 +10,6 @@ public interface IItemRepository
     /// <param name="id"></param>
     /// <returns></returns>
     Task<Item?> GetByIdAsync(long id);
-
-    /// <summary>
-    /// Gets all items.
-    /// </summary>
-    /// <returns></returns>
-    Task<IEnumerable<Item>> GetAllAsync();
-
-    /// <summary>
-    /// Gets all items that match the specified predicate.
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
-    Task<IEnumerable<Item>> GetAllAsync(Expression<Func<Item, bool>> predicate);
 
     /// <summary>
     /// Adds a new item to the repository.

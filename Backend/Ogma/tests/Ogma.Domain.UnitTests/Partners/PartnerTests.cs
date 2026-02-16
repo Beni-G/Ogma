@@ -33,16 +33,16 @@ public class PartnerTests
         // Arrange
         var individualName = new PersonName("Jane", "Doe");
         var partnerIdentifier = PartnerIdentifier.Create("SSN", "123-45-6789");
-        var partnerRole = PartnerRoleType.Create("Customer", "Customer");
+        var partnerRoleId = 1L;
         // Act
-        var partner = Partner.CreateIndividual(individualName, partnerIdentifier, partnerRole, _defaultAddress);
+        var partner = Partner.CreateIndividual(individualName, partnerIdentifier, partnerRoleId, _defaultAddress);
         // Assert
         partner.IndividualName.Should().Be(individualName);
         partner.CompanyName.Should().BeNull();
         partner.IsNaturalPerson.Should().BeTrue();
         partner.Identifiers.Should().ContainSingle().Which.Should().Be(partnerIdentifier);
         partner.Identifiers.FirstOrDefault()?.IsPrimary.Should().BeTrue();
-        partner.Roles.Should().ContainSingle().Which.Should().Be(partnerRole);
+        partner.RoleIds.Should().ContainSingle().Which.Should().Be(partnerRoleId);
         partner.HQAddress.Should().Be(_defaultAddress);
     }
 
@@ -52,9 +52,9 @@ public class PartnerTests
         // Arrange
         var individualName = new PersonName("Jane", "Doe");
         var partnerIdentifier = PartnerIdentifier.Create("SSN", "123-45-6789");
-        var partnerRole = PartnerRoleType.Create("Customer", "Customer");
+        var partnerRoleId = 1L;
         // Act
-        var partner = Partner.CreateIndividual(individualName, partnerIdentifier, partnerRole);
+        var partner = Partner.CreateIndividual(individualName, partnerIdentifier, partnerRoleId);
         // Assert
         partner.HQAddress.Should().BeNull();
     }
@@ -64,9 +64,9 @@ public class PartnerTests
     {
         // Arrange
         var partnerIdentifier = PartnerIdentifier.Create("SSN", "123-45-6789");
-        var partnerRole = PartnerRoleType.Create("Customer", "Customer");
+        var partnerRoleId = 1L;
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => Partner.CreateIndividual(null!, partnerIdentifier, partnerRole));
+        Assert.Throws<ArgumentNullException>(() => Partner.CreateIndividual(null!, partnerIdentifier, partnerRoleId));
     }
 
     [Fact]
@@ -74,19 +74,21 @@ public class PartnerTests
     {
         // Arrange
         var individualName = new PersonName("Jane", "Doe");
-        var partnerRole = PartnerRoleType.Create("Customer", "Customer");
+        var partnerRoleId = 1L;
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => Partner.CreateIndividual(individualName, null!, partnerRole));
+        Assert.Throws<ArgumentNullException>(() => Partner.CreateIndividual(individualName, null!, partnerRoleId));
     }
 
-    [Fact]
-    public void CreateIndividual_NullRole_ThrowsArgumentNullException()
+    [Theory]
+    [InlineData(0L)]
+    [InlineData(-1L)]
+    public void CreateIndividual_InvalidRoleId_ThrowsArgumentException(long invalidRoleId)
     {
         // Arrange
         var individualName = new PersonName("Jane", "Doe");
         var partnerIdentifier = PartnerIdentifier.Create("SSN", "123-45-6789");
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => Partner.CreateIndividual(individualName, partnerIdentifier, null!));
+        Assert.Throws<ArgumentException>(() => Partner.CreateIndividual(individualName, partnerIdentifier, invalidRoleId));
     }
 
     [Fact]
@@ -95,16 +97,16 @@ public class PartnerTests
         // Arrange
         var companyName = "Acme Corp";
         var partnerIdentifier = PartnerIdentifier.Create("EIN", "12-3456789");
-        var partnerRole = PartnerRoleType.Create("Supplier", "Supplier");
+        var partnerRoleId = 1L;
         // Act
-        var partner = Partner.CreateLegalEntity(companyName, partnerIdentifier, partnerRole, _defaultAddress);
+        var partner = Partner.CreateLegalEntity(companyName, partnerIdentifier, partnerRoleId, _defaultAddress);
         // Assert
         partner.CompanyName.Should().Be(companyName);
         partner.IndividualName.Should().BeNull();
         partner.IsNaturalPerson.Should().BeFalse();
         partner.Identifiers.Should().ContainSingle().Which.Should().Be(partnerIdentifier);
         partner.Identifiers.FirstOrDefault()?.IsPrimary.Should().BeTrue();
-        partner.Roles.Should().ContainSingle().Which.Should().Be(partnerRole);
+        partner.RoleIds.Should().ContainSingle().Which.Should().Be(partnerRoleId);
         partner.HQAddress.Should().Be(_defaultAddress);
     }
 
@@ -114,9 +116,9 @@ public class PartnerTests
         // Arrange
         var companyName = "Acme Corp";
         var partnerIdentifier = PartnerIdentifier.Create("EIN", "12-3456789");
-        var partnerRole = PartnerRoleType.Create("Supplier", "Supplier");
+        var partnerRoleId = 1L;
         // Act
-        var partner = Partner.CreateLegalEntity(companyName, partnerIdentifier, partnerRole);
+        var partner = Partner.CreateLegalEntity(companyName, partnerIdentifier, partnerRoleId);
         // Assert
         partner.HQAddress.Should().BeNull();
     }
@@ -129,9 +131,9 @@ public class PartnerTests
     {
         // Arrange
         var partnerIdentifier = PartnerIdentifier.Create("EIN", "12-3456789");
-        var partnerRole = PartnerRoleType.Create("Supplier", "Supplier");
+        var partnerRoleId = 1L;
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => Partner.CreateLegalEntity(invalidName!, partnerIdentifier, partnerRole));
+        Assert.Throws<ArgumentException>(() => Partner.CreateLegalEntity(invalidName!, partnerIdentifier, partnerRoleId));
     }
 
     [Fact]
@@ -139,19 +141,21 @@ public class PartnerTests
     {
         // Arrange
         var companyName = "Acme Corp";
-        var partnerRole = PartnerRoleType.Create("Supplier", "Supplier");
+        var partnerRoleId = 1L;
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => Partner.CreateLegalEntity(companyName, null!, partnerRole));
+        Assert.Throws<ArgumentNullException>(() => Partner.CreateLegalEntity(companyName, null!, partnerRoleId));
     }
 
-    [Fact]
-    public void CreateCompany_NullRole_ThrowsArgumentNullException()
+    [Theory]
+    [InlineData(0L)]
+    [InlineData(-1L)]
+    public void CreateCompany_InvalidRoleId_ThrowsArgumentException(long invalidRoleId)
     {
         // Arrange
         var companyName = "Acme Corp";
         var partnerIdentifier = PartnerIdentifier.Create("EIN", "12-3456789");
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => Partner.CreateLegalEntity(companyName, partnerIdentifier, null!));
+        Assert.Throws<ArgumentException>(() => Partner.CreateLegalEntity(companyName, partnerIdentifier, invalidRoleId));
     }
 
     [Fact]
@@ -168,14 +172,11 @@ public class PartnerTests
         {
             PartnerIdentifier.Create("SSN", "987-65-4321", isPrimary: true)
         };
-        var roles = new List<PartnerRoleType>
-        {
-            PartnerRoleType.Create("Customer", "Customer")
-        };
+        var roleIds = new List<long> { 1L, 2L };
         var bankAccounts = new List<PartnerBankAccount>();
         var contacts = new List<PartnerContact>();
         // Act
-        var partner = Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, _defaultAddress, identifiers, roles, bankAccounts, contacts);
+        var partner = Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, _defaultAddress, identifiers, roleIds, bankAccounts, contacts);
         // Assert
         partner.Id.Should().Be(id);
         partner.IndividualName.Should().Be(individualName);
@@ -185,7 +186,7 @@ public class PartnerTests
         partner.DisplayName.Should().Be(displayName);
         partner.HQAddress.Should().Be(_defaultAddress);
         partner.Identifiers.Should().BeEquivalentTo(identifiers);
-        partner.Roles.Should().BeEquivalentTo(roles);
+        partner.RoleIds.Should().BeEquivalentTo(roleIds);
         partner.BankAccounts.Should().BeEmpty();
         partner.Contacts.Should().BeEmpty();
     }
@@ -206,14 +207,12 @@ public class PartnerTests
         {
             PartnerIdentifier.Create("SSN", "987-65-4321", isPrimary: true)
         };
-        var roles = new List<PartnerRoleType>
-        {
-            PartnerRoleType.Create("Customer", "Customer")
-        };
+        var roleIds = new List<long> { 1L, 2L };
         var bankAccounts = new List<PartnerBankAccount>();
         var contacts = new List<PartnerContact>();
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => Partner.Reconstitute(invalidId, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roles, bankAccounts, contacts));
+        Assert.Throws<ArgumentException>(() => 
+            Partner.Reconstitute(invalidId, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roleIds, bankAccounts, contacts));
     }
 
     [Fact]
@@ -231,14 +230,12 @@ public class PartnerTests
         {
             PartnerIdentifier.Create("SSN", "987-65-4321", isPrimary: true)
         };
-        var roles = new List<PartnerRoleType>
-        {
-            PartnerRoleType.Create("Customer", "Customer")
-        };
+        var roleIds = new List<long> { 1L, 2L };
         var bankAccounts = new List<PartnerBankAccount>();
         var contacts = new List<PartnerContact>();
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roles, bankAccounts, contacts));
+        Assert.Throws<InvalidOperationException>(() => 
+            Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roleIds, bankAccounts, contacts));
     }
 
     [Fact]
@@ -254,14 +251,12 @@ public class PartnerTests
         {
             PartnerIdentifier.Create("SSN", "987-65-4321", isPrimary: true)
         };
-        var roles = new List<PartnerRoleType>
-        {
-            PartnerRoleType.Create("Customer", "Customer")
-        };
+        var roleIds = new List<long> { 1L, 2L };
         var bankAccounts = new List<PartnerBankAccount>();
         var contacts = new List<PartnerContact>();
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => Partner.Reconstitute(id, null, null, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roles, bankAccounts, contacts));
+        Assert.Throws<InvalidOperationException>(() => 
+            Partner.Reconstitute(id, null, null, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roleIds, bankAccounts, contacts));
     }
 
     [Fact]
@@ -279,14 +274,12 @@ public class PartnerTests
         {
             PartnerIdentifier.Create("SSN", "987-65-4321", isPrimary: true)
         };
-        var roles = new List<PartnerRoleType>
-        {
-            PartnerRoleType.Create("Customer", "Customer")
-        };
+        var roleIds = new List<long> { 1L, 2L };
         var bankAccounts = new List<PartnerBankAccount>();
         var contacts = new List<PartnerContact>();
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roles, bankAccounts, contacts));
+        Assert.Throws<InvalidOperationException>(() => 
+            Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roleIds, bankAccounts, contacts));
     }
 
     [Fact]
@@ -304,14 +297,12 @@ public class PartnerTests
         {
             PartnerIdentifier.Create("EIN", "12-3456789", isPrimary: true)
         };
-        var roles = new List<PartnerRoleType>
-        {
-            PartnerRoleType.Create("Supplier", "Supplier")
-        };
+        var roleIds = new List<long> { 1L, 2L };
         var bankAccounts = new List<PartnerBankAccount>();
         var contacts = new List<PartnerContact>();
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roles, bankAccounts, contacts));
+        Assert.Throws<InvalidOperationException>(() => 
+            Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roleIds, bankAccounts, contacts));
     }
 
     [Fact]
@@ -325,14 +316,12 @@ public class PartnerTests
         bool isActive = true;
         string? displayName = "Alice S.";
         Address? mainAddress = null;
-        List<PartnerRoleType> roles = new List<PartnerRoleType>
-        {
-            PartnerRoleType.Create("Customer", "Customer")
-        };
+        var roleIds = new List<long> { 1L, 2L };
         var bankAccounts = new List<PartnerBankAccount>();
         var contacts = new List<PartnerContact>();
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, null!, roles, bankAccounts, contacts));
+        Assert.Throws<ArgumentNullException>(() => 
+            Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, null!, roleIds, bankAccounts, contacts));
     }
 
     [Fact]
@@ -347,14 +336,12 @@ public class PartnerTests
         string? displayName = "Alice S.";
         Address? mainAddress = null;
         var identifiers = new List<PartnerIdentifier>();
-        var roles = new List<PartnerRoleType>
-        {
-            PartnerRoleType.Create("Customer", "Customer")
-        };
+        var roleIds = new List<long> { 1L, 2L };
         var bankAccounts = new List<PartnerBankAccount>();
         var contacts = new List<PartnerContact>();
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roles, bankAccounts, contacts));
+        Assert.Throws<InvalidOperationException>(() => 
+            Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roleIds, bankAccounts, contacts));
     }
 
     [Fact]
@@ -393,11 +380,12 @@ public class PartnerTests
         {
             PartnerIdentifier.Create("SSN", "987-65-4321", isPrimary: true)
         };
-        var roles = new List<PartnerRoleType>();
+        var roleIds = new List<long>();
         var bankAccounts = new List<PartnerBankAccount>();
         var contacts = new List<PartnerContact>();
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roles, bankAccounts, contacts));
+        Assert.Throws<InvalidOperationException>(() => 
+            Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roleIds, bankAccounts, contacts));
     }
 
     [Fact]
@@ -415,13 +403,11 @@ public class PartnerTests
         {
             PartnerIdentifier.Create("SSN", "987-65-4321", isPrimary: true)
         };
-        var roles = new List<PartnerRoleType>
-        {
-            PartnerRoleType.Create("Customer", "Customer")
-        };
+        var roleIds = new List<long> { 1L, 2L };
         var contacts = new List<PartnerContact>();
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roles, null!, contacts));
+        Assert.Throws<ArgumentNullException>(() => 
+            Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roleIds, null!, contacts));
     }
 
     [Fact]
@@ -439,13 +425,11 @@ public class PartnerTests
         {
             PartnerIdentifier.Create("SSN", "987-65-4321", isPrimary: true)
         };
-        var roles = new List<PartnerRoleType>
-        {
-            PartnerRoleType.Create("Customer", "Customer")
-        };
+        var roleIds = new List<long> { 1L, 2L };
         var bankAccounts = new List<PartnerBankAccount>();
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roles, bankAccounts, null!));
+        Assert.Throws<ArgumentNullException>(() => 
+            Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roleIds, bankAccounts, null!));
     }
 
     [Fact]
@@ -464,10 +448,7 @@ public class PartnerTests
             {
                 PartnerIdentifier.Create("SSN", "000-00-0000")
             },
-            new List<PartnerRoleType>
-            {
-                PartnerRoleType.Create("OldRole", "Old Role")
-            },
+            new List<long> { 1L },
             new List<PartnerBankAccount>(),
             new List<PartnerContact>());
 
@@ -478,11 +459,7 @@ public class PartnerTests
         {
             PartnerIdentifier.Create("SSN", "111-11-1111", isPrimary: true)
         };
-        List<PartnerRoleType> newRoles = new()
-        {
-            PartnerRoleType.Create("NewRole", "New Role"),
-            PartnerRoleType.Create("OldRole", "Old Role")
-        };
+        List<long> newRoleIds = new() { 2L, 3L };
         List<PartnerBankAccount> newBankAccounts = new()
         {
             PartnerBankAccount.Create(new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX"))
@@ -500,7 +477,7 @@ public class PartnerTests
             newDisplayName,
             _defaultAddress,
             newIdentifiers,
-            newRoles,
+            newRoleIds,
             newBankAccounts,
             newContacts);
         // Assert
@@ -511,7 +488,7 @@ public class PartnerTests
         partner.DisplayName.Should().Be(newDisplayName);
         partner.HQAddress.Should().Be(_defaultAddress);
         partner.Identifiers.Should().BeEquivalentTo(newIdentifiers);
-        partner.Roles.Should().BeEquivalentTo(newRoles);
+        partner.RoleIds.Should().BeEquivalentTo(newRoleIds);
         partner.BankAccounts.Should().BeEquivalentTo(newBankAccounts);
         partner.Contacts.Should().BeEquivalentTo(newContacts);
     }
@@ -532,10 +509,7 @@ public class PartnerTests
             {
                 PartnerIdentifier.Create("CUI", "000-00-0000")
             },
-            new List<PartnerRoleType>
-            {
-                PartnerRoleType.Create("OldRole", "Old Role")
-            },
+            new List<long> { 1L },
             new List<PartnerBankAccount>(),
             new List<PartnerContact>());
 
@@ -546,11 +520,7 @@ public class PartnerTests
         {
             PartnerIdentifier.Create("CUI", "111-11-1111", isPrimary: true)
         };
-        List<PartnerRoleType> newRoles = new()
-        {
-            PartnerRoleType.Create("NewRole", "New Role"),
-            PartnerRoleType.Create("OldRole", "Old Role")
-        };
+        List<long> newRoleIds = new() { 2L, 3L };
         List<PartnerBankAccount> newBankAccounts = new()
         {
             PartnerBankAccount.Create(new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX"))
@@ -568,7 +538,7 @@ public class PartnerTests
             newDisplayName,
             _defaultAddress,
             newIdentifiers,
-            newRoles,
+            newRoleIds,
             newBankAccounts,
             newContacts);
         // Assert
@@ -579,7 +549,7 @@ public class PartnerTests
         partner.DisplayName.Should().Be(newDisplayName);
         partner.HQAddress.Should().Be(_defaultAddress);
         partner.Identifiers.Should().BeEquivalentTo(newIdentifiers);
-        partner.Roles.Should().BeEquivalentTo(newRoles);
+        partner.RoleIds.Should().BeEquivalentTo(newRoleIds);
         partner.BankAccounts.Should().BeEquivalentTo(newBankAccounts);
         partner.Contacts.Should().BeEquivalentTo(newContacts);
     }
@@ -600,10 +570,7 @@ public class PartnerTests
             {
                 PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
-            new List<PartnerRoleType>()
-            {
-                PartnerRoleType.Create("Role", "Role")
-            },
+            new List<long>() { 1L },
             new List<PartnerBankAccount>(),
             new List<PartnerContact>());
         var newCompanyName = "Acme Corp";
@@ -619,10 +586,7 @@ public class PartnerTests
             {
                 PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
-            new List<PartnerRoleType>()
-            {
-                PartnerRoleType.Create("Role", "Role")
-            },
+            new List<long>() { 2L },
             new List<PartnerBankAccount>(),
             new List<PartnerContact>());
         // Assert
@@ -647,10 +611,7 @@ public class PartnerTests
             {
                 PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
-            new List<PartnerRoleType>()
-            {
-                PartnerRoleType.Create("Role", "Role")
-            },
+            new List<long>() { 1L },
             new List<PartnerBankAccount>(),
             new List<PartnerContact>());
         var newIndividualName = new PersonName("John", "Doe");
@@ -666,10 +627,7 @@ public class PartnerTests
             {
                 PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
-            new List<PartnerRoleType>()
-            {
-                PartnerRoleType.Create("Role", "Role")
-            },
+            new List<long>() { 2L },
             new List<PartnerBankAccount>(),
             new List<PartnerContact>());
         // Assert
@@ -694,10 +652,7 @@ public class PartnerTests
             {
                 PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
-            new List<PartnerRoleType>()
-            {
-                PartnerRoleType.Create("Role", "Role")
-            },
+            new List<long>() { 1L },
             new List<PartnerBankAccount>(),
             new List<PartnerContact>());
         // Act & Assert
@@ -713,10 +668,7 @@ public class PartnerTests
                 {
                     PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
                 },
-                new List<PartnerRoleType>()
-                {
-                    PartnerRoleType.Create("Role", "Role")
-                },
+                new List<long>() { 2L },
                 new List<PartnerBankAccount>(),
                 new List<PartnerContact>()));
     }
@@ -737,10 +689,7 @@ public class PartnerTests
             {
                 PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
-            new List<PartnerRoleType>()
-            {
-                PartnerRoleType.Create("Role", "Role")
-            },
+            new List<long>() { 1L },
             new List<PartnerBankAccount>(),
             new List<PartnerContact>());
         // Act & Assert
@@ -756,10 +705,7 @@ public class PartnerTests
                 {
                     PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
                 },
-                new List<PartnerRoleType>()
-                {
-                    PartnerRoleType.Create("Role", "Role")
-                },
+                new List<long>() { 2L },
                 new List<PartnerBankAccount>(),
                 new List<PartnerContact>()));
     }
@@ -780,10 +726,7 @@ public class PartnerTests
             {
                 PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
-            new List<PartnerRoleType>()
-            {
-                PartnerRoleType.Create("Role", "Role")
-            },
+            new List<long>() { 1L },
             new List<PartnerBankAccount>(),
             new List<PartnerContact>());
         // Act & Assert
@@ -799,10 +742,7 @@ public class PartnerTests
                 {
                     PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
                 },
-                new List<PartnerRoleType>()
-                {
-                    PartnerRoleType.Create("Role", "Role")
-                },
+                new List<long>() { 2L },
                 new List<PartnerBankAccount>(),
                 new List<PartnerContact>()));
     }
@@ -823,10 +763,7 @@ public class PartnerTests
             {
                 PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
-            new List<PartnerRoleType>()
-            {
-                PartnerRoleType.Create("Role", "Role")
-            },
+            new List<long>() { 1L },
             new List<PartnerBankAccount>(),
             new List<PartnerContact>());
         // Act & Assert
@@ -842,10 +779,7 @@ public class PartnerTests
                 {
                     PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
                 },
-                new List<PartnerRoleType>()
-                {
-                    PartnerRoleType.Create("Role", "Role")
-                },
+                new List<long>() { 2L },
                 new List<PartnerBankAccount>(),
                 new List<PartnerContact>()));
     }
@@ -866,10 +800,7 @@ public class PartnerTests
             {
                 PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
-            new List<PartnerRoleType>()
-            {
-                PartnerRoleType.Create("Role", "Role")
-            },
+            new List<long>() { 1L },
             new List<PartnerBankAccount>(),
             new List<PartnerContact>());
         // Act & Assert
@@ -885,10 +816,7 @@ public class PartnerTests
                 {
                     PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
                 },
-                new List<PartnerRoleType>()
-                {
-                    PartnerRoleType.Create("Role", "Role")
-                },
+                new List<long>() { 2L },
                 new List<PartnerBankAccount>(),
                 new List<PartnerContact>()));
     }
@@ -909,10 +837,7 @@ public class PartnerTests
             {
                 PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
-            new List<PartnerRoleType>()
-            {
-                PartnerRoleType.Create("Role", "Role")
-            },
+            new List<long>() { 1L },
             new List<PartnerBankAccount>(),
             new List<PartnerContact>());
         // Act & Assert
@@ -928,10 +853,7 @@ public class PartnerTests
                 {
                     PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
                 },
-                new List<PartnerRoleType>()
-                {
-                    PartnerRoleType.Create("Role", "Role")
-                },
+                new List<long>() { 2L },
                 new List<PartnerBankAccount>(),
                 new List<PartnerContact>()));
     }
@@ -952,10 +874,7 @@ public class PartnerTests
             {
                 PartnerIdentifier.Create("SSN", "000-00-0000")
             },
-            new List<PartnerRoleType>
-            {
-                PartnerRoleType.Create("OldRole", "Old Role")
-            },
+            new List<long>() { 1L },
             new List<PartnerBankAccount>(),
             new List<PartnerContact>());
 
@@ -964,11 +883,7 @@ public class PartnerTests
         Address newMainAddress = new Address("Main St", "123", "City", "State", "12345", "US");
         bool newIsActive = false;
         List<PartnerIdentifier> newIdentifiers = new();
-        List<PartnerRoleType> newRoles = new()
-        {
-            PartnerRoleType.Create("NewRole", "New Role"),
-            PartnerRoleType.Create("OldRole", "Old Role")
-        };
+        List<long> newRoleIds = new() { 2L, 3L };
         List<PartnerBankAccount> newBankAccounts = new();
         List<PartnerContact> newContacts = new();
         // Act & Assert
@@ -980,7 +895,7 @@ public class PartnerTests
             newDisplayName,
             newMainAddress,
             newIdentifiers,
-            newRoles,
+            newRoleIds,
             newBankAccounts,
             newContacts));
     }
@@ -1001,10 +916,7 @@ public class PartnerTests
             {
                 PartnerIdentifier.Create("SSN", "000-00-0000")
             },
-            new List<PartnerRoleType>
-            {
-                PartnerRoleType.Create("OldRole", "Old Role")
-            },
+            new List<long>() { 1L },
             new List<PartnerBankAccount>(),
             new List<PartnerContact>());
 
@@ -1016,7 +928,7 @@ public class PartnerTests
         {
             PartnerIdentifier.Create("SSN", "000-00-0000")
         };
-        List<PartnerRoleType> newRoles = new();
+        List<long> newRoleIds = new();
         List<PartnerBankAccount> newBankAccounts = new();
         List<PartnerContact> newContacts = new();
         // Act & Assert
@@ -1028,7 +940,7 @@ public class PartnerTests
             newDisplayName,
             newMainAddress,
             newIdentifiers,
-            newRoles,
+            newRoleIds,
             newBankAccounts,
             newContacts));
     }
@@ -1049,10 +961,7 @@ public class PartnerTests
             {
                 PartnerIdentifier.Create("SSN", "000-00-0000")
             },
-            new List<PartnerRoleType>
-            {
-                PartnerRoleType.Create("OldRole", "Old Role")
-            },
+            new List<long>() { 1L },
             new List<PartnerBankAccount>(),
             new List<PartnerContact>());
 
@@ -1060,7 +969,7 @@ public class PartnerTests
         string newDisplayName = "New Name";
         Address newMainAddress = new Address("Main St", "123", "City", "State", "12345", "US");
         bool newIsActive = false;
-        List<PartnerRoleType> newRoles = new();
+        List<long> newRoleIds = new();
         List<PartnerBankAccount> newBankAccounts = new();
         List<PartnerContact> newContacts = new();
         // Act & Assert
@@ -1072,7 +981,7 @@ public class PartnerTests
             newDisplayName,
             newMainAddress,
             null,
-            newRoles,
+            newRoleIds,
             newBankAccounts,
             newContacts));
     }
@@ -1093,10 +1002,7 @@ public class PartnerTests
             {
                 PartnerIdentifier.Create("SSN", "000-00-0000")
             },
-            new List<PartnerRoleType>
-            {
-                PartnerRoleType.Create("OldRole", "Old Role")
-            },
+            new List<long>() { 1L },
             new List<PartnerBankAccount>(),
             new List<PartnerContact>());
 
@@ -1137,10 +1043,7 @@ public class PartnerTests
             {
                 PartnerIdentifier.Create("SSN", "000-00-0000")
             },
-            new List<PartnerRoleType>
-            {
-                PartnerRoleType.Create("OldRole", "Old Role")
-            },
+            new List<long>() { 1L },
             new List<PartnerBankAccount>(),
             new List<PartnerContact>());
 
@@ -1149,7 +1052,7 @@ public class PartnerTests
         Address newMainAddress = new Address("Main St", "123", "City", "State", "12345", "US");
         bool newIsActive = false;
         List<PartnerIdentifier> newIdentifiers = new();
-        List<PartnerRoleType> newRoles = new();
+        List<long> newRoleIds = new();
         List<PartnerContact> newContacts = new();
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => partner.Update(
@@ -1160,7 +1063,7 @@ public class PartnerTests
             newDisplayName,
             newMainAddress,
             newIdentifiers,
-            newRoles,
+            newRoleIds,
             null,
             newContacts));
     }
@@ -1181,10 +1084,7 @@ public class PartnerTests
             {
                 PartnerIdentifier.Create("SSN", "000-00-0000")
             },
-            new List<PartnerRoleType>
-            {
-                PartnerRoleType.Create("OldRole", "Old Role")
-            },
+            new List<long>() { 1L },
             new List<PartnerBankAccount>(),
             new List<PartnerContact>());
 
@@ -1193,7 +1093,7 @@ public class PartnerTests
         Address newMainAddress = new Address("Main St", "123", "City", "State", "12345", "US");
         bool newIsActive = false;
         List<PartnerIdentifier> newIdentifiers = new();
-        List<PartnerRoleType> newRoles = new();
+        List<long> newRoleIds = new();
         List<PartnerBankAccount> newBankAccounts = new();
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => partner.Update(
@@ -1204,7 +1104,7 @@ public class PartnerTests
             newDisplayName,
             newMainAddress,
             newIdentifiers,
-            newRoles,
+            newRoleIds,
             newBankAccounts,
             null));
     }
@@ -1234,10 +1134,7 @@ public class PartnerTests
             {
                 PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
-            roles: new List<PartnerRoleType>()
-            {
-                PartnerRoleType.Create("Role", "Role")
-            },
+            roleIds: new List<long>() { 1L },
             bankAccounts: Array.Empty<PartnerBankAccount>(),
             contacts: Array.Empty<PartnerContact>());
 
@@ -1275,10 +1172,7 @@ public class PartnerTests
             {
                 PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
             },
-            roles: new List<PartnerRoleType>()
-            {
-                PartnerRoleType.Create("Role", "Role")
-            },
+            roleIds: new List<long>() { 1L },
             bankAccounts: Array.Empty<PartnerBankAccount>(),
             contacts: Array.Empty<PartnerContact>());
 

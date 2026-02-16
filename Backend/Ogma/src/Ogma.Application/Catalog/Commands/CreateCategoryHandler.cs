@@ -7,7 +7,7 @@ using Ogma.Domain.Catalog.Services;
 
 namespace Ogma.Application.Catalog.Commands;
 
-public class CreateCategoryHandler : IRequestHandler<CreateCategoryCommand, CategoryWithDescendantsDto>
+public class CreateCategoryHandler : IRequestHandler<CreateCategoryCommand, CategoryDto>
 {
     private readonly ICategoryRepository _categoryRepository;
     private readonly ICategoryDomainService _categoryDomainService;
@@ -18,17 +18,14 @@ public class CreateCategoryHandler : IRequestHandler<CreateCategoryCommand, Cate
         _categoryDomainService = categoryDomainService;
     }
 
-    public async Task<CategoryWithDescendantsDto> Handle(CreateCategoryCommand command, CancellationToken cancellationToken)
+    public async Task<CategoryDto> Handle(CreateCategoryCommand command, CancellationToken cancellationToken)
     {
         Category? parent = null;
 
         if (command.ParentCategoryId.HasValue)
         {
-            parent = await _categoryRepository.GetByIdAsync(command.ParentCategoryId.Value);
-            if (parent == null)
-            {
-                throw new KeyNotFoundException($"Parent category with ID {command.ParentCategoryId.Value} not found.");
-            }
+            parent = await _categoryRepository.GetByIdAsync(command.ParentCategoryId.Value)
+                ?? throw new KeyNotFoundException($"Parent category with ID {command.ParentCategoryId.Value} not found.");
         }
 
         var newCategory = Category.Create(command.Name, command.ParentCategoryId);
@@ -37,6 +34,7 @@ public class CreateCategoryHandler : IRequestHandler<CreateCategoryCommand, Cate
         newCategory.UpdatePath(path);
 
         var created = await _categoryRepository.AddAsync(newCategory);
-        return created.ToDtoWithDescendants();
+        return created.ToDto();
+
     }
 }

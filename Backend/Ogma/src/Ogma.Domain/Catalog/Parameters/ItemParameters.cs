@@ -20,9 +20,9 @@ namespace Ogma.Domain.Catalog.Parameters;
 public record ItemParameters(
     string Name,
     string Code,
-    Category Category,
+    long CategoryId,
     Money ListPrice,
-    ItemType ItemType,
+    long ItemTypeId,
     string UnitOfMeasurement,
     bool IsActive = true,
     string Description = ""

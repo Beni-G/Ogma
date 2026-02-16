@@ -13,23 +13,26 @@ public static class PartnersMappingExtensions
         new (partnerRoleType.Id, partnerRoleType.Code, partnerRoleType.Name, partnerRoleType.Color);
 
     public static PartnerBankAccountDto ToDto(this PartnerBankAccount partnerBankAccount) =>
-        new PartnerBankAccountDto(partnerBankAccount.BankAccount.ToDto(), partnerBankAccount.IsDefault);
+        new PartnerBankAccountDto(partnerBankAccount.Id, partnerBankAccount.BankAccount.ToDto(), partnerBankAccount.IsDefault);
 
     public static PartnerContactDto ToDto(this PartnerContact partnerContact)
     {
-        return new PartnerContactDto(partnerContact.Name.ToDto(), 
+        return new PartnerContactDto(
+            partnerContact.Id,
+            partnerContact.Name.ToDto(), 
             partnerContact.Email?.Value,
             partnerContact.Phone,
             partnerContact.Mobile,
             partnerContact.Title,
             partnerContact.JobTitle,
-            partnerContact.IsPrimary);
+            partnerContact.IsPrimary
+        );
     }
 
     public static PartnerIdentifierDto ToDto(this PartnerIdentifier partnerIdentifier) =>
-        new PartnerIdentifierDto(partnerIdentifier.Type, partnerIdentifier.Value, partnerIdentifier.ValidityPeriod?.ToDto(), partnerIdentifier.IsPrimary);
+        new PartnerIdentifierDto(partnerIdentifier.Id, partnerIdentifier.Type, partnerIdentifier.Value, partnerIdentifier.ValidityPeriod?.ToDto(), partnerIdentifier.IsPrimary);
 
-    public static PartnerDto ToDto(this Partner entity) 
+    public static PartnerDto ToDto(this Partner entity, IEnumerable<PartnerRoleTypeDto>? roles = null) 
     { 
         return new PartnerDto(
             entity.Id,
@@ -39,7 +42,7 @@ public static class PartnersMappingExtensions
             entity.IsActive,
             entity.DisplayName,
             entity.HQAddress?.ToDto(),
-            entity.Roles.Select(r => r.ToDto()).ToList(),
+            roles?.ToList() ?? [],
             entity.Identifiers.Select(i => i.ToDto()).ToList(),
             entity.BankAccounts.Select(b => b.ToDto()).ToList(),
             entity.Contacts.Select(c => c.ToDto()).ToList());

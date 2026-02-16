@@ -10,7 +10,8 @@ public record UpdatePartnerRequest(
     bool IsActive,
     string? DisplayName,
     AddressRequest HQAddress,
-    List<PartnerIdentifierRequest> Identifiers,
+    List<UpdatePartnerIdentifierRequest> Identifiers,
     List<long> RoleIds,
-    List<PartnerBankAccountRequest> BankAccounts,
-    List<PartnerContactRequest> Contacts);
+    List<UpdatePartnerBankAccountRequest> BankAccounts,
+    List<UpdatePartnerContactRequest> Contacts
+);

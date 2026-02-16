@@ -1,8 +1,132 @@
-﻿using Ogma.Domain.Catalog.Parameters;
+﻿using Ogma.Application.Catalog.Dtos;
+using Ogma.Application.SharedKernel.Dtos;
+using Ogma.Domain.Catalog.Entities;
+using Ogma.Domain.Catalog.Parameters;
+using Ogma.Domain.SharedKernel.ValueObjects;
 
 namespace Ogma.Infrastructure.Persistence.Catalog.Extensions;
 public static class CatalogMappingExtensions
 {
+    #region ToDto
+    /// <summary>
+    /// Creates a new <see cref="ItemDto"/> instance that represents the specified <see cref="Models.Item"/>.
+    /// </summary>
+    /// <param name="item">The item to convert to a data transfer object. Cannot be <see langword="null"/>.</param>
+    /// <returns>An <see cref="ItemDto"/> containing the data from the specified <paramref name="item"/>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="item"/> is <see langword="null"/>.</exception>
+    public static ItemDto ToDto(this Models.Item item, IEnumerable<CategoryDto>? categoryAncestors = null, IEnumerable<CategoryDto>? categorySubCategories = null) => 
+        item == null 
+        ? throw new ArgumentNullException(nameof(item)) 
+        : new ItemDto(
+            item.Id, 
+            item.Name, 
+            item.Code, 
+            item.Description, 
+            item.CategoryId,
+            item.Category.ToDto(categoryAncestors, categorySubCategories), 
+            new MoneyDto(item.ListPriceAmount, item.ListPriceCurrency), 
+            item.ItemTypeId,
+            item.ItemType.ToDto(), 
+            item.UnitOfMeasurement, 
+            item.IsActive);
+
+    /// <summary>
+    /// Creates a new instance of <see cref="ItemDto"/> based on the specified item, optionally including category
+    /// ancestor and subcategory information.
+    /// </summary>
+    /// <param name="item">The source <see cref="ItemDto"/> to convert. Cannot be null.</param>
+    /// <param name="categoryAncestors">An optional collection of ancestor categories to associate with the item's category. May be null if no ancestor
+    /// information is needed.</param>
+    /// <param name="categorySubCategories">An optional collection of subcategories to associate with the item's category. May be null if no subcategory
+    /// information is needed.</param>
+    /// <returns>A new <see cref="ItemDto"/> instance containing the data from <paramref name="item"/>, with category information
+    /// populated according to the provided ancestors and subcategories.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="item"/> is null.</exception>
+    public static ItemDto ToDto(this ItemDto item, IEnumerable<CategoryDto>? categoryAncestors = null, IEnumerable<CategoryDto>? categorySubCategories = null) =>
+        item == null
+        ? throw new ArgumentNullException(nameof(item))
+        : new ItemDto(
+            item.Id,
+            item.Name,
+            item.Code,
+            item.Description,
+            item.CategoryId,
+            item.Category?.ToDto(categoryAncestors, categorySubCategories),
+            item.ListPrice,
+            item.ItemTypeId,
+            item.ItemType,
+            item.UnitOfMeasurement,
+            item.IsActive);
+
+    /// <summary>
+    /// Converts a <see cref="Models.Category"/> instance to its corresponding <see cref="CategoryDto"/> representation.
+    /// </summary>
+    /// <param name="category">The <see cref="Models.Category"/> object to convert. Cannot be <see langword="null"/>.</param>
+    /// <returns>A <see cref="CategoryDto"/> containing the data from the specified <see cref="Models.Category"/>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="category"/> is <see langword="null"/>.</exception>
+    public static CategoryDto ToDto(this Models.Category category, IEnumerable<CategoryDto>? ancestors = null, IEnumerable<CategoryDto>? subCategories = null) => 
+        category == null 
+        ? throw new ArgumentNullException(nameof(category)) 
+        : new CategoryDto(
+            category.Id, 
+            category.Name, 
+            category.ParentCategoryId, 
+            category.Path, 
+            ancestors?.ToList() ?? [], 
+            subCategories?.ToList() ?? []
+        );
+
+    /// <summary>
+    /// Converts a <see cref="Models.Category"/> instance to a <see cref="CategoryDto"/>, recursively converting all subcategories as well.
+    /// </summary>
+    /// <param name="category"></param>
+    /// <returns></returns>
+    public static CategoryDto ToDtoRecursive(this Models.Category category)
+    {
+        var subCategoryDtos = category.SubCategories?
+            .Select(sc => sc.ToDtoRecursive()) // Recursive call
+            .ToList();
+
+        return category.ToDto(subCategories: subCategoryDtos);
+    }
+
+    /// <summary>
+    /// Creates a new <see cref="CategoryDto"/> instance with the specified category's data, optionally including
+    /// ancestor and subcategory information.
+    /// </summary>
+    /// <param name="category">The source <see cref="CategoryDto"/> whose data is used to create the new instance. Cannot be null.</param>
+    /// <param name="ancestors">An optional collection of ancestor categories to associate with the new instance. If null, an empty list is
+    /// used.</param>
+    /// <param name="subCategories">An optional collection of subcategories to associate with the new instance. If null, an empty list is used.</param>
+    /// <returns>A new <see cref="CategoryDto"/> containing the data from <paramref name="category"/>, with the specified
+    /// ancestors and subcategories.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="category"/> is null.</exception>
+    public static CategoryDto ToDto(this CategoryDto category, IEnumerable<CategoryDto>? ancestors = null, IEnumerable<CategoryDto>? subCategories = null) =>
+        category == null
+        ? throw new ArgumentNullException(nameof(category))
+        : new CategoryDto(
+            category.Id,
+            category.Name,
+            category.ParentCategoryId,
+            category.Path,
+            ancestors?.ToList() ?? [],
+            subCategories?.ToList() ?? []
+        );
+
+    /// <summary>
+    /// Converts an <see cref="Models.ItemType"/> instance to its corresponding <see cref="ItemTypeDto"/>
+    /// representation.
+    /// </summary>
+    /// <param name="itemType">The <see cref="Models.ItemType"/> object to convert. Cannot be <see langword="null"/>.</param>
+    /// <returns>An <see cref="ItemTypeDto"/> containing the identifier, name, and description from the specified <paramref
+    /// name="itemType"/>.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if <paramref name="itemType"/> is <see langword="null"/>.</exception>
+    public static ItemTypeDto ToDto(this Models.ItemType itemType) =>
+        itemType == null 
+        ? throw new ArgumentNullException(nameof(itemType)) 
+        : new ItemTypeDto(itemType.Id, itemType.Name, itemType.Description);
+    #endregion
+
     #region ToDomain
     /// <summary>
     /// Mapss a Models.Item to a Domain.Catalog.Entities.Item
@@ -10,7 +134,7 @@ public static class CatalogMappingExtensions
     /// <param name="item"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static Domain.Catalog.Entities.Item ToDomain(this Models.Item item)
+    public static Item ToDomain(this Models.Item item)
     {
         if (item == null)
         {
@@ -21,14 +145,14 @@ public static class CatalogMappingExtensions
             Name: item.Name,
             Code: item.Code,
             Description: item.Description,
-            Category: item.Category.ToDomain(),
-            ListPrice: new Domain.SharedKernel.ValueObjects.Money(item.ListPriceAmount, item.ListPriceCurrency),
-            ItemType: item.ItemType.ToDomain(),
+            CategoryId: item.CategoryId,
+            ListPrice: new Money(item.ListPriceAmount, item.ListPriceCurrency),
+            ItemTypeId: item.ItemTypeId,
             UnitOfMeasurement: item.UnitOfMeasurement,
             IsActive: item.IsActive
         );
 
-        return Domain.Catalog.Entities.Item.Reconstitute(item.Id, itemParameters);
+        return Item.Reconstitute(item.Id, itemParameters);
     }
 
     /// <summary>
@@ -37,13 +161,13 @@ public static class CatalogMappingExtensions
     /// <param name="category"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static Domain.Catalog.Entities.Category ToDomain(this Models.Category category)
+    public static Category ToDomain(this Models.Category category)
     {
         if (category == null)
         {
             throw new ArgumentNullException(nameof(category));
         }
-        var domainCategory = Domain.Catalog.Entities.Category.Reconstitute(category.Id, category.Name, category.ParentCategoryId, category.Path);
+        var domainCategory = Category.Reconstitute(category.Id, category.Name, category.ParentCategoryId, category.Path);
 
         foreach (var subCategory in category.SubCategories)
         {
@@ -58,13 +182,13 @@ public static class CatalogMappingExtensions
     /// <param name="itemType"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static Domain.Catalog.Entities.ItemType ToDomain(this Models.ItemType itemType)
+    public static ItemType ToDomain(this Models.ItemType itemType)
     {
         if (itemType == null)
         {
             throw new ArgumentNullException(nameof(itemType));
         }
-        var domainItemType = Domain.Catalog.Entities.ItemType.Reconstitute(itemType.Id, itemType.Name, itemType.Description);
+        var domainItemType = ItemType.Reconstitute(itemType.Id, itemType.Name, itemType.Description);
 
         return domainItemType;
     }
@@ -79,7 +203,7 @@ public static class CatalogMappingExtensions
     /// <param name="item"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static Models.Item ToModel(this Domain.Catalog.Entities.Item item)
+    public static Models.Item ToModel(this Item item)
     {
         if (item == null)
         {
@@ -91,24 +215,23 @@ public static class CatalogMappingExtensions
             Name = item.Name,
             Code = item.Code,
             Description = item.Description,
-            CategoryId = item.Category.Id,
+            CategoryId = item.CategoryId,
             ListPriceAmount = item.ListPrice.Amount,
             ListPriceCurrency = item.ListPrice.Currency,
-            ItemTypeId = item.ItemType.Id,
+            ItemTypeId = item.ItemTypeId,
             UnitOfMeasurement = item.UnitOfMeasurement,
             IsActive = item.IsActive
         };
         return modelItem;
     }
 
-    
     /// <summary>
     /// Mapss a Domain.Catalog.Entities.Category to a Models.Category
     /// </summary>
     /// <param name="category"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static Models.Category ToModel(this Domain.Catalog.Entities.Category category)
+    public static Models.Category ToModel(this Category category)
     {
         if (category == null)
         {
@@ -130,7 +253,7 @@ public static class CatalogMappingExtensions
     /// <param name="itemType"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentNullException"></exception>
-    public static Models.ItemType ToModel(this Domain.Catalog.Entities.ItemType itemType)
+    public static Models.ItemType ToModel(this ItemType itemType)
     {
         if (itemType == null)
         {

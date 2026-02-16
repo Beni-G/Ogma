@@ -19,42 +19,42 @@ public class CategoryController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<CategoryWithDescendantsResponse>>> GetAllFlat()
+    public async Task<ActionResult<List<CategoryResponse>>> GetAllFlat()
     {
         var result = await _mediator.Send(new GetAllCategoriesFlatQuery());
-        var response = result.Select(c => c.ToResponseWithDescendants()).ToList();
+        var response = result.Select(c => c.ToResponse()).ToList();
         return Ok(response);
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<CategoryWithDescendantsResponse>> GetById(long id)
+    public async Task<ActionResult<CategoryResponse>> GetById(long id)
     {
         var result = await _mediator.Send(new GetCategoryByIdQuery(id));
         if (result == null)
         {
             return NotFound();
         }
-        return Ok(result.ToResponseWithDescendants());
+        return Ok(result.ToResponse());
     }
 
     [HttpGet("tree")]
-    public async Task<ActionResult<List<CategoryWithDescendantsResponse>>> GetAllTree()
+    public async Task<ActionResult<List<CategoryResponse>>> GetAllTree()
     {
         var result = await _mediator.Send(new GetAllCategoriesTreeQuery());
-        var response = result.Select(c => c.ToResponseWithDescendants()).ToList();
+        var response = result.Select(c => c.ToResponse()).ToList();
         return Ok(response);
     }
 
     [HttpPost]
-    public async Task<ActionResult<CategoryWithDescendantsResponse>> Create(CreateCategoryRequest request)
+    public async Task<ActionResult<CategoryResponse>> Create(CreateCategoryRequest request)
     {
         var command = new CreateCategoryCommand(request.Name, request.ParentCategoryId);
         var created = await _mediator.Send(command);
-        return CreatedAtAction(nameof(GetById), new { created.Id }, created.ToResponseWithDescendants());
+        return CreatedAtAction(nameof(GetById), new { created.Id }, created.ToResponse());
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult<CategoryWithDescendantsResponse>> Update(long id, UpdateCategoryRequest request)
+    public async Task<ActionResult<CategoryResponse>> Update(long id, UpdateCategoryRequest request)
     {
         if (id != request.Id)
         {
@@ -64,7 +64,7 @@ public class CategoryController : ControllerBase
         var command = new UpdateCategoryCommand(request.Id, request.Name, request.ParentCategoryId);
         var updated = await _mediator.Send(command);
 
-        return Ok(updated.ToResponseWithDescendants());
+        return Ok(updated.ToResponse());
     }
 
     [HttpDelete("{id}")]

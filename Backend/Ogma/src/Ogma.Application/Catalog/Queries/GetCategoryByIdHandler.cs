@@ -1,26 +1,18 @@
 ﻿using MediatR;
 using Ogma.Application.Catalog.Dtos;
-using Ogma.Application.Catalog.Extensions;
-using Ogma.Domain.Catalog.Repositories;
+using Ogma.Application.Catalog.Ports;
 
 namespace Ogma.Application.Catalog.Queries;
-public class GetCategoryByIdHandler : IRequestHandler<GetCategoryByIdQuery, CategoryWithDescendantsDto>
+
+public class GetCategoryByIdHandler : IRequestHandler<GetCategoryByIdQuery, CategoryDto>
 {
-    private readonly ICategoryRepository _categoryRepository;
+    private readonly ICategoryReader _categoryReader;
 
-    public GetCategoryByIdHandler(ICategoryRepository categoryRepository)
+    public GetCategoryByIdHandler(ICategoryReader categoryReader) => _categoryReader = categoryReader;
+
+    public async Task<CategoryDto> Handle(GetCategoryByIdQuery query, CancellationToken cancellationToken)
     {
-        _categoryRepository = categoryRepository;
-    }
-
-    public async Task<CategoryWithDescendantsDto> Handle(GetCategoryByIdQuery query, CancellationToken cancellationToken)
-    {
-        var result = await _categoryRepository.GetByIdAsync(query.Id);
-        if (result == null)
-        {
-            throw new KeyNotFoundException($"Category with ID {query.Id} was not found.");
-
-        }
-        return result.ToDtoWithDescendants();
+        return await _categoryReader.GetByIdAsync(query.Id)
+            ?? throw new KeyNotFoundException($"Category with ID {query.Id} not found.");
     }
 }

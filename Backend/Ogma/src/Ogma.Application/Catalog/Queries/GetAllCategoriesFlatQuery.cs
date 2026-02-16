@@ -2,4 +2,4 @@
 using Ogma.Application.Catalog.Dtos;
 
 namespace Ogma.Application.Catalog.Queries;
-public record GetAllCategoriesFlatQuery : IRequest<List<CategoryWithDescendantsDto>>;
+public record GetAllCategoriesFlatQuery : IRequest<List<CategoryDto>>;

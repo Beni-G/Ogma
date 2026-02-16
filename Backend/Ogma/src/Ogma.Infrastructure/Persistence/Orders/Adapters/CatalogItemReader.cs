@@ -29,4 +29,5 @@ public class CatalogItemReader : ICatalogItemReader
             .Select(i => new OrderItemDto(i.Id, i.Name, i.Code))
             .ToDictionaryAsync(i => i.ItemId);
     }
+
 }

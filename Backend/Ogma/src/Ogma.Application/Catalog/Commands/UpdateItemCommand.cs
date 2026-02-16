@@ -3,7 +3,8 @@ using Ogma.Application.Catalog.Dtos;
 using Ogma.Application.SharedKernel.Dtos;
 
 namespace Ogma.Application.Catalog.Commands;
-public record UpdateItemCommand(long Id,
+public record UpdateItemCommand(
+    long Id,
     string Name,
     string Code,
     long CategoryId,
@@ -11,4 +12,5 @@ public record UpdateItemCommand(long Id,
     long ItemTypeId,
     string UnitOfMeasurement,
     bool IsActive,
-    string Description = "") : IRequest<ItemDto>;
+    string Description = ""
+) : IRequest<ItemDto>;

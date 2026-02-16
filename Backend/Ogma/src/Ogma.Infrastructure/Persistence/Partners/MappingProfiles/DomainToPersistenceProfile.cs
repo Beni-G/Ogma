@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using Ogma.Application.Partners.Dtos;
 using Ogma.Domain.Partners.Entities;
 using Ogma.Domain.SharedKernel.ValueObjects;
+using Ogma.Infrastructure.Persistence.SharedKernel.ValueObjectRecords;
 
 namespace Ogma.Infrastructure.Persistence.Partners.MappingProfiles;
 
@@ -10,11 +12,19 @@ public class DomainToPersistenceProfile : Profile
     {
         CreateMap<PartnerRoleType, Models.PartnerRoleType>()
             .ReverseMap();
+        CreateMap<PartnerRoleTypeDto, Models.PartnerRoleType>()
+            .ReverseMap();
         CreateMap<Partner, Models.Partner>()
             .ForMember(dest => dest.IndividualFirstName,
-                opt => opt.MapFrom(src => src.IndividualName.FirstName))
+                opt => opt.MapFrom(src => src.IndividualName!.FirstName))
             .ForMember(dest => dest.IndividualLastName,
-                opt => opt.MapFrom(src => src.IndividualName.LastName))
+                opt => opt.MapFrom(src => src.IndividualName!.LastName))
+            .ReverseMap();
+        CreateMap<PartnerDto, Models.Partner>()
+            .ForMember(dest => dest.IndividualFirstName,
+                opt => opt.MapFrom(src => src.IndividualName!.FirstName))
+            .ForMember(dest => dest.IndividualLastName,
+                opt => opt.MapFrom(src => src.IndividualName!.LastName))
             .ReverseMap();
         CreateMap<PartnerBankAccount, Models.PartnerBankAccount>()
             .ReverseMap();
@@ -26,9 +36,9 @@ public class DomainToPersistenceProfile : Profile
             .ReverseMap();
         CreateMap<PartnerIdentifier, Models.PartnerIdentifier>()
             .ReverseMap();
-        CreateMap<Address, ValueObjectRecords.AddressRecord>()
+        CreateMap<Address, AddressRecord>()
             .ReverseMap();
-        CreateMap<BankAccount, ValueObjectRecords.BankAccountRecord>()
+        CreateMap<BankAccount, BankAccountRecord>()
             .ReverseMap();
     }
 }

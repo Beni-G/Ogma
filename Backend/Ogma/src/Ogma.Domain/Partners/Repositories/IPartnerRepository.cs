@@ -14,22 +14,6 @@ public interface IPartnerRepository
     Task<Partner?> GetByIdAsync(long id);
 
     /// <summary>
-    /// Asynchronously retrieves all partners from the data source.
-    /// </summary>
-    /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of <see
-    /// cref="Partner"/> objects representing all partners. The collection will be empty if no partners are found.</returns>
-    Task<IEnumerable<Partner>> GetAllAsync();
-
-    /// <summary>
-    /// Asynchronously retrieves all partners that satisfy the specified filter criteria.
-    /// </summary>
-    /// <param name="predicate">An expression used to filter the partners to be retrieved. Only partners for which the predicate evaluates to
-    /// <see langword="true"/> will be included in the result. Cannot be null.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains an enumerable collection of partners
-    /// matching the filter. If no partners match, the collection will be empty.</returns>
-    Task<IEnumerable<Partner>> GetAllAsync(Expression<Func<Partner, bool>> predicate);
-
-    /// <summary>
     /// Asynchronously adds a new partner to the system.
     /// </summary>
     /// <param name="partner">The partner entity to add. Cannot be null.</param>

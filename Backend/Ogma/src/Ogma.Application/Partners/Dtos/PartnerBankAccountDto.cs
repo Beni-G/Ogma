@@ -2,4 +2,4 @@
 
 namespace Ogma.Application.Partners.Dtos;
 
-public record PartnerBankAccountDto(BankAccountDto BankAccount, bool IsDefault);
+public record PartnerBankAccountDto(long Id, BankAccountDto BankAccount, bool IsDefault);

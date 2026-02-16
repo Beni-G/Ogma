@@ -7,5 +7,5 @@ public record CreatePartnerRequest(
     string? CompanyName,
     bool IsNaturalPerson,
     AddressRequest HQAddress,
-    PartnerIdentifierRequest Identifier,
+    CreatePartnerIdentifierRequest Identifier,
     long RoleId);

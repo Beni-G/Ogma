@@ -3,6 +3,7 @@
 namespace Ogma.Api.Contracts.Partners;
 
 public record PartnerContactResponse(
+    long Id,
     PersonNameResponse Name,
     string? Email,
     string? Phone,
