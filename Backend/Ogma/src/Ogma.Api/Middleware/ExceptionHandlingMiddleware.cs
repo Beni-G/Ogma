@@ -31,6 +31,11 @@ public class ExceptionHandlingMiddleware
             _logger.LogWarning(ex, "Invalid operation");
             await WriteErrorAsync(context, HttpStatusCode.BadRequest, ex.Message);
         }
+        catch (OperationCanceledException)
+        {
+            _logger.LogInformation("Request was cancelled by the client.");
+            context.Response.StatusCode = 499; 
+        }
         catch (DbUpdateException ex) when (ex.InnerException is PostgresException pgEx && pgEx.SqlState == "23503")
         {
             // 23503 = foreign key violation in PostgreSQL

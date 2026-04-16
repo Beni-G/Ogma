@@ -1,25 +1,17 @@
 ﻿using FluentAssertions;
 using Moq;
-using Ogma.Application.Catalog.Commands;
 using Ogma.Application.Catalog.Dtos;
 using Ogma.Application.Catalog.Ports;
 using Ogma.Application.Catalog.Queries;
 using Ogma.Application.UnitTests.Catalog.Helpers;
-using Ogma.Domain.Catalog.Entities;
-using Ogma.Domain.Catalog.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ogma.Application.UnitTests.Catalog.Tests.Queries;
+
 public class GetItemTypeByIdHandlerTests
 {
 
     private readonly Mock<IItemTypeReader> _itemTypeReaderStub;
     private readonly GetItemTypeByIdHandler _handler;
-
 
     public GetItemTypeByIdHandlerTests()
     {
@@ -38,10 +30,7 @@ public class GetItemTypeByIdHandlerTests
         // Act
         var result = await _handler.Handle(query, CancellationToken.None);
         // Assert
-        result.Should().NotBeNull();
-        result.Id.Should().Be(existingItemType.Id);
-        result.Name.Should().Be(existingItemType.Name);
-        result.Description.Should().Be(existingItemType.Description);
+        result.Should().BeEquivalentTo(existingItemType);
         _itemTypeReaderStub.Verify(r => r.GetByIdAsync(It.IsAny<long>()), Times.Once);
     }
 

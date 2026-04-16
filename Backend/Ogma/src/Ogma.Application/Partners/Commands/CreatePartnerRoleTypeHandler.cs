@@ -10,10 +10,7 @@ public class CreatePartnerRoleTypeHandler : IRequestHandler<CreatePartnerRoleTyp
 {
     private readonly IPartnerRoleTypeRepository _partnerRoleTypeRepository;
 
-    public CreatePartnerRoleTypeHandler(IPartnerRoleTypeRepository partnerRoleTypeRepository)
-    {
-        _partnerRoleTypeRepository = partnerRoleTypeRepository;
-    }
+    public CreatePartnerRoleTypeHandler(IPartnerRoleTypeRepository partnerRoleTypeRepository) => _partnerRoleTypeRepository = partnerRoleTypeRepository;
 
     public async Task<PartnerRoleTypeDto> Handle(CreatePartnerRoleTypeCommand request, CancellationToken cancellationToken)
     {

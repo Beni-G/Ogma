@@ -3,13 +3,9 @@ using Moq;
 using Ogma.Application.Catalog.Commands;
 using Ogma.Domain.Catalog.Entities;
 using Ogma.Domain.Catalog.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ogma.Application.UnitTests.Catalog.Tests.Commands;
+
 public class DeleteItemTypeHandlerTests
 {
     private readonly Mock<IItemTypeRepository> _itemTypeRepositoryStub;
@@ -23,7 +19,7 @@ public class DeleteItemTypeHandlerTests
     }
 
     [Fact]
-    public async Task Handle_ValidItemType_ReturnsUpdatedItemType()
+    public async Task Handle_ValidItemType_DeletesItemType()
     {
         // Arrange
         long id = 1;
@@ -40,7 +36,7 @@ public class DeleteItemTypeHandlerTests
     }
 
     [Fact]
-    public async Task Handle_NonExistingId_ReturnsKeyNotFoundException()
+    public async Task Handle_NonExistingId_ThrowsKeyNotFoundException()
     {
         // Arrange
         long id = 1;

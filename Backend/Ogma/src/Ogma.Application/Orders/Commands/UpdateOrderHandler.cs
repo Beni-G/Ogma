@@ -38,6 +38,10 @@ public class UpdateOrderHandler : IRequestHandler<UpdateOrderCommand, OrderDto>
             ?? throw new KeyNotFoundException($"Order with ID {command.Id} not found.");
         var partner = await _partnerReader.GetByIdAsync(command.PartnerId)
             ?? throw new KeyNotFoundException($"Partner with ID {command.PartnerId} not found.");
+        _ = await _orderTypeReader.GetByIdAsync(command.OrderTypeId)
+            ?? throw new KeyNotFoundException($"Order Type with ID {command.OrderTypeId} not found.");
+        _ = await _orderStatusReader.GetByIdAsync(command.OrderStatusId)
+            ?? throw new KeyNotFoundException($"Order Status with ID {command.OrderStatusId} not found.");
         var itemIds = command.OrderLines.Select(ol => ol.ItemId).Distinct();
         var itemsLookup = await _catalogItemReader.GetByIdsAsync(itemIds);
 

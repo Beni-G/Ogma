@@ -62,7 +62,7 @@ public class GetItemByIdHandlerTests
     }
 
     [Fact]
-    public async Task Handle_NonExistingItem_ReturnsKeyNotFoundException()
+    public async Task Handle_NonExistingItem_ThrowsKeyNotFoundException()
     {
         // Arrange
         long id = CatalogTestData.NextId();
@@ -77,7 +77,7 @@ public class GetItemByIdHandlerTests
     }
 
     [Fact]
-    public async Task Handle_NonExistingCategory_ReturnsKeyNotFoundException()
+    public async Task Handle_NonExistingCategory_ThrowsKeyNotFoundException()
     {
         // Arrange
         var item = CatalogTestData.CreateItemDto(CatalogTestData.NextId(), CatalogTestData.NextId());
@@ -94,7 +94,7 @@ public class GetItemByIdHandlerTests
     }
 
     [Fact]
-    public async Task Handle_NonExistingItemType_ReturnsKeyNotFoundException()
+    public async Task Handle_NonExistingItemType_ThrowsKeyNotFoundException()
     {
         // Arrange
         var categoryEntity = Category.Reconstitute(CatalogTestData.NextId(), CatalogTestData.CreateName());
