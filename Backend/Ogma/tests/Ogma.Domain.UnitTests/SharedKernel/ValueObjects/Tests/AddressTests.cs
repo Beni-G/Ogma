@@ -7,7 +7,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ogma.Domain.UnitTests.SharedKernel.ValueObjects;
+namespace Ogma.Domain.UnitTests.SharedKernel.ValueObjects.Tests;
 
 public class AddressTests
 {

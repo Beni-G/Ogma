@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ogma.Domain.UnitTests.SharedKernel.ValueObjects;
+namespace Ogma.Domain.UnitTests.SharedKernel.ValueObjects.Tests;
 public class MoneyTests
 {
     [Fact]

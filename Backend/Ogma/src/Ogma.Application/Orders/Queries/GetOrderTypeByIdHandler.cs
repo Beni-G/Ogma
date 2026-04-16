@@ -10,8 +10,6 @@ public class GetOrderTypeByIdHandler : IRequestHandler<GetOrderTypeByIdQuery, Or
 
     public GetOrderTypeByIdHandler(IOrderTypeReader orderTypeReader) => _orderTypeReader = orderTypeReader;
 
-    public async Task<OrderTypeDto> Handle(GetOrderTypeByIdQuery request, CancellationToken cancellationToken)
-    {
-        return await _orderTypeReader.GetByIdAsync(request.Id) ?? throw new KeyNotFoundException($"Order type with Id {request.Id} not found.");
-    }
+    public async Task<OrderTypeDto> Handle(GetOrderTypeByIdQuery request, CancellationToken cancellationToken) =>
+        await _orderTypeReader.GetByIdAsync(request.Id) ?? throw new KeyNotFoundException($"Order type with Id {request.Id} not found.");
 }

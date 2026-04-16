@@ -32,14 +32,7 @@ public class GetAllItemTypesHandlerTests
         // Act
         var result = await _handler.Handle(new GetAllItemTypesQuery(), CancellationToken.None);
         // Assert
-        result.Should().NotBeNull();
-        result.Count.Should().Be(2);
-        result[0].Id.Should().Be(itemTypes[0].Id);
-        result[0].Name.Should().Be(itemTypes[0].Name);
-        result[0].Description.Should().Be(itemTypes[0].Description);
-        result[1].Id.Should().Be(itemTypes[1].Id);
-        result[1].Name.Should().Be(itemTypes[1].Name);
-        result[1].Description.Should().Be(itemTypes[1].Description);
+        result.Should().BeEquivalentTo(itemTypes, options => options.WithStrictOrdering());
         _itemTypeReaderStub.Verify(r => r.GetAllAsync(), Times.Once);
     }
 

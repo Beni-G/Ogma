@@ -32,7 +32,7 @@ public class UpdatePartnerHandler : IRequestHandler<UpdatePartnerCommand, Partne
         }
 
         existingPartner.Update(
-            command.IndividualName!.ToDomain(),
+            command.IndividualName != null ? command.IndividualName.ToDomain() : null,
             command.CompanyName,
             command.IsNaturalPerson,
             command.IsActive,

@@ -60,11 +60,11 @@ public class CreateOrderHandler : IRequestHandler<CreateOrderCommand, OrderDto>
         }
 
         var orderType = await _orderTypeReader.GetByIdAsync(command.OrderTypeId)
-            ?? throw new InvalidOperationException($"Order Type with ID {command.OrderTypeId} not found.");
+            ?? throw new KeyNotFoundException($"Order Type with ID {command.OrderTypeId} not found.");
 
         var orderStatus = await _orderStatusReader.GetByIdAsync(command.OrderStatusId)
-            ?? throw new InvalidOperationException($"Order Status with ID {command.OrderStatusId} not found.");
+            ?? throw new KeyNotFoundException($"Order Status with ID {command.OrderStatusId} not found.");
 
-        return (await _orderRepository.AddAsync(newOrder)).ToDto(orderType, orderStatus);
+        return (await _orderRepository.AddAsync(newOrder)).ToDtoWithDto(orderType, orderStatus);
     }
 }

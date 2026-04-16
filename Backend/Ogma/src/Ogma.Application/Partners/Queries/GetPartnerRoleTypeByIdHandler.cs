@@ -1,8 +1,6 @@
 ﻿using MediatR;
 using Ogma.Application.Partners.Dtos;
-using Ogma.Application.Partners.Extensions;
 using Ogma.Application.Partners.Ports;
-using Ogma.Domain.Partners.Repositories;
 
 namespace Ogma.Application.Partners.Queries;
 

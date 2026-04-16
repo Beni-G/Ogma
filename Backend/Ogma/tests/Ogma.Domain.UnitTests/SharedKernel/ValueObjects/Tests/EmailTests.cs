@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using Ogma.Domain.SharedKernel.ValueObjects;
 
-namespace Ogma.Domain.UnitTests.SharedKernel.ValueObjects;
+namespace Ogma.Domain.UnitTests.SharedKernel.ValueObjects.Tests;
 
 public class EmailTests
 {

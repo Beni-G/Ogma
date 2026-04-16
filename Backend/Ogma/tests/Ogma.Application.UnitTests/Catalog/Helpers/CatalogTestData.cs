@@ -82,7 +82,7 @@ internal static class CatalogTestData
         Id: NextId(),
         Name: CreateName(),
         Description: CreateDescription()
-        );
+    );
 
     public static ItemDto CreateItemDto(long? categoryId = null, long? itemTypeId = null) => new(
             Id: NextId(),

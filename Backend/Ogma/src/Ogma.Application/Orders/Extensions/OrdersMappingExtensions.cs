@@ -30,7 +30,7 @@ public static class OrdersMappingExtensions
         orderLine.AdditionalInformation
     );
 
-    public static OrderDto ToDto(this Order order, OrderType? orderType = null, OrderStatus? orderStatus = null) => new(
+    public static OrderDto ToDtoWithDomain(this Order order, OrderType? orderType = null, OrderStatus? orderStatus = null) => new(
         order.Id,
         order.OrderPartner.ToDto(),
         order.OrderNumber,
@@ -43,7 +43,7 @@ public static class OrdersMappingExtensions
         order.OrderLines.Select(ol => ol.ToDto()).ToList()
     );
 
-    public static OrderDto ToDto(this Order order, OrderTypeDto? orderType = null, OrderStatusDto? orderStatus = null) => new(
+    public static OrderDto ToDtoWithDto(this Order order, OrderTypeDto? orderType = null, OrderStatusDto? orderStatus = null) => new(
         order.Id,
         order.OrderPartner.ToDto(),
         order.OrderNumber,
