@@ -3,17 +3,20 @@ using Moq;
 using Ogma.Application.Catalog.Commands;
 using Ogma.Domain.Catalog.Entities;
 using Ogma.Domain.Catalog.Repositories;
+using Ogma.Domain.SharedKernel.BaseTypes;
 
 namespace Ogma.Application.UnitTests.Catalog.Tests.Commands;
 public class DeleteCategoryHandlerTests
 {
     private readonly Mock<ICategoryRepository> _categoryRepositoryStub;
     private readonly DeleteCategoryHandler _handler;
+    private readonly EntityMetadata _metadata;
 
     public DeleteCategoryHandlerTests()
     {
         _categoryRepositoryStub = new Mock<ICategoryRepository>();
         _handler = new DeleteCategoryHandler(_categoryRepositoryStub.Object);
+        _metadata = new EntityMetadata(DateTime.UtcNow, DateTime.UtcNow, 1);
     }
 
     [Fact]
@@ -21,7 +24,7 @@ public class DeleteCategoryHandlerTests
     {
         // Arrange
         long id = 1;
-        var existingCategory = Category.Reconstitute(id, "CategoryToDelete", null, "");
+        var existingCategory = Category.Reconstitute(id, "CategoryToDelete", _metadata, null, "");
         var command = new DeleteCategoryCommand(id);
         _categoryRepositoryStub.Setup(repo => repo.GetByIdAsync(id))
             .ReturnsAsync(existingCategory);
@@ -38,7 +41,7 @@ public class DeleteCategoryHandlerTests
     public async Task Handle_DeleteAsyncThrows_PropagatesException()
     {
         // Arrange
-        var category = Category.Reconstitute(1L, "Category", null, "");
+        var category = Category.Reconstitute(1L, "Category", _metadata, null, "");
         var command = new DeleteCategoryCommand(category.Id);
 
         _categoryRepositoryStub.Setup(r => r.GetByIdAsync(category.Id))

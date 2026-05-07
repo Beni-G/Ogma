@@ -2,6 +2,7 @@
 using Moq;
 using Ogma.Application.Orders.Commands;
 using Ogma.Application.Orders.Extensions;
+using Ogma.Application.UnitTests.Orders.Helpers;
 using Ogma.Domain.Orders.Entities;
 using Ogma.Domain.Orders.Repositories;
 
@@ -22,9 +23,9 @@ public class UpdateOrderStatusHandlerTests
     public async Task Handle_ValidOrderStatus_ReturnsUpdatedOrderStatus()
     {
         // Arrange
-        var existingOrderStatus = OrderStatus.Reconstitute(1L, "Valid", "Valid");
+        var existingOrderStatus = OrderStatus.Reconstitute(1L, "Valid", "Valid", OrdersTestData.GetMetadata());
         var command = new UpdateOrderStatusCommand(1L, "Approved", "Approved");
-        var updatedOrderStatus = OrderStatus.Reconstitute(command.Id, command.Name, command.Description);
+        var updatedOrderStatus = OrderStatus.Reconstitute(command.Id, command.Name, command.Description, OrdersTestData.GetMetadata());
         _OrderStatusRepositoryStub.Setup(r => r.GetByIdAsync(It.IsAny<long>()))
             .ReturnsAsync(updatedOrderStatus);
         _OrderStatusRepositoryStub.Setup(r => r.UpdateAsync(updatedOrderStatus))
@@ -60,9 +61,9 @@ public class UpdateOrderStatusHandlerTests
     public async Task Handle_UpdateFails_ThrowsInvalidOperationException()
     {
         // Arrange
-        var existingOrderStatus = OrderStatus.Reconstitute(1L, "Valid", "Valid");
+        var existingOrderStatus = OrderStatus.Reconstitute(1L, "Valid", "Valid", OrdersTestData.GetMetadata());
         var command = new UpdateOrderStatusCommand(1L, "Approved", "Approved");
-        var updatedOrderStatus = OrderStatus.Reconstitute(command.Id, command.Name, command.Description);
+        var updatedOrderStatus = OrderStatus.Reconstitute(command.Id, command.Name, command.Description, OrdersTestData.GetMetadata());
         _OrderStatusRepositoryStub.Setup(r => r.GetByIdAsync(It.IsAny<long>()))
             .ReturnsAsync(updatedOrderStatus);
         _OrderStatusRepositoryStub.Setup(r => r.UpdateAsync(updatedOrderStatus))

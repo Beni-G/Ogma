@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Moq;
 using Ogma.Application.Partners.Commands;
+using Ogma.Application.UnitTests.Partners.Helpers;
 using Ogma.Domain.Partners.Entities;
 using Ogma.Domain.Partners.Repositories;
 
@@ -22,7 +23,7 @@ public class UpdatePartnerRoleTypeHandlerTests
     {
         // Arrange
         long id = 1;
-        var existingPartnerRoleType = PartnerRoleType.Reconstitute(id, "ExistingCode", "ExistingName", "#FFFFFF");
+        var existingPartnerRoleType = PartnerRoleType.Reconstitute(id, "ExistingCode", "ExistingName", PartnersTestData.GetMetadata(), "#FFFFFF");
         var command = new UpdatePartnerRoleTypeCommand(id, "UpdatedCode", "UpdatedName", "#000000");
         _partnerRoleTypeRepositoryStub.Setup(repo => repo.UpdateAsync(It.IsAny<PartnerRoleType>()))
             .ReturnsAsync((PartnerRoleType partnerRoleType) => true);
@@ -60,7 +61,7 @@ public class UpdatePartnerRoleTypeHandlerTests
     {
         // Arrange
         long id = 1;
-        var existingPartnerRoleType = PartnerRoleType.Reconstitute(id, "ExistingCode", "ExistingName", "#FFFFFF");
+        var existingPartnerRoleType = PartnerRoleType.Reconstitute(id, "ExistingCode", "ExistingName", PartnersTestData.GetMetadata(), "#FFFFFF");
         var command = new UpdatePartnerRoleTypeCommand(id, "UpdatedCode", "UpdatedName", "#000000");
         _partnerRoleTypeRepositoryStub.Setup(repo => repo.UpdateAsync(It.IsAny<PartnerRoleType>()))
             .ReturnsAsync(false);

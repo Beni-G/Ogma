@@ -1,4 +1,6 @@
-﻿using Ogma.Domain.Orders.ValueObjects;
+﻿using Ogma.Domain.Orders.Entities;
+using Ogma.Domain.Orders.ValueObjects;
+using Ogma.Domain.SharedKernel.BaseTypes;
 
 namespace Ogma.Domain.UnitTests.Orders.Helpers;
 
@@ -22,4 +24,6 @@ internal static class OrdersTestData
             code ?? Guid.NewGuid().ToString()
             );
     }
+
+    public static EntityMetadata GetMetadata() => new EntityMetadata(DateTime.UtcNow, DateTime.UtcNow, 1);
 }

@@ -1,8 +1,9 @@
-﻿namespace Ogma.Infrastructure.Persistence.Orders.Models;
+﻿using Ogma.Infrastructure.Persistence.SharedKernel.BaseTypes;
 
-public class OrderType
+namespace Ogma.Infrastructure.Persistence.Orders.Models;
+
+public class OrderType : Entity
 {
-    public long Id { get; set; }
     public string Code { get; set; } = default!;
     public string Description { get; set; } = default!;
 }

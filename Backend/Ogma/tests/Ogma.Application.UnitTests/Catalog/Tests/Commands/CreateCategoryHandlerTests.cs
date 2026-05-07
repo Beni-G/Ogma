@@ -4,6 +4,7 @@ using Ogma.Application.Catalog.Commands;
 using Ogma.Domain.Catalog.Entities;
 using Ogma.Domain.Catalog.Repositories;
 using Ogma.Domain.Catalog.Services;
+using Ogma.Domain.SharedKernel.BaseTypes;
 
 namespace Ogma.Application.UnitTests.Catalog.Tests.Commands;
 
@@ -12,12 +13,14 @@ public class CreateCategoryHandlerTests
     private readonly Mock<ICategoryRepository> _categoryRepositoryStub;
     private readonly Mock<ICategoryDomainService> _categoryDomainServiceStub;
     private readonly CreateCategoryHandler _handler;
+    private readonly EntityMetadata _metadata;
 
     public CreateCategoryHandlerTests()
     {
         _categoryRepositoryStub = new Mock<ICategoryRepository>();
         _categoryDomainServiceStub = new Mock<ICategoryDomainService>();
         _handler = new CreateCategoryHandler(_categoryRepositoryStub.Object, _categoryDomainServiceStub.Object);
+        _metadata = new EntityMetadata(DateTime.UtcNow, DateTime.UtcNow, 1);
     }
 
     [Fact]
@@ -31,7 +34,7 @@ public class CreateCategoryHandlerTests
         _categoryRepositoryStub.Setup(repo => repo.AddAsync(It.IsAny<Category>()))
             .ReturnsAsync((Category category) =>
             {
-                return Category.Reconstitute(nextId, category.Name, category.ParentCategoryId, category.Path);
+                return Category.Reconstitute(nextId, category.Name, _metadata, category.ParentCategoryId, category.Path);
             });
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -48,7 +51,7 @@ public class CreateCategoryHandlerTests
     public async Task Handle_ValidChildCategory_ReturnsCreatedCategory()
     {
         // Arrange
-        var parentCategory = Category.Reconstitute(1, "ParentCategory", null, "");
+        var parentCategory = Category.Reconstitute(1, "ParentCategory", _metadata, null, "");
         var command = new CreateCategoryCommand("ChildCategory", parentCategory.Id);
         long nextId = 2;
         _categoryRepositoryStub.Setup(repo => repo.GetByIdAsync(parentCategory.Id))
@@ -58,7 +61,7 @@ public class CreateCategoryHandlerTests
         _categoryRepositoryStub.Setup(repo => repo.AddAsync(It.IsAny<Category>()))
             .ReturnsAsync((Category category) =>
             {
-                return Category.Reconstitute(nextId, category.Name, category.ParentCategoryId, category.Path);
+                return Category.Reconstitute(nextId, category.Name, _metadata, category.ParentCategoryId, category.Path);
             });
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);

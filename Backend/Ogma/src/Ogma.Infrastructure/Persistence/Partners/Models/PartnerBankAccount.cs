@@ -1,10 +1,10 @@
-﻿using Ogma.Infrastructure.Persistence.SharedKernel.ValueObjectRecords;
+﻿using Ogma.Infrastructure.Persistence.SharedKernel.BaseTypes;
+using Ogma.Infrastructure.Persistence.SharedKernel.ValueObjectRecords;
 
 namespace Ogma.Infrastructure.Persistence.Partners.Models;
 
-public class PartnerBankAccount
+public class PartnerBankAccount : Entity
 {
-    public long Id { get; set; }
     public long PartnerId { get; set; }
     public Partner Partner { get; set; }
     public BankAccountRecord BankAccount { get; set; } = default!;

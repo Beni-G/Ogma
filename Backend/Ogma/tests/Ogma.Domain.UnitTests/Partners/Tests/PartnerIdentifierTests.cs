@@ -1,8 +1,9 @@
 ﻿using FluentAssertions;
 using Ogma.Domain.Partners.Entities;
 using Ogma.Domain.SharedKernel.ValueObjects;
+using Ogma.Domain.UnitTests.Partners.Helpers;
 
-namespace Ogma.Domain.UnitTests.Partners;
+namespace Ogma.Domain.UnitTests.Partners.Tests;
 
 public class PartnerIdentifierTests
 {
@@ -85,7 +86,7 @@ public class PartnerIdentifierTests
         var validityPeriod = new Period(DateTime.UtcNow, DateTime.UtcNow.AddYears(1));
         bool isPrimary = true;
         // Act
-        var partnerIdentifier = PartnerIdentifier.Reconstitute(id, type, value, validityPeriod, isPrimary);
+        var partnerIdentifier = PartnerIdentifier.Reconstitute(id, type, value, PartnersTestData.GetMetadata(), validityPeriod, isPrimary);
         // Assert
         partnerIdentifier.Id.Should().Be(id);
         partnerIdentifier.Type.Should().Be(type);
@@ -103,7 +104,7 @@ public class PartnerIdentifierTests
         string type = "TaxID";
         string value = "123-45-6789";
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => PartnerIdentifier.Reconstitute(invalidId, type, value));
+        Assert.Throws<ArgumentException>(() => PartnerIdentifier.Reconstitute(invalidId, type, value, PartnersTestData.GetMetadata()));
     }
 
     [Theory]
@@ -116,7 +117,7 @@ public class PartnerIdentifierTests
         long id = 1;
         string value = "123-45-6789";
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => PartnerIdentifier.Reconstitute(id, invalidType, value));
+        Assert.Throws<ArgumentException>(() => PartnerIdentifier.Reconstitute(id, invalidType, value, PartnersTestData.GetMetadata()));
     }
 
     [Theory]
@@ -129,7 +130,7 @@ public class PartnerIdentifierTests
         long id = 1;
         string type = "TaxID";
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => PartnerIdentifier.Reconstitute(id, type, invalidValue));
+        Assert.Throws<ArgumentException>(() => PartnerIdentifier.Reconstitute(id, type, invalidValue, PartnersTestData.GetMetadata()));
     }
 
 
@@ -141,7 +142,7 @@ public class PartnerIdentifierTests
         string type = "TaxID";
         string value = "123-45-6789";
         // Act
-        var partnerIdentifier = PartnerIdentifier.Reconstitute(id, type, value);
+        var partnerIdentifier = PartnerIdentifier.Reconstitute(id, type, value, PartnersTestData.GetMetadata());
         // Assert
         partnerIdentifier.Id.Should().Be(id);
         partnerIdentifier.Type.Should().Be(type);
@@ -159,7 +160,7 @@ public class PartnerIdentifierTests
         string value = "123-45-6789";
         var validityPeriod = new Period(DateTime.UtcNow, DateTime.UtcNow.AddYears(1));
         // Act
-        var partnerIdentifier = PartnerIdentifier.Reconstitute(id, type, value, validityPeriod);
+        var partnerIdentifier = PartnerIdentifier.Reconstitute(id, type, value, PartnersTestData.GetMetadata(), validityPeriod);
         // Assert
         partnerIdentifier.IsPrimary.Should().BeFalse();
     }

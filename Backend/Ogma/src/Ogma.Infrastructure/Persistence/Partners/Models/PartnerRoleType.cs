@@ -1,8 +1,9 @@
-﻿namespace Ogma.Infrastructure.Persistence.Partners.Models;
+﻿using Ogma.Infrastructure.Persistence.SharedKernel.BaseTypes;
 
-public class PartnerRoleType
+namespace Ogma.Infrastructure.Persistence.Partners.Models;
+
+public class PartnerRoleType : Entity
 {
-    public long Id { get; set; }
     public string Code { get; set; } = default!;
     public string Name { get; set; } = default!;
     public string? Color { get; set; }

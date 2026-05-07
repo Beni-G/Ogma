@@ -1,8 +1,10 @@
 ﻿using FluentAssertions;
 using Ogma.Domain.Partners.Entities;
+using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.SharedKernel.ValueObjects;
+using Ogma.Domain.UnitTests.Partners.Helpers;
 
-namespace Ogma.Domain.UnitTests.Partners;
+namespace Ogma.Domain.UnitTests.Partners.Tests;
 
 public class PartnerBankAccountTests
 {
@@ -46,7 +48,7 @@ public class PartnerBankAccountTests
         var bankAccount = new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX");
         var isDefault = true;
         // Act
-        var partnerBankAccount = PartnerBankAccount.Reconstitute(id, bankAccount, isDefault);
+        var partnerBankAccount = PartnerBankAccount.Reconstitute(id, bankAccount, PartnersTestData.GetMetadata(), isDefault);
         // Assert
         partnerBankAccount.Id.Should().Be(id);
         partnerBankAccount.BankAccount.Should().Be(bankAccount);
@@ -60,7 +62,7 @@ public class PartnerBankAccountTests
         var id = 10L;
         var bankAccount = new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX");
         // Act
-        var partnerBankAccount = PartnerBankAccount.Reconstitute(id, bankAccount);
+        var partnerBankAccount = PartnerBankAccount.Reconstitute(id, bankAccount, PartnersTestData.GetMetadata());
         // Assert
         partnerBankAccount.Id.Should().Be(id);
         partnerBankAccount.BankAccount.Should().Be(bankAccount);
@@ -75,7 +77,7 @@ public class PartnerBankAccountTests
         // Arrange
         var bankAccount = new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX");
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => PartnerBankAccount.Reconstitute(invalidId, bankAccount));
+        Assert.Throws<ArgumentException>(() => PartnerBankAccount.Reconstitute(invalidId, bankAccount, PartnersTestData.GetMetadata()));
     }
 
     [Fact]
@@ -84,7 +86,7 @@ public class PartnerBankAccountTests
         // Arrange
         var id = 10L;
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => PartnerBankAccount.Reconstitute(id, null!));
+        Assert.Throws<ArgumentNullException>(() => PartnerBankAccount.Reconstitute(id, null!, PartnersTestData.GetMetadata()));
     }
 
     [Fact]

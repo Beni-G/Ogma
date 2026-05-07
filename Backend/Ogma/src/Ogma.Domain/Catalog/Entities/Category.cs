@@ -40,20 +40,17 @@ public class Category : AggregateRoot<long>
     }
 
     /// <summary>
-    /// Creates a new instance of the Category class with the specified id, name, optional parent category ID, and path.
+    /// Creates a new instance of the Category class with the specified id, name, metadata, optional parent category ID, and path.
     /// </summary>
     /// <param name="id"></param>
     /// <param name="name"></param>
+    /// <param name="metadata"></param>
     /// <param name="parentCategoryId"></param>
     /// <param name="path"></param>
     /// <exception cref="ArgumentException"></exception>
-    private Category(long id, string name, long? parentCategoryId = null, string? path = null) : base(id)
+    private Category(long id, string name, EntityMetadata metadata, long? parentCategoryId = null, string? path = null) 
+        : base(id, metadata)
     {
-        if (id <= 0)
-        {
-            throw new ArgumentException("ID must be a positive number.", nameof(id));
-        }
-
         if (string.IsNullOrWhiteSpace(name))
         {
             throw new ArgumentException("Name cannot be null or empty.", nameof(name));
@@ -80,10 +77,12 @@ public class Category : AggregateRoot<long>
     /// </summary>
     /// <param name="id"></param>
     /// <param name="name"></param>
+    /// <param name="metadata"></param>
     /// <param name="parentCategoryId"></param>
     /// <param name="path"></param>
     /// <returns></returns>
-    public static Category Reconstitute(long id, string name, long? parentCategoryId = null, string? path = null) => new(id, name, parentCategoryId, path);
+    public static Category Reconstitute(long id, string name, EntityMetadata metadata, long? parentCategoryId = null, string? path = null) => 
+        new(id, name, metadata, parentCategoryId, path);
 
     /// <summary>
     /// Updates the Name and ParentCategoryId of the Category.
@@ -105,6 +104,8 @@ public class Category : AggregateRoot<long>
 
         Name = name;
         ParentCategoryId = parentCategoryId;
+
+        Touch();
     }
 
     /// <summary>

@@ -52,6 +52,7 @@ public class PartnerContact : Entity<long>
     /// </summary>
     /// <param name="id"></param>
     /// <param name="name"></param>
+    /// <param name="metadata"></param>
     /// <param name="email"></param>
     /// <param name="phone"></param>
     /// <param name="mobile"></param>
@@ -62,17 +63,14 @@ public class PartnerContact : Entity<long>
     private PartnerContact(
         long id,
         PersonName name,
+        EntityMetadata metadata,
         Email? email = null,
         string? phone = null,
         string? mobile = null,
         string? title = null,
         string? jobTitle = null,
-        bool isPrimary = false) : base(id)
+        bool isPrimary = false) : base(id, metadata)
     {
-        if (id <= 0)
-        {
-            throw new ArgumentException("ID must be a positive number.", nameof(id));
-        }
         if (name == null)
         {
             throw new ArgumentNullException("Name cannot be null.", nameof(name));
@@ -113,6 +111,7 @@ public class PartnerContact : Entity<long>
     /// </summary>
     /// <param name="id"></param>
     /// <param name="name"></param>
+    /// <param name="metadata"></param>
     /// <param name="email"></param>
     /// <param name="phone"></param>
     /// <param name="mobile"></param>
@@ -123,13 +122,14 @@ public class PartnerContact : Entity<long>
     public static PartnerContact Reconstitute(
         long id,
         PersonName name,
+        EntityMetadata metadata,
         Email? email = null,
         string? phone = null,
         string? mobile = null,
         string? title = null,
         string? jobTitle = null,
         bool isPrimary = false) 
-        => new(id, name, email, phone, mobile, title, jobTitle, isPrimary);
+        => new(id, name, metadata, email, phone, mobile, title, jobTitle, isPrimary);
 
     public void UpdateContactDetails(
         PersonName name,
@@ -154,6 +154,7 @@ public class PartnerContact : Entity<long>
         {
             UnmarkAsPrimary();
         }
+        Touch();
     }
 
     private void UpdateName(PersonName name) => Name = name ?? throw new ArgumentNullException("Name cannot be null.", nameof(name));

@@ -40,7 +40,7 @@ public class OrderTypeTests
         var code = "OT003";
         var description = "Reconstituted Order Type";
         // Act
-        var orderType = OrderType.Reconstitute(id, code, description);
+        var orderType = OrderType.Reconstitute(id, code, description, OrdersTestData.GetMetadata());
         // Assert
         orderType.Should().NotBeNull();
         orderType.Id.Should().Be(id);
@@ -57,7 +57,7 @@ public class OrderTypeTests
         var code = "OT004";
         var description = "Invalid ID Order Type";
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderType.Reconstitute(invalidId, code, description));
+        Assert.Throws<ArgumentException>(() => OrderType.Reconstitute(invalidId, code, description, OrdersTestData.GetMetadata()));
     }
 
     [Theory]
@@ -70,14 +70,14 @@ public class OrderTypeTests
         var id = OrdersTestData.NextId();
         var description = "Invalid Code Order Type";
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => OrderType.Reconstitute(id, invalidCode, description));
+        Assert.Throws<ArgumentException>(() => OrderType.Reconstitute(id, invalidCode, description, OrdersTestData.GetMetadata()));
     }
 
     [Fact]
     public void Update_ValidParameters_ShouldCreateOrderType()
     {
         // Arrange
-        var orderType = OrderType.Reconstitute(1L, "custord", "Customer Orders");
+        var orderType = OrderType.Reconstitute(1L, "custord", "Customer Orders", OrdersTestData.GetMetadata());
         var newCode = "sales_ord";
         var newDescription = "Sales order";
         // Act
@@ -94,7 +94,7 @@ public class OrderTypeTests
     public void Update_InvalidCode_ShouldThrowArgumentException(string invalidCode)
     {
         // Arrange
-        var orderType = OrderType.Reconstitute(1L, "custord", "Customer Orders");
+        var orderType = OrderType.Reconstitute(1L, "custord", "Customer Orders", OrdersTestData.GetMetadata());
         var newDescription = "Sales order";
         // Act & Assert
         Assert.Throws<ArgumentException>(() => orderType.Update(invalidCode, newDescription));

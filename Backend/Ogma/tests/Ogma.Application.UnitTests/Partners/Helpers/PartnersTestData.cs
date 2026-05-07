@@ -2,6 +2,7 @@
 using Ogma.Application.Partners.Dtos;
 using Ogma.Application.SharedKernel.Dtos;
 using Ogma.Domain.Partners.Entities;
+using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.SharedKernel.ValueObjects;
 
 namespace Ogma.Application.UnitTests.Partners.Helpers;
@@ -160,6 +161,7 @@ internal static class PartnersTestData
             id: NextId(),
             type: $"Type_{Guid.NewGuid().ToString()[..8]}",
             value: $"Value_{Guid.NewGuid().ToString()[..8]}",
+            metadata: GetMetadata(),
             validityPeriod: CreatePeriod(),
             isPrimary: true);
     }
@@ -171,11 +173,12 @@ internal static class PartnersTestData
         bic: "Abc"
     );
 
-    public static PartnerBankAccount CreatePartnerBankAccount() => PartnerBankAccount.Reconstitute(id: NextId(), bankAccount: CreateBankAccount(), isDefault: Random.Shared.Next(0, 2) == 1);
+    public static PartnerBankAccount CreatePartnerBankAccount() => PartnerBankAccount.Reconstitute(id: NextId(), bankAccount: CreateBankAccount(), metadata: GetMetadata(), isDefault: Random.Shared.Next(0, 2) == 1);
 
     public static PartnerContact CreatePartnerContact() => PartnerContact.Reconstitute(
         id: NextId(),
         name: CreatePersonName(),
+        metadata: GetMetadata(),
         email: new Email(CreateEmail()),
         phone: "+12 234 56789",
         mobile: "+98 765 4321",
@@ -208,8 +211,11 @@ internal static class PartnersTestData
                 {
                     CreatePartnerContact(),
                     CreatePartnerContact()
-                }
+                },
+            metadata: GetMetadata()
             );
     }
+
+    public static EntityMetadata GetMetadata() => new EntityMetadata(DateTime.UtcNow, DateTime.UtcNow, 1);
 
 }

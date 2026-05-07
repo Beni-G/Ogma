@@ -5,29 +5,34 @@ public abstract class Entity<TKey> : IEquatable<Entity<TKey>>
 {
     public TKey Id { get; protected set; }
 
-    public DateTime CreatedAt { get; protected set; }
-    public DateTime UpdatedAt { get; protected set; }
-    public int Version { get; protected set; }
+    public EntityMetadata Metadata { get; protected set; }
 
     private readonly List<IDomainEvent> _domainEvents = new();
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
     protected Entity()
     {
-        CreatedAt = DateTime.UtcNow;
-        UpdatedAt = DateTime.UtcNow;
-        Version = 1;
+        Id = default!;
+        Metadata = new EntityMetadata(DateTime.UtcNow, DateTime.UtcNow, 1);
     }
 
-    protected Entity(TKey id) : this()
+    protected Entity(TKey id, EntityMetadata metadata) 
     {
+        if (id is long longId && longId <= 0)
+        {
+            throw new ArgumentException("Reconstituted ID must be positive.", nameof(id));
+        }
         Id = id;
+        Metadata = metadata;
     }
 
     public void Touch()
     {
-        UpdatedAt = DateTime.UtcNow;
-        Version++;
+        Metadata = Metadata with
+        {
+            UpdatedAt = DateTime.UtcNow,
+            Version = Metadata.Version + 1
+        };
     }
 
     public void AddDomainEvent(IDomainEvent domainEvent)

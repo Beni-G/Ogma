@@ -60,37 +60,9 @@ public static class OrdersMappingExtensions
 
     #region ToDomain
 
-    public static OrderType ToDomain(this OrderTypeDto orderTypeDto) => OrderType.Reconstitute(orderTypeDto.Id, orderTypeDto.Code, orderTypeDto.Description);
-
-    public static OrderStatus ToDomain(this OrderStatusDto orderStatusDto) => OrderStatus.Reconstitute(orderStatusDto.Id, orderStatusDto.Name, orderStatusDto.Description);
-
     public static OrderPartner ToDomain(this OrderPartnerDto orderPartnerDto) => new(orderPartnerDto.PartnerId, orderPartnerDto.PartnerName);
 
     public static OrderItem ToDomain(this OrderItemDto orderItemDto) => new(orderItemDto.ItemId, orderItemDto.ItemName, orderItemDto.ItemName);
-
-    public static OrderLine ToDomain(this OrderLineDto orderLineDto) =>
-        OrderLine.Reconstitute(
-            orderLineDto.Id,
-            orderLineDto.OrderItem!.ToDomain(),
-            orderLineDto.OrderedQuantity,
-            orderLineDto.CancelledQuantity,
-            orderLineDto.FullfilledQuantity,
-            orderLineDto.Price.ToDomain(),
-            orderLineDto.ExchangeRate?.ToDomain(),
-            orderLineDto.AdditionalInformation
-        );
-
-    public static Order ToDomain(this OrderDto orderDto) =>
-        Order.Reconstitute(
-            orderDto.Id,
-            orderDto.OrderPartner.ToDomain(),
-            orderDto.OrderNumber,
-            orderDto.OrderDate,
-            orderDto.OrderTypeId,
-            orderDto.OrderStatusId,
-            orderDto.AdditionalInformation,
-            orderDto.OrderLines.Select(ol => ol.ToDomain()).ToList()
-        );
 
     #endregion
 }

@@ -28,8 +28,8 @@ public class GetItemByIdHandlerTests
     public async Task Handle_ValidId_ReturnsItem()
     {
         // Arrange
-        var ancestorCategoryEntity = Category.Reconstitute(CatalogTestData.NextId(), CatalogTestData.CreateName());
-        var categoryEntity = Category.Reconstitute(CatalogTestData.NextId(), CatalogTestData.CreateName(), ancestorCategoryEntity.Id, $"{ancestorCategoryEntity.Id}");
+        var ancestorCategoryEntity = Category.Reconstitute(CatalogTestData.NextId(), CatalogTestData.CreateName(), CatalogTestData.GetMetadata());
+        var categoryEntity = Category.Reconstitute(CatalogTestData.NextId(), CatalogTestData.CreateName(), CatalogTestData.GetMetadata(), ancestorCategoryEntity.Id, $"{ancestorCategoryEntity.Id}");
         var ancestorCategories = new List<CategoryDto> { ancestorCategoryEntity.ToDto() };
         var category = categoryEntity.ToDto(ancestorCategories);
         var itemType = CatalogTestData.CreateItemTypeDto();
@@ -97,7 +97,7 @@ public class GetItemByIdHandlerTests
     public async Task Handle_NonExistingItemType_ThrowsKeyNotFoundException()
     {
         // Arrange
-        var categoryEntity = Category.Reconstitute(CatalogTestData.NextId(), CatalogTestData.CreateName());
+        var categoryEntity = Category.Reconstitute(CatalogTestData.NextId(), CatalogTestData.CreateName(), CatalogTestData.GetMetadata());
         var category = categoryEntity.ToDto();
         var item = CatalogTestData.CreateItemDto(category.Id, CatalogTestData.NextId());
         var query = new GetItemByIdQuery(item.Id);

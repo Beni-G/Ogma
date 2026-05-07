@@ -42,18 +42,15 @@ public class PartnerIdentifier : Entity<long>
     /// <param name="id">The unique identifier for the partner identifier. Must be a positive number.</param>
     /// <param name="type">The type of the identifier. Cannot be null or empty.</param>
     /// <param name="value">The value of the identifier. Cannot be null or empty.</param>
+    /// <param name="metadata">Metadata for the partner identifier.</param>
     /// <param name="validityPeriod">The optional validity period for the identifier. If not specified, the identifier is considered to have no
     /// expiration.</param>
     /// <param name="isPrimary">Indicates whether this identifier is the primary identifier for the partner. Defaults to <see
     /// langword="false"/>.</param>
     /// <exception cref="ArgumentException">Thrown if <paramref name="id"/>, <paramref name="type"/>, or <paramref
     /// name="value"/> do not meet the specified conditions.</exception>
-    private PartnerIdentifier(long id, string type, string value, Period? validityPeriod = null, bool isPrimary = false) : base(id)
+    private PartnerIdentifier(long id, string type, string value, EntityMetadata metadata, Period? validityPeriod = null, bool isPrimary = false) : base(id, metadata)
     {
-        if (id <= 0)
-        {
-            throw new ArgumentException("Identifier ID must be a positive number.", nameof(id));
-        }
         
         if (string.IsNullOrWhiteSpace(type))
         {
@@ -89,11 +86,12 @@ public class PartnerIdentifier : Entity<long>
     /// <param name="id">The unique identifier for the partner.</param>
     /// <param name="type">The type of the partner identifier.</param>
     /// <param name="value">The value of the partner identifier.</param>
+    /// <param name="metadata">Metadata for the partner identifier.</param>
     /// <param name="validityPeriod">The optional validity period for the partner identifier. Defaults to <see langword="null"/> if not specified.</param>
     /// <param name="isPrimary">A value indicating whether this identifier is the primary one. Defaults to <see langword="false"/>.</param>
     /// <returns>A <see cref="PartnerIdentifier"/> instance initialized with the provided parameters.</returns>
-    public static PartnerIdentifier Reconstitute(long id, string type, string value, Period? validityPeriod = null, bool isPrimary = false) 
-        => new(id, type, value, validityPeriod, isPrimary);
+    public static PartnerIdentifier Reconstitute(long id, string type, string value, EntityMetadata metadata, Period? validityPeriod = null, bool isPrimary = false) 
+        => new(id, type, value, metadata, validityPeriod, isPrimary);
 
     /// <summary>
     /// Updates the identifier with the specified type, value, and optional validity period.
@@ -119,6 +117,7 @@ public class PartnerIdentifier : Entity<long>
         Value = value;
         ValidityPeriod = validityPeriod;
         IsPrimary = isPrimary;
+        Touch();
     }
 
     /// <summary>

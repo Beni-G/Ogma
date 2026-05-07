@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Ogma.Domain.Orders.Entities;
+using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.SharedKernel.ValueObjects;
 using Ogma.Domain.UnitTests.Orders.Helpers;
 
@@ -7,7 +8,6 @@ namespace Ogma.Domain.UnitTests.Orders.Tests;
 
 public class OrderTests
 {
-
 
     [Fact]
     public void Create_ValidParameters_ShouldCreateInstance()
@@ -143,7 +143,7 @@ public class OrderTests
         var orderTypeId = OrdersTestData.NextId();
         var orderStatusId = OrdersTestData.NextId();
         // Act
-        var order = Order.Reconstitute(id, orderPartner, orderNumber, orderDate, orderTypeId, orderStatusId);
+        var order = Order.Reconstitute(id, orderPartner, orderNumber, orderDate, orderTypeId, orderStatusId, OrdersTestData.GetMetadata());
         // Assert
         order.Should().NotBeNull();
         order.Id.Should().Be(id);
@@ -173,7 +173,7 @@ public class OrderTests
             OrderLine.Create(OrdersTestData.CreateOrderItem(), 20m, new Money(5m, "eur"))
         };
         // Act
-        var order = Order.Reconstitute(id, orderPartner, orderNumber, orderDate, orderTypeId, orderStatusId, additionalInformation, orderLines);
+        var order = Order.Reconstitute(id, orderPartner, orderNumber, orderDate, orderTypeId, orderStatusId, OrdersTestData.GetMetadata(), additionalInformation, orderLines);
         // Assert
         order.Should().NotBeNull();
         order.Id.Should().Be(id);
@@ -198,7 +198,7 @@ public class OrderTests
         var orderTypeId = OrdersTestData.NextId();
         var orderStatusId = OrdersTestData.NextId();
         // Act
-        Action act = () => Order.Reconstitute(invalidId, orderPartner, orderNumber, orderDate, orderTypeId, orderStatusId);
+        Action act = () => Order.Reconstitute(invalidId, orderPartner, orderNumber, orderDate, orderTypeId, orderStatusId, OrdersTestData.GetMetadata());
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -213,7 +213,7 @@ public class OrderTests
         var orderTypeId = OrdersTestData.NextId();
         var orderStatusId = OrdersTestData.NextId();
         // Act
-        Action act = () => Order.Reconstitute(id, null!, orderNumber, orderDate, orderTypeId, orderStatusId);
+        Action act = () => Order.Reconstitute(id, null!, orderNumber, orderDate, orderTypeId, orderStatusId, OrdersTestData.GetMetadata());
         // Assert
         act.Should().Throw<ArgumentNullException>();
     }
@@ -229,7 +229,7 @@ public class OrderTests
         var orderTypeId = OrdersTestData.NextId();
         var orderStatusId = OrdersTestData.NextId();
         // Act
-        Action act = () => Order.Reconstitute(id, orderPartner, invalidOrderNumber, orderDate, orderTypeId, orderStatusId);
+        Action act = () => Order.Reconstitute(id, orderPartner, invalidOrderNumber, orderDate, orderTypeId, orderStatusId, OrdersTestData.GetMetadata());
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -245,7 +245,7 @@ public class OrderTests
         var orderTypeId = OrdersTestData.NextId();
         var orderStatusId = OrdersTestData.NextId();
         // Act
-        Action act = () => Order.Reconstitute(id, orderPartner, orderNumber, invalidOrderDate, orderTypeId, orderStatusId);
+        Action act = () => Order.Reconstitute(id, orderPartner, orderNumber, invalidOrderDate, orderTypeId, orderStatusId, OrdersTestData.GetMetadata());
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -262,7 +262,7 @@ public class OrderTests
         var orderDate = DateTime.Now;
         var orderStatusId = OrdersTestData.NextId();
         // Act
-        Action act = () => Order.Reconstitute(id, orderPartner, orderNumber, orderDate, invalidOrderTypeId, orderStatusId);
+        Action act = () => Order.Reconstitute(id, orderPartner, orderNumber, orderDate, invalidOrderTypeId, orderStatusId, OrdersTestData.GetMetadata());
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -279,7 +279,7 @@ public class OrderTests
         var orderDate = DateTime.Now;
         var orderTypeId = OrdersTestData.NextId();
         // Act
-        Action act = () => Order.Reconstitute(id, orderPartner, orderNumber, orderDate, orderTypeId, invalidOrderStatusId);
+        Action act = () => Order.Reconstitute(id, orderPartner, orderNumber, orderDate, orderTypeId, invalidOrderStatusId, OrdersTestData.GetMetadata());
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -357,7 +357,7 @@ public class OrderTests
     {
         // Arrange
         var order = Order.Create(OrdersTestData.CreateOrderPartner(), "123", DateTime.Now, 1L, 1L);
-        var orderLine = OrderLine.Reconstitute(1L, OrdersTestData.CreateOrderItem(), 2, 0, 0, new Money(10m, "eur"));
+        var orderLine = OrderLine.Reconstitute(1L, OrdersTestData.CreateOrderItem(), 2, 0, 0, new Money(10m, "eur"), OrdersTestData.GetMetadata());
         order.AddOrderLine(orderLine);
         // Act
         order.RemoveOrderLine(1L);
@@ -370,7 +370,7 @@ public class OrderTests
     {
         // Arrange
         var order = Order.Create(OrdersTestData.CreateOrderPartner(), "123", DateTime.Now, 1L, 1L);
-        var orderLine = OrderLine.Reconstitute(1L, OrdersTestData.CreateOrderItem(), 2, 0, 0, new Money(10m, "eur"));
+        var orderLine = OrderLine.Reconstitute(1L, OrdersTestData.CreateOrderItem(), 2, 0, 0, new Money(10m, "eur"), OrdersTestData.GetMetadata());
         order.AddOrderLine(orderLine);
         // Act
         Action act = () => order.RemoveOrderLine(2L);
@@ -383,8 +383,8 @@ public class OrderTests
     {
         // Arrange
         var order = Order.Create(OrdersTestData.CreateOrderPartner(), "123", DateTime.Now, 1L, 1L);
-        var orderLine1 = OrderLine.Reconstitute(1L, OrdersTestData.CreateOrderItem(), 2, 0, 0, new Money(10m, "eur"));
-        var orderLine2 = OrderLine.Reconstitute(2L, OrdersTestData.CreateOrderItem(), 3, 0, 0, new Money(15m, "eur"));
+        var orderLine1 = OrderLine.Reconstitute(1L, OrdersTestData.CreateOrderItem(), 2, 0, 0, new Money(10m, "eur"), OrdersTestData.GetMetadata());
+        var orderLine2 = OrderLine.Reconstitute(2L, OrdersTestData.CreateOrderItem(), 3, 0, 0, new Money(15m, "eur"), OrdersTestData.GetMetadata());
         order.AddOrderLine(orderLine1);
         order.AddOrderLine(orderLine2);
         // Act
@@ -405,7 +405,7 @@ public class OrderTests
         var newOrderStatusId = 2L;
         var newAdditionalInformation = "Updated order";
         // Act
-        order.Update(newOrderPartner, newOrderNumber, newOrderDate, newOrderTypeId, newOrderStatusId, newAdditionalInformation);
+        order.Update(newOrderPartner, newOrderNumber, newOrderDate, newOrderTypeId, newOrderStatusId, newAdditionalInformation, new List<OrderLineInput>());
         // Assert
         order.OrderPartner.Should().Be(newOrderPartner);
         order.OrderNumber.Should().Be(newOrderNumber);
@@ -426,7 +426,7 @@ public class OrderTests
         var newOrderStatusId = 2L;
         var additionalInformation = "Updated order";
         // Act
-        Action act = () => order.Update(null!, newOrderNumber, newOrderDate, newOrderTypeId, newOrderStatusId, additionalInformation);
+        Action act = () => order.Update(null!, newOrderNumber, newOrderDate, newOrderTypeId, newOrderStatusId, additionalInformation, new List<OrderLineInput>());
         // Assert
         act.Should().Throw<ArgumentNullException>();
     }
@@ -444,7 +444,7 @@ public class OrderTests
         var newOrderStatusId = 2L;
         var additionalInformation = "Updated order";
         // Act
-        Action act = () => order.Update(newOrderPartner, newOrderNumber, newOrderDate, invalidOrderTypeId, newOrderStatusId, additionalInformation);
+        Action act = () => order.Update(newOrderPartner, newOrderNumber, newOrderDate, invalidOrderTypeId, newOrderStatusId, additionalInformation, new List<OrderLineInput>());
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -463,7 +463,7 @@ public class OrderTests
         var newOrderStatusId = 2L;
         var additionalInformation = "Updated order";
         // Act
-        Action act = () => order.Update(newOrderPartner, invalidOrderNumber, newOrderDate, newOrderTypeId, newOrderStatusId, additionalInformation);
+        Action act = () => order.Update(newOrderPartner, invalidOrderNumber, newOrderDate, newOrderTypeId, newOrderStatusId, additionalInformation, new List<OrderLineInput>());
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -480,7 +480,7 @@ public class OrderTests
         var newOrderStatusId = 2L;
         var additionalInformation = "Updated order";
         // Act
-        Action act = () => order.Update(newOrderPartner, newOrderNumber, invalidOrderDate, newOrderTypeId, newOrderStatusId, additionalInformation);
+        Action act = () => order.Update(newOrderPartner, newOrderNumber, invalidOrderDate, newOrderTypeId, newOrderStatusId, additionalInformation, new List<OrderLineInput>());
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -498,7 +498,7 @@ public class OrderTests
         var newOrderTypeId = 2L;
         var additionalInformation = "Updated order";
         // Act
-        Action act = () => order.Update(newOrderPartner, newOrderNumber, newOrderDate, newOrderTypeId, invalidOrderStatusId, additionalInformation);
+        Action act = () => order.Update(newOrderPartner, newOrderNumber, newOrderDate, newOrderTypeId, invalidOrderStatusId, additionalInformation, new List<OrderLineInput>());
         // Assert
         act.Should().Throw<ArgumentException>();
     }

@@ -27,7 +27,7 @@ public class CreatePartnerRoleTypeHandlerTests
         _partnerRoleTypeRepositoryStub.Setup(repo => repo.AddAsync(It.IsAny<PartnerRoleType>()))
             .ReturnsAsync((PartnerRoleType partnerRoleType) =>
             {
-                return PartnerRoleType.Reconstitute(nextId, partnerRoleType.Code, partnerRoleType.Name, partnerRoleType.Color);
+                return PartnerRoleType.Reconstitute(nextId, partnerRoleType.Code, partnerRoleType.Name, PartnersTestData.GetMetadata(), partnerRoleType.Color);
             });
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);

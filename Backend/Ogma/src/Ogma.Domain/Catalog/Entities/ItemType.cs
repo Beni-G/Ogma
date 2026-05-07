@@ -24,19 +24,15 @@ public class ItemType : AggregateRoot<long>
     }
 
     /// <summary>
-    /// Creates a new instance of the ItemType class with the specified ID, name, and description.
+    /// Creates a new instance of the ItemType class with the specified ID, name description and metadata.
     /// </summary>
     /// <param name="id"></param>
     /// <param name="name"></param>
     /// <param name="description"></param>
+    /// /// <param name="metadata"></param>
     /// <exception cref="ArgumentNullException"></exception>
-    private ItemType(long id, string name, string description) : base(id)
+    private ItemType(long id, string name, string description, EntityMetadata metadata) : base(id, metadata)
     {
-        if (id <= 0)
-        {
-            throw new ArgumentException("ID must be a positive number.", nameof(id));
-        }
-
         if (string.IsNullOrWhiteSpace(name))
         {
             throw new ArgumentException("ItemType name is invalid.", nameof(name));
@@ -55,13 +51,15 @@ public class ItemType : AggregateRoot<long>
     public static ItemType Create(string name, string description) => new(name, description);
 
     /// <summary>
-    /// Reconstitutes a ItemType instance from existing data.
+    /// Reconstitutes the ItemType class with the specified ID, name description and metadata.
     /// </summary>
     /// <param name="id"></param>
     /// <param name="name"></param>
     /// <param name="description"></param>
+    /// <param name="metadata"></param>
     /// <returns></returns>
-    public static ItemType Reconstitute(long id, string name, string description) => new(id, name, description);
+    public static ItemType Reconstitute(long id, string name, string description, EntityMetadata metadata) => 
+        new(id, name, description, metadata);
 
     /// <summary>
     /// Updates the Name and Description of the ItemType.
@@ -76,5 +74,7 @@ public class ItemType : AggregateRoot<long>
 
         Name = name;
         Description = description;
+
+        Touch();
     }
 }

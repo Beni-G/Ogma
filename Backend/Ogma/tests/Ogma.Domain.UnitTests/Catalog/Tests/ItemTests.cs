@@ -137,7 +137,7 @@ public class ItemTests
         var id = CatalogTestData.NextId();
         var itemParameters = CatalogTestData.CreateItemParameters();
         // Act
-        var item = Item.Reconstitute(id, itemParameters);
+        var item = Item.Reconstitute(id, itemParameters, CatalogTestData.GetMetadata());
 
         // Assert
         item.Id.Should().Be(id);
@@ -159,7 +159,7 @@ public class ItemTests
         // Arrange
         var itemParameters = CatalogTestData.CreateItemParameters();
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => Item.Reconstitute(invalidId, itemParameters));
+        Assert.Throws<ArgumentException>(() => Item.Reconstitute(invalidId, itemParameters, CatalogTestData.GetMetadata()));
     }
 
     [Theory]
@@ -173,7 +173,7 @@ public class ItemTests
         var itemParameters = CatalogTestData.CreateItemParameters();
         var invalidItemParameters = itemParameters with { Name = invalidName };
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => Item.Reconstitute(id, invalidItemParameters));
+        Assert.Throws<ArgumentException>(() => Item.Reconstitute(id, invalidItemParameters, CatalogTestData.GetMetadata()));
     }
 
     [Theory]
@@ -187,7 +187,7 @@ public class ItemTests
         var itemParameters = CatalogTestData.CreateItemParameters();
         var invalidItemParameters = itemParameters with { Code = invalidCode };
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => Item.Reconstitute(id, invalidItemParameters));
+        Assert.Throws<ArgumentException>(() => Item.Reconstitute(id, invalidItemParameters, CatalogTestData.GetMetadata()));
     }
 
     [Theory]
@@ -201,14 +201,14 @@ public class ItemTests
         var itemParameters = CatalogTestData.CreateItemParameters();
         var invalidItemParameters = itemParameters with { UnitOfMeasurement = invalidUom };
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => Item.Reconstitute(id, invalidItemParameters));
+        Assert.Throws<ArgumentException>(() => Item.Reconstitute(id, invalidItemParameters, CatalogTestData.GetMetadata()));
     }
 
     [Fact]
     public void Reconstitute_NullItemParameters_ThrowsArgumentNullException()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => Item.Reconstitute(1L, null));
+        Assert.Throws<ArgumentNullException>(() => Item.Reconstitute(1L, null, CatalogTestData.GetMetadata()));
     }
 
     [Fact]
@@ -224,7 +224,7 @@ public class ItemTests
             CatalogTestData.NextId(),
             CatalogTestData.CreateUnitOfMeasurement());
         // Act
-        var item = Item.Reconstitute(id, itemParameters);
+        var item = Item.Reconstitute(id, itemParameters, CatalogTestData.GetMetadata());
         // Assert
         item.Id.Should().Be(id);
         item.Name.Should().Be(itemParameters.Name);
@@ -248,7 +248,7 @@ public class ItemTests
         var itemParameters = CatalogTestData.CreateItemParameters();
         var invalidItemParameters = itemParameters with { CategoryId = invalidCategoryId };
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => Item.Reconstitute(id, invalidItemParameters));
+        Assert.Throws<ArgumentException>(() => Item.Reconstitute(id, invalidItemParameters, CatalogTestData.GetMetadata()));
     }
 
     [Theory]
@@ -261,7 +261,7 @@ public class ItemTests
         var itemParameters = CatalogTestData.CreateItemParameters();
         var invalidItemParameters = itemParameters with { ItemTypeId = invalidItemTypeId };
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => Item.Reconstitute(id, invalidItemParameters));
+        Assert.Throws<ArgumentException>(() => Item.Reconstitute(id, invalidItemParameters, CatalogTestData.GetMetadata()));
     }
 
     [Fact]
@@ -272,7 +272,7 @@ public class ItemTests
         var itemParameters = CatalogTestData.CreateItemParameters();
         var invalidItemParameters = itemParameters with { ListPrice = null };
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => Item.Reconstitute(id, invalidItemParameters));
+        Assert.Throws<ArgumentNullException>(() => Item.Reconstitute(id, invalidItemParameters, CatalogTestData.GetMetadata()));
     }
 
     [Fact]

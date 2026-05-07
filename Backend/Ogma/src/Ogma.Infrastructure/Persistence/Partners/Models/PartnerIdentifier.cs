@@ -1,8 +1,9 @@
-﻿namespace Ogma.Infrastructure.Persistence.Partners.Models;
+﻿using Ogma.Infrastructure.Persistence.SharedKernel.BaseTypes;
 
-public class PartnerIdentifier
+namespace Ogma.Infrastructure.Persistence.Partners.Models;
+
+public class PartnerIdentifier : Entity
 {
-    public long Id { get; set; }
     public long PartnerId { get; set; }
     public Partner Partner { get; set; } = default!;
     public string Type { get; set; } = default!;

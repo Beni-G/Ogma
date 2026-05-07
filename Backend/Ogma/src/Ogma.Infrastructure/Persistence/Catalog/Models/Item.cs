@@ -1,7 +1,8 @@
-﻿namespace Ogma.Infrastructure.Persistence.Catalog.Models;
-public class Item
+﻿using Ogma.Infrastructure.Persistence.SharedKernel.BaseTypes;
+
+namespace Ogma.Infrastructure.Persistence.Catalog.Models;
+public class Item : Entity
 {
-    public long Id { get; set; }
     public string Name { get; set; } = default!;
     public string Code { get; set; } = default!;
     public string Description { get; set; } = default!;

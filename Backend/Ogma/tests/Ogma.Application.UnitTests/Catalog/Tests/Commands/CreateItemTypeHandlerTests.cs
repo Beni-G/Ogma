@@ -3,17 +3,20 @@ using Moq;
 using Ogma.Application.Catalog.Commands;
 using Ogma.Domain.Catalog.Entities;
 using Ogma.Domain.Catalog.Repositories;
+using Ogma.Domain.SharedKernel.BaseTypes;
 
 namespace Ogma.Application.UnitTests.Catalog.Tests.Commands;
 public class CreateItemTypeHandlerTests
 {
     private readonly Mock<IItemTypeRepository> _itemTypeRepositoryStub;
     private readonly CreateItemTypeHandler _handler;
+    private readonly EntityMetadata _metadata;
 
     public CreateItemTypeHandlerTests()
     {
         _itemTypeRepositoryStub = new Mock<IItemTypeRepository>();
         _handler = new CreateItemTypeHandler(_itemTypeRepositoryStub.Object);
+        _metadata = new EntityMetadata(DateTime.UtcNow, DateTime.UtcNow, 1);
     }
 
     [Fact]
@@ -26,7 +29,7 @@ public class CreateItemTypeHandlerTests
         _itemTypeRepositoryStub.Setup(repo => repo.AddAsync(It.IsAny<ItemType>()))
             .ReturnsAsync((ItemType itemType) =>
             {
-                return ItemType.Reconstitute(nextId, itemType.Name, itemType.Description);
+                return ItemType.Reconstitute(nextId, itemType.Name, itemType.Description, _metadata);
             });
 
         // Act

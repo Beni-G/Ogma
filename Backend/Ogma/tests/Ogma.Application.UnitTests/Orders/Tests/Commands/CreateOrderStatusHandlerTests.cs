@@ -2,6 +2,7 @@
 using Moq;
 using Ogma.Application.Orders.Commands;
 using Ogma.Application.Orders.Extensions;
+using Ogma.Application.UnitTests.Orders.Helpers;
 using Ogma.Domain.Orders.Entities;
 using Ogma.Domain.Orders.Repositories;
 
@@ -23,7 +24,7 @@ public class CreateOrderStatusHandlerTests
     {
         // Arrange
         var command = new CreateOrderStatusCommand("Pending", "Pending");
-        var createdOrderStatus = OrderStatus.Reconstitute(1L, command.Name, command.Description);
+        var createdOrderStatus = OrderStatus.Reconstitute(1L, command.Name, command.Description, OrdersTestData.GetMetadata());
         _orderStatusRepositoryStub.Setup(r => r.AddAsync(It.IsAny<OrderStatus>()))
             .ReturnsAsync(createdOrderStatus);
         // Act

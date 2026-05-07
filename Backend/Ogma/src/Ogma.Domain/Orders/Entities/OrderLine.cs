@@ -47,13 +47,10 @@ public class OrderLine : Entity<long>
         decimal cancelledQuantity, 
         decimal fullfilledQuantity, 
         Money price, 
+        EntityMetadata metadata,
         ExchangeRate? exchangeRate = null, 
-        string? additionalInformation = "")
+        string? additionalInformation = "") : base(id, metadata)
     {
-        if (id < 0)
-        {
-            throw new ArgumentException("ID must be a positive number.", nameof(id));
-        }
         if (orderItem == null!)
         {
             throw new ArgumentNullException(nameof(orderItem));
@@ -82,8 +79,6 @@ public class OrderLine : Entity<long>
         {
             throw new ArgumentException("Price currency must match the exchange rate's base currency.", nameof(price));
         }
-
-        Id = id;
         OrderItem = orderItem;
         OrderedQuantity = orderedQuantity;
         CancelledQuantity = cancelledQuantity;
@@ -115,6 +110,7 @@ public class OrderLine : Entity<long>
     /// <param name="cancelledQuantity"></param>
     /// <param name="fullfilledQuantity"></param>
     /// <param name="price"></param>
+    /// <param name="metadata"></param>
     /// <param name="exchangeRate"></param>
     /// <param name="additionalInformation"></param>
     /// <returns></returns>
@@ -125,9 +121,10 @@ public class OrderLine : Entity<long>
         decimal cancelledQuantity,
         decimal fullfilledQuantity,
         Money price, 
+        EntityMetadata metadata,
         ExchangeRate? exchangeRate = null, 
         string? additionalInformation = "") 
-        => new(id, orderItem, orderedQuantity, cancelledQuantity, fullfilledQuantity, price, exchangeRate, additionalInformation);
+        => new(id, orderItem, orderedQuantity, cancelledQuantity, fullfilledQuantity, price, metadata, exchangeRate, additionalInformation);
 
     /// <summary>
     /// Updates the order line with new values for item, quantities, price, exchange rate, and additional information.
@@ -149,7 +146,7 @@ public class OrderLine : Entity<long>
         decimal fullfilledQuantity,
         Money price,
         ExchangeRate? exchangeRate,
-        string additionalInformation)
+        string? additionalInformation)
     {
         if (orderItem == null!)
         {

@@ -54,7 +54,6 @@ public class OrderRepository : IOrderRepository
 
         var affected = await _ordersDbContext.SaveChangesAsync();
         return affected > 0;
-
     }
 
     public async Task DeleteAsync(Order order)

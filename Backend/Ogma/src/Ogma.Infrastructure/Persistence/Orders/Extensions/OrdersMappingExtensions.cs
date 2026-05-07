@@ -2,7 +2,9 @@
 using Ogma.Application.SharedKernel.Dtos;
 using Ogma.Domain.Orders.Entities;
 using Ogma.Domain.Orders.ValueObjects;
+using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.SharedKernel.ValueObjects;
+using Ogma.Infrastructure.Persistence.SharedKernel.Extensions;
 
 namespace Ogma.Infrastructure.Persistence.Orders.Extensions;
 
@@ -49,10 +51,10 @@ public static class OrdersMappingExtensions
     #region From Persistence Models ToDomain Methods
 
     public static OrderType ToDomain(this Models.OrderType orderType) =>
-        OrderType.Reconstitute(orderType.Id, orderType.Code, orderType.Description);
+        OrderType.Reconstitute(orderType.Id, orderType.Code, orderType.Description, new EntityMetadata(orderType.CreatedAt, orderType.UpdatedAt, orderType.Version));
 
     public static OrderStatus ToDomain(this Models.OrderStatus orderStatus) =>
-        OrderStatus.Reconstitute(orderStatus.Id, orderStatus.Name, orderStatus.Description);
+        OrderStatus.Reconstitute(orderStatus.Id, orderStatus.Name, orderStatus.Description, new EntityMetadata(orderStatus.CreatedAt, orderStatus.UpdatedAt, orderStatus.Version));
 
     public static OrderLine ToDomain(this Models.OrderLine orderLine) =>
         OrderLine.Reconstitute(
@@ -65,6 +67,7 @@ public static class OrdersMappingExtensions
             orderLine.CancelledQuantity,
             orderLine.FullfilledQuantity,
             new Money(orderLine.PriceAmount, orderLine.PriceCurrency),
+            new EntityMetadata(orderLine.CreatedAt, orderLine.UpdatedAt, orderLine.Version),
             !string.IsNullOrWhiteSpace(orderLine.ExchangeTargetCurrency)
                 ? new ExchangeRate(
                     orderLine.PriceCurrency,
@@ -81,6 +84,7 @@ public static class OrdersMappingExtensions
             order.OrderDate,
             order.OrderTypeId,
             order.OrderStatusId,
+            new EntityMetadata(order.CreatedAt, order.UpdatedAt, order.Version),
             order.AdditionalInformation!,
             order.OrderLines.Select(ol => ol.ToDomain()).ToList());
 
@@ -94,26 +98,33 @@ public static class OrdersMappingExtensions
     public static ValueObjectRecords.OrderPartner ToModel(this OrderPartner orderPartner) =>
         new(orderPartner.PartnerId, orderPartner.PartnerName);
 
-    public static Models.OrderType ToModel(this OrderType orderType) =>
-        new Models.OrderType
+    public static Models.OrderType ToModel(this OrderType orderType)
+    {
+        var modelOrderType = new Models.OrderType
         {
-            Id = orderType.Id,
             Code = orderType.Code,
             Description = orderType.Description
         };
+        orderType.MapBaseProperties(modelOrderType);
+        return modelOrderType;
+    }
 
-    public static Models.OrderStatus ToModel(this OrderStatus orderStatus) =>
-        new Models.OrderStatus
+
+    public static Models.OrderStatus ToModel(this OrderStatus orderStatus)
+    {
+        var modelOrderStatus = new Models.OrderStatus
         {
-            Id = orderStatus.Id,
             Name = orderStatus.Name,
             Description = orderStatus.Description
         };
+        orderStatus.MapBaseProperties(modelOrderStatus);
+        return modelOrderStatus;
+    }
 
-    public static Models.OrderLine ToModel(this OrderLine orderLine) =>
-        new Models.OrderLine
+    public static Models.OrderLine ToModel(this OrderLine orderLine)
+    {
+        var modelOrderLine = new Models.OrderLine
         {
-            Id = orderLine.Id,
             OrderItem = orderLine.OrderItem.ToModel(),
             OrderedQuantity = orderLine.OrderedQuantity,
             CancelledQuantity = orderLine.CancelledQuantity,
@@ -124,11 +135,14 @@ public static class OrdersMappingExtensions
             ExchangeTargetCurrency = orderLine.ExchangeRate?.TargetCurrency ?? string.Empty,
             AdditionalInformation = orderLine.AdditionalInformation
         };
+        orderLine.MapBaseProperties(modelOrderLine);
+        return modelOrderLine;
+    }
 
-    public static Models.Order ToModel(this Order order) =>
-        new Models.Order
+    public static Models.Order ToModel(this Order order)
+    {
+        var modelOrder = new Models.Order
         {
-            Id = order.Id,
             OrderPartner = order.OrderPartner.ToModel(),
             OrderNumber = order.OrderNumber,
             OrderDate = order.OrderDate,
@@ -137,6 +151,9 @@ public static class OrdersMappingExtensions
             AdditionalInformation = order.AdditionalInformation,
             OrderLines = order.OrderLines.Select(ol => ol.ToModel()).ToList()
         };
+        order.MapBaseProperties(modelOrder);
+        return modelOrder;
+    }
 
     #endregion
 }

@@ -34,7 +34,7 @@ public class UpdatePartnerHandlerTests
         var partner = new PartnerBuilder()
             .AsLegalEntity()
             .Build();
-        var partnerRole = PartnerRoleType.Reconstitute(partner.RoleIds.First(), "customer", "customer");
+        var partnerRole = PartnerRoleType.Reconstitute(partner.RoleIds.First(), "customer", "customer", PartnersTestData.GetMetadata());
         var command = new UpdatePartnerCommandBuilder().FromPartner(partner)
            .TogglingStatus()
            .WithDisplayName("new display name")
@@ -113,7 +113,7 @@ public class UpdatePartnerHandlerTests
         var partner = new PartnerBuilder()
             .AsLegalEntity()
             .Build();
-        var partnerRole = PartnerRoleType.Reconstitute(partner.RoleIds.First(), "customer", "customer");
+        var partnerRole = PartnerRoleType.Reconstitute(partner.RoleIds.First(), "customer", "customer", PartnersTestData.GetMetadata());
         var command = new UpdatePartnerCommandBuilder().FromPartner(partner)
            .TogglingStatus()
            .WithDisplayName("new display name")
@@ -138,7 +138,7 @@ public class UpdatePartnerHandlerTests
         var partner = new PartnerBuilder()
             .AsLegalEntity()
             .Build();
-        var partnerRole = PartnerRoleType.Reconstitute(partner.RoleIds.First(), "customer", "customer");
+        var partnerRole = PartnerRoleType.Reconstitute(partner.RoleIds.First(), "customer", "customer", PartnersTestData.GetMetadata());
         var command = new UpdatePartnerCommandBuilder().FromPartner(partner)
            .TogglingStatus()
            .WithDisplayName("new display name")

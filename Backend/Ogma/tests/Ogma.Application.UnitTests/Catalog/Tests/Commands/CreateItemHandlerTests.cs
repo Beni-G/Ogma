@@ -7,6 +7,7 @@ using Ogma.Application.UnitTests.Catalog.Helpers;
 using Ogma.Domain.Catalog.Entities;
 using Ogma.Domain.Catalog.Parameters;
 using Ogma.Domain.Catalog.Repositories;
+using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.SharedKernel.ValueObjects;
 
 namespace Ogma.Application.UnitTests.Catalog.Tests.Commands;
@@ -17,6 +18,7 @@ public class CreateItemHandlerTests
     private readonly Mock<IItemTypeReader> _itemTypeReaderMock;
     private readonly Mock<ICategoryReader> _categoryReaderMock;
     private readonly CreateItemHandler _handler;
+    private readonly EntityMetadata _metadata;
 
     public CreateItemHandlerTests()
     {
@@ -24,6 +26,7 @@ public class CreateItemHandlerTests
         _itemTypeReaderMock = new Mock<IItemTypeReader>();
         _categoryReaderMock = new Mock<ICategoryReader>();
         _handler = new CreateItemHandler(_itemRepositoryMock.Object, _itemTypeReaderMock.Object, _categoryReaderMock.Object);
+        _metadata = new EntityMetadata(DateTime.UtcNow, DateTime.UtcNow, 1);
     }
 
     [Fact]
@@ -50,7 +53,8 @@ public class CreateItemHandlerTests
                     command.ItemTypeId,
                     command.UnitOfMeasurement,
                     command.IsActive,
-                    command.Description)
+                    command.Description),
+                    _metadata
                 );
             });
         // Act

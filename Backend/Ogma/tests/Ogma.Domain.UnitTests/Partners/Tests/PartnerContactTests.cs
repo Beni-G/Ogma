@@ -1,8 +1,9 @@
 ﻿using FluentAssertions;
 using Ogma.Domain.Partners.Entities;
 using Ogma.Domain.SharedKernel.ValueObjects;
+using Ogma.Domain.UnitTests.Partners.Helpers;
 
-namespace Ogma.Domain.UnitTests.Partners;
+namespace Ogma.Domain.UnitTests.Partners.Tests;
 
 public class PartnerContactTests
 {
@@ -76,6 +77,7 @@ public class PartnerContactTests
         var contact = PartnerContact.Reconstitute(
             id,
             name,
+            PartnersTestData.GetMetadata(),
             email,
             phone,
             mobile,
@@ -100,9 +102,7 @@ public class PartnerContactTests
         long id = 10;
         PersonName name = new PersonName("John", "Doe");
         // Act
-        var contact = PartnerContact.Reconstitute(
-            id,
-            name);
+        var contact = PartnerContact.Reconstitute(id, name, PartnersTestData.GetMetadata());
         // Assert
         contact.Id.Should().Be(id);
         contact.Name.Should().BeEquivalentTo(name);
@@ -123,14 +123,14 @@ public class PartnerContactTests
         long partnerId = 1;
         PersonName name = new PersonName("John", "Doe");
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => PartnerContact.Reconstitute(invalidId, name));
+        Assert.Throws<ArgumentException>(() => PartnerContact.Reconstitute(invalidId, name, PartnersTestData.GetMetadata()));
     }
 
     [Fact]
     public void Reconstitute_NullName_ThrowsArgumentNullException()
     {
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => PartnerContact.Reconstitute(1L, null));
+        Assert.Throws<ArgumentNullException>(() => PartnerContact.Reconstitute(1L, null, PartnersTestData.GetMetadata()));
     }
 
     [Fact]

@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Ogma.Domain.Catalog.Entities;
+using Ogma.Domain.UnitTests.Catalog.Helpers;
 
 namespace Ogma.Domain.UnitTests.Catalog.Tests;
 public class CategoryTests
@@ -67,7 +68,7 @@ public class CategoryTests
         string path = "1/2/3";
 
         // Act
-        var category = Category.Reconstitute(id, name, parentCategoryId, path);
+        var category = Category.Reconstitute(id, name, CatalogTestData.GetMetadata(), parentCategoryId, path);
 
         // Assert
         category.Id.Should().Be(id);
@@ -84,7 +85,7 @@ public class CategoryTests
         string name = "created category";
 
         // Act
-        var category = Category.Reconstitute(id, name);
+        var category = Category.Reconstitute(id, name, CatalogTestData.GetMetadata());
 
         // Assert
         category.Id.Should().Be(id);
@@ -98,7 +99,7 @@ public class CategoryTests
     [InlineData(-1L)]
     public void Reconstitute_InvalidId_ThrowsArgumentException(long invalidId)
     {
-        Assert.Throws<ArgumentException>(() => Category.Reconstitute(invalidId, "category"));
+        Assert.Throws<ArgumentException>(() => Category.Reconstitute(invalidId, "category", CatalogTestData.GetMetadata()));
     }
 
     [Theory]
@@ -107,7 +108,7 @@ public class CategoryTests
     [InlineData("   ")]
     public void Reconstitute_NullOrEmptyName_ThrowsArgumentException(string invalidName)
     {
-        Assert.Throws<ArgumentException>(() => Category.Reconstitute(1, invalidName));
+        Assert.Throws<ArgumentException>(() => Category.Reconstitute(1, invalidName, CatalogTestData.GetMetadata()));
     }
 
     [Theory]
@@ -117,7 +118,7 @@ public class CategoryTests
     [InlineData("2/2/99")] // Path with duplicate IDs
     public void Reconstitute_InvalidPath_ThrowsArgumentException(string path)
     {
-        Assert.Throws<ArgumentException>(() => Category.Reconstitute(1,"category", 99, path));
+        Assert.Throws<ArgumentException>(() => Category.Reconstitute(1,"category", CatalogTestData.GetMetadata(), 99, path));
     }
 
     [Fact]
@@ -140,7 +141,7 @@ public class CategoryTests
     public void Update_ParentNull_RemovesParent()
     {
         // Arrange
-        var category = Category.Reconstitute(1, "initial name", 2);
+        var category = Category.Reconstitute(1, "initial name", CatalogTestData.GetMetadata(), 2);
 
         // Act
         category.Update(category.Name, null);
@@ -168,7 +169,7 @@ public class CategoryTests
         long categoryId = 1;
         string name = "initial name";
         long parentCategoryId = 2;
-        var category = Category.Reconstitute(categoryId, name, parentCategoryId);
+        var category = Category.Reconstitute(categoryId, name, CatalogTestData.GetMetadata(), parentCategoryId);
 
         // Act & Assert
         Assert.Throws<InvalidOperationException>(() => category.Update("updated name", categoryId));
@@ -210,7 +211,7 @@ public class CategoryTests
     public void UpdatePath_InvalidPath_ThrowsArgumentException(string path)
     {
         // Arrange
-        var category = Category.Reconstitute(1, "category", 99);
+        var category = Category.Reconstitute(1, "category", CatalogTestData.GetMetadata(), 99);
 
         // Act & Assert
         Assert.Throws<ArgumentException>(() => category.UpdatePath(path));
@@ -220,8 +221,8 @@ public class CategoryTests
     public void AddSubCategory_ValidSubCategory_AddsSuccessfully()
     {
         // Arrange
-        var parentCategory = Category.Reconstitute(1, "Parent Category");
-        var subCategory = Category.Reconstitute(2, "Sub Category", parentCategory.Id);
+        var parentCategory = Category.Reconstitute(1, "Parent Category", CatalogTestData.GetMetadata());
+        var subCategory = Category.Reconstitute(2, "Sub Category", CatalogTestData.GetMetadata(), parentCategory.Id);
 
         // Act
         parentCategory.AddSubCategory(subCategory);
@@ -234,7 +235,7 @@ public class CategoryTests
     public void AddSubCategory_NullSubCategory_ThrowsArgumentNullException()
     {
         // Arrange
-        var parentCategory = Category.Reconstitute(1, "Parent Category");
+        var parentCategory = Category.Reconstitute(1, "Parent Category", CatalogTestData.GetMetadata());
 
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => parentCategory.AddSubCategory(null!));
@@ -244,8 +245,8 @@ public class CategoryTests
     public void AddSubCategory_MismatchedParentCategoryId_ThrowsInvalidOperationException()
     {
         // Arrange
-        var parentCategory = Category.Reconstitute(1, "Parent Category");
-        var subCategory = Category.Reconstitute(2, "Sub Category", 999); // Mismatched ParentCategoryId
+        var parentCategory = Category.Reconstitute(1, "Parent Category", CatalogTestData.GetMetadata());
+        var subCategory = Category.Reconstitute(2, "Sub Category", CatalogTestData.GetMetadata(), 999); // Mismatched ParentCategoryId
 
         // Act & Assert
         Assert.Throws<InvalidOperationException>(() => parentCategory.AddSubCategory(subCategory));
@@ -255,7 +256,7 @@ public class CategoryTests
     public void AddSubCategory_MaxDepthReached_ThrowsInvalidOperationException()
     {
         // Arrange
-        var parentCategory = Category.Reconstitute(1, "Parent", null, "2/3/4/5"); // Depth = 4, RemainingDepth = 0
+        var parentCategory = Category.Reconstitute(1, "Parent", CatalogTestData.GetMetadata(), null, "2/3/4/5"); // Depth = 4, RemainingDepth = 0
 
         var subCategory = Category.Create("Sub", 1);
 
@@ -267,8 +268,8 @@ public class CategoryTests
     public void AddSubCategory_MultipleTimes_ThrowsInvalidOperationException()
     {
         // Arrange
-        var parentCategory = Category.Reconstitute(1, "Parent Category");
-        var subCategory = Category.Reconstitute(2, "Sub Category", parentCategory.Id);
+        var parentCategory = Category.Reconstitute(1, "Parent Category", CatalogTestData.GetMetadata());
+        var subCategory = Category.Reconstitute(2, "Sub Category", CatalogTestData.GetMetadata(), parentCategory.Id);
 
         // Act
         parentCategory.AddSubCategory(subCategory);
@@ -281,11 +282,11 @@ public class CategoryTests
     public void AddSubCategories_ValidCollection_AddsAll()
     {
         // Arrange
-        var parentCategory = Category.Reconstitute(1, "Parent Category");
+        var parentCategory = Category.Reconstitute(1, "Parent Category", CatalogTestData.GetMetadata());
         var subCategories = new List<Category>
         {
-            Category.Reconstitute(2, "Sub Category 1", parentCategory.Id),
-            Category.Reconstitute(3, "Sub Category 2", parentCategory.Id)
+            Category.Reconstitute(2, "Sub Category 1", CatalogTestData.GetMetadata(), parentCategory.Id),
+            Category.Reconstitute(3, "Sub Category 2", CatalogTestData.GetMetadata(), parentCategory.Id)
         };
 
         // Act
@@ -299,7 +300,7 @@ public class CategoryTests
     public void AddSubCategories_NullCollection_ThrowsArgumentNullException()
     {
         // Arrange
-        var parentCategory = Category.Reconstitute(1, "Parent Category");
+        var parentCategory = Category.Reconstitute(1, "Parent Category", CatalogTestData.GetMetadata());
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => parentCategory.AddSubCategories(null!));
     }
@@ -308,11 +309,11 @@ public class CategoryTests
     public void AddSubCategories_OneInvalidSubCategory_ThrowsInvalidOperationException()
     {
         // Arrange
-        var parentCategory = Category.Reconstitute(1, "Parent Category");
+        var parentCategory = Category.Reconstitute(1, "Parent Category", CatalogTestData.GetMetadata());
         var subCategories = new List<Category>
         {
-            Category.Reconstitute(2, "Sub Category 1", parentCategory.Id),
-            Category.Reconstitute(3, "Sub Category 2", 999)
+            Category.Reconstitute(2, "Sub Category 1", CatalogTestData.GetMetadata(), parentCategory.Id),
+            Category.Reconstitute(3, "Sub Category 2", CatalogTestData.GetMetadata(), 999)
         };
 
         // Act & Assert
@@ -323,12 +324,12 @@ public class CategoryTests
     public void AddSubCategories_MaxDepthReached_ThrowsInvalidOperationException()
     {
         // Arrange
-        var parentCategory = Category.Reconstitute(1, "Parent", null, "2/3/4/5"); // Depth = 4, RemainingDepth = 0
+        var parentCategory = Category.Reconstitute(1, "Parent", CatalogTestData.GetMetadata(), null, "2/3/4/5"); // Depth = 4, RemainingDepth = 0
 
         var subCategories = new List<Category>
         {
-            Category.Reconstitute(99, "Sub 99", 1),
-            Category.Reconstitute(100, "Sub 100", 1),
+            Category.Reconstitute(99, "Sub 99", CatalogTestData.GetMetadata(), 1),
+            Category.Reconstitute(100, "Sub 100", CatalogTestData.GetMetadata(), 1),
         };
 
         // Act & Assert
@@ -339,7 +340,7 @@ public class CategoryTests
     public void GetFullPath_NoExistingPath_ReturnsIdAsString()
     {
         // Arrange
-        var category = Category.Reconstitute(42, "Category Without Path");
+        var category = Category.Reconstitute(42, "Category Without Path", CatalogTestData.GetMetadata());
 
         // Act
         var fullPath = category.GetFullPath();
@@ -352,7 +353,7 @@ public class CategoryTests
     public void GetFullPath_ExistingPath_ReturnsConcatenatedPath()
     {
         // Arrange
-        var category = Category.Reconstitute(42, "Category With Path", null, "1/2/3");
+        var category = Category.Reconstitute(42, "Category With Path", CatalogTestData.GetMetadata(), null, "1/2/3");
 
         // Act
         var fullPath = category.GetFullPath();

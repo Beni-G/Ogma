@@ -47,12 +47,16 @@ public class Order : AggregateRoot<long>
         AdditionalInformation = additionalInformation;
     }
 
-    private Order(long id, OrderPartner orderPartner, string orderNumber, DateTime orderDate, long orderTypeId, long orderStatusId, string? additionalInformation = "")
+    private Order(
+        long id,
+        OrderPartner orderPartner,
+        string orderNumber,
+        DateTime orderDate,
+        long orderTypeId,
+        long orderStatusId,
+        EntityMetadata metadata,
+        string? additionalInformation = "") : base(id, metadata)
     {
-        if (id <= 0)
-        {
-            throw new ArgumentException("ID must be a positive number.", nameof(id));
-        }
         if (orderPartner == null!)
         {
             throw new ArgumentNullException(nameof(orderPartner));
@@ -73,8 +77,6 @@ public class Order : AggregateRoot<long>
         {
             throw new ArgumentException("Order Status ID must be a positive number.", nameof(orderStatusId));
         }
-
-        Id = id;
         OrderPartner = orderPartner;
         OrderNumber = orderNumber;
         OrderDate = orderDate;
@@ -105,6 +107,7 @@ public class Order : AggregateRoot<long>
     /// <param name="orderDate"></param>
     /// <param name="orderTypeId"></param>
     /// <param name="orderStatusId"></param>
+    /// <param name="metadata"></param>
     /// <param name="additionalInformation"></param>
     /// <param name="orderLines"></param>
     /// <returns></returns>
@@ -115,10 +118,11 @@ public class Order : AggregateRoot<long>
         DateTime orderDate,
         long orderTypeId,
         long orderStatusId,
+        EntityMetadata metadata,
         string? additionalInformation = "",
         IReadOnlyCollection<OrderLine> orderLines = null!)
     {
-        var order = new Order(id, orderPartner, orderNumber, orderDate, orderTypeId, orderStatusId, additionalInformation);
+        var order = new Order(id, orderPartner, orderNumber, orderDate, orderTypeId, orderStatusId, metadata, additionalInformation);
         if (orderLines != null)
         {
             foreach (var orderLine in orderLines)
@@ -189,9 +193,17 @@ public class Order : AggregateRoot<long>
     /// <param name="orderTypeId"></param>
     /// <param name="orderStatusId"></param>
     /// <param name="additionalInformation"></param>
+    /// <param name="orderLineInputs"></param>
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="ArgumentException"></exception>
-    public void Update(OrderPartner orderPartner, string orderNumber, DateTime orderDate, long orderTypeId, long orderStatusId, string additionalInformation)
+    public void Update(
+        OrderPartner orderPartner,
+        string orderNumber,
+        DateTime orderDate,
+        long orderTypeId,
+        long orderStatusId,
+        string? additionalInformation,
+        IEnumerable<OrderLineInput> orderLineInputs)
     {
         if (orderPartner == null!)
         {
@@ -221,6 +233,8 @@ public class Order : AggregateRoot<long>
         OrderStatusId = orderStatusId;
         AdditionalInformation = additionalInformation;
 
+        SyncOrderLines(orderLineInputs);
+
         Touch();
     }
 
@@ -236,5 +250,26 @@ public class Order : AggregateRoot<long>
         => _orderLines.Count == 0
             ? null
             : new Money(_orderLines.Sum(ol => ol.LineActiveConvertedValue.Amount), _orderLines.FirstOrDefault()?.LineActiveConvertedValue.Currency!);
+
+
+    private void SyncOrderLines(IEnumerable<OrderLineInput> orderLineInputs)
+    {
+        var incomingIds = orderLineInputs.Select(i => i.Id).Where(Id => Id > 0).ToHashSet();
+        _orderLines.RemoveAll(line => !incomingIds.Contains(line.Id));
+
+        foreach (var input in orderLineInputs)
+        {
+            var existingLine = _orderLines.FirstOrDefault(l => l.Id == input.Id);
+            if (existingLine != null)
+            {
+                existingLine.Update(input.OrderItem, input.OrderedQuantity, input.CancelledQuantity, input.FullfilledQuantity, input.Price, input.ExchangeRate, input.AdditionalInformation);
+            }
+            else
+            {
+                var newLine = OrderLine.Create(input.OrderItem, input.OrderedQuantity, input.Price, input.ExchangeRate, input.AdditionalInformation);
+                _orderLines.Add(newLine);
+            }
+        }
+    }
 
 }

@@ -1,6 +1,7 @@
 ﻿using Ogma.Application.Partners.Dtos;
 using Ogma.Application.SharedKernel.Dtos;
 using Ogma.Domain.Partners.Entities;
+using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.SharedKernel.ValueObjects;
 using Ogma.Infrastructure.Persistence.SharedKernel.Extensions;
 using Ogma.Infrastructure.Persistence.SharedKernel.ValueObjectRecords;
@@ -22,8 +23,9 @@ public static class PartnersMappingExtensions
         ArgumentNullException.ThrowIfNull(partnerRoleType, nameof(partnerRoleType));
         var domainPartnerRoleType = PartnerRoleType.Reconstitute(
             partnerRoleType.Id,
-            partnerRoleType.Name,
             partnerRoleType.Code,
+            partnerRoleType.Name,
+            new EntityMetadata(partnerRoleType.CreatedAt, partnerRoleType.UpdatedAt, partnerRoleType.Version),
             partnerRoleType.Color
         );
         return domainPartnerRoleType;
@@ -89,6 +91,7 @@ public static class PartnersMappingExtensions
             id: partnerIdentifier.Id,
             type: partnerIdentifier.Type,
             value: partnerIdentifier.Value,
+            metadata: new EntityMetadata(partnerIdentifier.CreatedAt, partnerIdentifier.UpdatedAt, partnerIdentifier.Version),
             validityPeriod: partnerIdentifier.ValidityStart.HasValue ? new Period(partnerIdentifier.ValidityStart.Value, partnerIdentifier.ValidityEnd) : null,
             isPrimary: partnerIdentifier.IsPrimary
         );
@@ -107,6 +110,7 @@ public static class PartnersMappingExtensions
         var domainPartnerBankAccount = PartnerBankAccount.Reconstitute(
             id: partnerBankAccount.Id,
             bankAccount: partnerBankAccount.BankAccount.ToDomain(),
+            metadata: new EntityMetadata(partnerBankAccount.CreatedAt, partnerBankAccount.UpdatedAt, partnerBankAccount.Version),
             isDefault: partnerBankAccount.IsDefault
         );
         return domainPartnerBankAccount;
@@ -125,6 +129,7 @@ public static class PartnersMappingExtensions
         var domainPartnerContact = PartnerContact.Reconstitute(
             id: partnerContact.Id,
             name: new PersonName(partnerContact.FirstName, partnerContact.LastName),
+            metadata: new EntityMetadata(partnerContact.CreatedAt, partnerContact.UpdatedAt, partnerContact.Version),
             email: new Email(partnerContact.Email),
             phone: partnerContact.Phone,
             mobile: partnerContact.Mobile,
@@ -156,7 +161,8 @@ public static class PartnersMappingExtensions
             identifiers: partner.Identifiers?.Select(i => i.ToDomain()).ToList() ?? new List<PartnerIdentifier>(),
             roleIds: partner.Roles?.Select(r => r.Id).ToList() ?? new List<long>(),
             bankAccounts: partner.BankAccounts?.Select(b => b.ToDomain()).ToList() ?? new List<PartnerBankAccount>(),
-            contacts: partner.Contacts?.Select(c => c.ToDomain()).ToList() ?? new List<PartnerContact>()
+            contacts: partner.Contacts?.Select(c => c.ToDomain()).ToList() ?? new List<PartnerContact>(),
+            metadata: new EntityMetadata(partner.CreatedAt, partner.UpdatedAt, partner.Version)
         );
         return domainPartner;
     }
@@ -176,11 +182,11 @@ public static class PartnersMappingExtensions
         ArgumentNullException.ThrowIfNull(partnerRoleType, nameof(partnerRoleType));
         var modelPartnerRoleType = new Models.PartnerRoleType
         {
-            Id = partnerRoleType.Id,
             Name = partnerRoleType.Name,
             Code = partnerRoleType.Code,
             Color = partnerRoleType.Color
         };
+        partnerRoleType.MapBaseProperties(modelPartnerRoleType);
         return modelPartnerRoleType;
     }
 
@@ -239,13 +245,13 @@ public static class PartnersMappingExtensions
         ArgumentNullException.ThrowIfNull(partnerIdentifier, nameof(partnerIdentifier));
         var modelPartnerIdentifier = new Models.PartnerIdentifier
         {
-            Id = partnerIdentifier.Id,
             Type = partnerIdentifier.Type,
             Value = partnerIdentifier.Value,
             ValidityStart = partnerIdentifier.ValidityPeriod! != null! ? partnerIdentifier.ValidityPeriod.Start : null,
             ValidityEnd = partnerIdentifier.ValidityPeriod! != null! ? partnerIdentifier.ValidityPeriod.End : null,
             IsPrimary = partnerIdentifier.IsPrimary
         };
+        partnerIdentifier.MapBaseProperties(modelPartnerIdentifier);
         return modelPartnerIdentifier;
     }
 
@@ -260,10 +266,10 @@ public static class PartnersMappingExtensions
         ArgumentNullException.ThrowIfNull(partnerBankAccount, nameof(partnerBankAccount));
         var modelPartnerBankAccount = new Models.PartnerBankAccount
         {
-            Id = partnerBankAccount.Id,
             BankAccount = partnerBankAccount.BankAccount.ToModel(),
             IsDefault = partnerBankAccount.IsDefault
         };
+        partnerBankAccount.MapBaseProperties(modelPartnerBankAccount);
         return modelPartnerBankAccount;
     }
 
@@ -278,7 +284,6 @@ public static class PartnersMappingExtensions
         ArgumentNullException.ThrowIfNull(partnerContact, nameof(partnerContact));
         var modelPartnerContact = new Models.PartnerContact
         {
-            Id = partnerContact.Id,
             FirstName = partnerContact.Name.FirstName,
             LastName = partnerContact.Name.LastName,
             Email = partnerContact.Email?.Value,
@@ -288,6 +293,7 @@ public static class PartnersMappingExtensions
             JobTitle = partnerContact.JobTitle,
             IsPrimary = partnerContact.IsPrimary
         };
+        partnerContact.MapBaseProperties(modelPartnerContact);
         return modelPartnerContact;
     }
 
@@ -301,7 +307,6 @@ public static class PartnersMappingExtensions
         ArgumentNullException.ThrowIfNull(partner, nameof(partner));
         var modelPartner = new Models.Partner
         {
-            Id = partner.Id,
             IndividualFirstName = partner.IsNaturalPerson && partner.IndividualName != null ? partner.IndividualName.FirstName : null,
             IndividualLastName = partner.IsNaturalPerson && partner.IndividualName != null ? partner.IndividualName.LastName : null,
             CompanyName = partner.IsNaturalPerson ? null : partner.CompanyName,
@@ -313,6 +318,7 @@ public static class PartnersMappingExtensions
             BankAccounts = partner.BankAccounts?.Select(b => b.ToModel()).ToList() ?? new List<Models.PartnerBankAccount>(),
             Contacts = partner.Contacts?.Select(c => c.ToModel()).ToList() ?? new List<Models.PartnerContact>()
         };
+        partner.MapBaseProperties(modelPartner);
         return modelPartner;
     }
 

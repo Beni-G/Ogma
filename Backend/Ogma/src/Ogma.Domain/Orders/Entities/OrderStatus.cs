@@ -18,19 +18,12 @@ public class OrderStatus : AggregateRoot<long>
         Description = description;
     }
 
-    private OrderStatus(long id, string name, string description)
+    private OrderStatus(long id, string name, string description, EntityMetadata metadata) : base(id, metadata)
     {
-        if (id <= 0)
-        {
-            throw new ArgumentException("ID must be a positive number.", nameof(id));
-        }
-
         if (string.IsNullOrWhiteSpace(name))
         {
             throw new ArgumentException(nameof(name));
         }
-
-        Id = id;
         Name = name;
         Description = description;
     }
@@ -50,8 +43,9 @@ public class OrderStatus : AggregateRoot<long>
     /// <param name="id">The unique identifier for the order status.</param>
     /// <param name="name">The name of the order status. Cannot be null or empty.</param>
     /// <param name="description">A description of the order status. Can be null or empty if no description is available.</param>
+    /// <param name="metadata">The metadata for the reconstituted order statis.</param>
     /// <returns>An OrderStatus instance initialized with the provided identifier, name, and description.</returns>
-    public static OrderStatus Reconstitute(long id, string name, string description) => new(id, name, description);
+    public static OrderStatus Reconstitute(long id, string name, string description, EntityMetadata metadata) => new(id, name, description, metadata);
 
     /// <summary>
     /// Updates the name and description of the current instance.
@@ -65,8 +59,8 @@ public class OrderStatus : AggregateRoot<long>
         {
             throw new ArgumentException(nameof(name));
         }
-
         Name = name;
         Description = description;
+        Touch();
     }
 }

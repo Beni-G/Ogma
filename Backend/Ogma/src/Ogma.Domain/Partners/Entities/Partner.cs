@@ -1,6 +1,7 @@
 ﻿using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.SharedKernel.Extentions;
 using Ogma.Domain.SharedKernel.ValueObjects;
+using System.Net;
 
 namespace Ogma.Domain.Partners.Entities;
 
@@ -21,6 +22,26 @@ public class Partner : AggregateRoot<long>
     public IReadOnlyCollection<PartnerIdentifier> Identifiers => _identifiers.AsReadOnly();
     public IReadOnlyCollection<PartnerBankAccount> BankAccounts => _bankAccounts.AsReadOnly();
     public IReadOnlyCollection<PartnerContact> Contacts => _contacts.AsReadOnly();
+
+    private Partner(PersonName? individualName, string? companyName, string? displayName, bool isNaturalPerson, bool isActive)
+    {
+        IndividualName = individualName;
+        CompanyName = companyName;
+        DisplayName = displayName;
+        IsNaturalPerson = isNaturalPerson;
+        IsActive = isActive;
+    }
+
+    private Partner(long id, PersonName? individualName, string? companyName, string? displayName, bool isNaturalPerson, bool isActive, Address? hqAddress, EntityMetadata metadata) 
+        : base(id, metadata)
+    {
+        IndividualName = individualName;
+        CompanyName = companyName;
+        DisplayName = displayName;
+        IsNaturalPerson = isNaturalPerson;
+        IsActive = isActive;
+        HQAddress = hqAddress;
+    }
 
     /// <summary>
     /// Creates a new individual partner with the specified name, primary identifier, and partner role.
@@ -46,14 +67,7 @@ public class Partner : AggregateRoot<long>
         {
             throw new ArgumentException("Partner role ID must be a positive number.", nameof(partnerRoleId));
         }
-        var partner = new Partner
-        {
-            IndividualName = individualName,
-            CompanyName = null,
-            DisplayName = individualName.FullName,
-            IsNaturalPerson = true,
-            IsActive = true
-        };
+        var partner = new Partner(individualName, null, individualName.FullName, true, true);
         primaryIdentifier.MarkAsPrimary();
         var identifiers = new List<PartnerIdentifier> { primaryIdentifier };
         partner.ReplaceIdentifiers(identifiers);
@@ -87,13 +101,7 @@ public class Partner : AggregateRoot<long>
         {
             throw new ArgumentException("Partner role ID must be a positive number.", nameof(partnerRoleId));
         }
-        var partner = new Partner
-        {
-            CompanyName = name,
-            DisplayName = name,
-            IsNaturalPerson = false,
-            IsActive = true
-        };
+        var partner = new Partner(null, name, name, false, true);
         primaryIdentifier.MarkAsPrimary();
         var identifiers = new List<PartnerIdentifier> { primaryIdentifier };
         partner.ReplaceIdentifiers(identifiers);
@@ -117,6 +125,7 @@ public class Partner : AggregateRoot<long>
     /// <param name="roleIds"></param>
     /// <param name="bankAccounts"></param>
     /// <param name="contacts"></param>
+    /// <param name="metadata"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
     public static Partner Reconstitute(
@@ -130,7 +139,8 @@ public class Partner : AggregateRoot<long>
         IReadOnlyCollection<PartnerIdentifier> identifiers,
         IReadOnlyCollection<long> roleIds,
         IReadOnlyCollection<PartnerBankAccount> bankAccounts,
-        IReadOnlyCollection<PartnerContact> contacts)
+        IReadOnlyCollection<PartnerContact> contacts,
+        EntityMetadata metadata)
     {
         if (id <= 0)
         {
@@ -145,16 +155,7 @@ public class Partner : AggregateRoot<long>
         EnforceLegalStatusInvariant(individualName, companyName, isNaturalPerson);
         EnsureIdentifiersAndRolesInvariant(identifiers, roleIds);
 
-        var partner = new Partner
-        {
-            Id = id,
-            IndividualName = individualName,
-            CompanyName = companyName,
-            IsNaturalPerson = isNaturalPerson,
-            IsActive = isActive,
-            DisplayName = displayName,
-            HQAddress = hqAddress
-        };
+        var partner = new Partner(id, individualName, companyName, displayName, isNaturalPerson, isActive, hqAddress, metadata);
 
         partner.ReplaceIdentifiers(identifiers);
         partner.ReplaceRoles(roleIds);
@@ -218,7 +219,7 @@ public class Partner : AggregateRoot<long>
         ReplaceRoles(roleIds);
         ReplaceBankAccounts(bankAccounts);
         ReplaceContacts(contacts);
-
+        Touch();
     }
 
     /// <summary>
