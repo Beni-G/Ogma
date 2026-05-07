@@ -37,6 +37,7 @@ public class PartnerBuilder
             id: _faker.Random.Long(1),
             type: type,
             value: value,
+            metadata: PartnersTestData.GetMetadata(),
             validityPeriod: SharedFaker.CreatePeriod(),
             isPrimary: !_identifiers.Any()
         ));
@@ -68,6 +69,7 @@ public class PartnerBuilder
                 id: _faker.Random.Long(1),
                 type: "VAT_ID",
                 value: _faker.Random.AlphaNumeric(8),
+                metadata: PartnersTestData.GetMetadata(),
                 validityPeriod: SharedFaker.CreatePeriod(),
                 isPrimary: true
             ));
@@ -84,7 +86,8 @@ public class PartnerBuilder
             identifiers: _identifiers,
             roleIds: _roleIds,
             bankAccounts: new List<PartnerBankAccount>(),
-            contacts: new List<PartnerContact>()
+            contacts: new List<PartnerContact>(),
+            metadata: PartnersTestData.GetMetadata()
         );
     }
 }

@@ -2,6 +2,7 @@
 using Moq;
 using Ogma.Application.Orders.Commands;
 using Ogma.Application.Orders.Extensions;
+using Ogma.Application.UnitTests.Orders.Helpers;
 using Ogma.Domain.Orders.Entities;
 using Ogma.Domain.Orders.Repositories;
 
@@ -23,7 +24,7 @@ public class CreateOrderTypeHandlerTests
     {
         // Arrange
         var command = new CreateOrderTypeCommand("sales", "sales");
-        var createdOrderType = OrderType.Reconstitute(1L, command.Code, command.Description);
+        var createdOrderType = OrderType.Reconstitute(1L, command.Code, command.Description, OrdersTestData.GetMetadata());
         _orderTypeRepositoryStub.Setup(r => r.AddAsync(It.IsAny<OrderType>()))
             .ReturnsAsync(createdOrderType);
         // Act

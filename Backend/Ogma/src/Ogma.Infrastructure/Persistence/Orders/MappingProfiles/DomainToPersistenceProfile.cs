@@ -51,14 +51,13 @@ public class DomainToPersistenceProfile : Profile
         CreateMap<OrderStatusDto, Models.OrderStatus>().ReverseMap();
 
         CreateMap<OrderLine, Models.OrderLine>()
-            .ForMember(d => d.PriceAmount,
-                       opt => opt.MapFrom(src => src.Price.Amount))
-            .ForMember(d => d.PriceCurrency,
-                       opt => opt.MapFrom(src => src.Price.Currency))
-            .ForMember(d => d.ExchangeRate,
-                opt => opt.MapFrom(s => GetExchangeRate(s.ExchangeRate)))
-            .ForMember(d => d.ExchangeTargetCurrency,
-                opt => opt.MapFrom(s => GetExchangeTargetCurrency(s.ExchangeRate)))
+            .ForMember(d => d.PriceAmount, opt => opt.MapFrom(src => src.Price.Amount))
+            .ForMember(d => d.PriceCurrency, opt => opt.MapFrom(src => src.Price.Currency))
+            .ForMember(d => d.ExchangeRate, opt => opt.MapFrom(s => GetExchangeRate(s.ExchangeRate)))
+            .ForMember(d => d.ExchangeTargetCurrency, opt => opt.MapFrom(s => GetExchangeTargetCurrency(s.ExchangeRate)))
+            .ForMember(d => d.CreatedAt, opt => opt.MapFrom(src => src.Metadata.CreatedAt))
+            .ForMember(d => d.UpdatedAt, opt => opt.MapFrom(src => src.Metadata.UpdatedAt))
+            .ForMember(d => d.Version, opt => opt.MapFrom(src => src.Metadata.Version))
             .ForMember(d => d.Order, opt => opt.Ignore())
             .ReverseMap();
 

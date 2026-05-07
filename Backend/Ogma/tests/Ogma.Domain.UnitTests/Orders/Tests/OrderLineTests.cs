@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Ogma.Domain.Orders.Entities;
+using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.SharedKernel.ValueObjects;
 using Ogma.Domain.UnitTests.Orders.Helpers;
 
@@ -7,6 +8,7 @@ namespace Ogma.Domain.UnitTests.Orders.Tests;
 
 public class OrderLineTests
 {
+
     [Fact]
     public void Create_ValidParameters_ShouldCreateInstance()
     {
@@ -111,7 +113,7 @@ public class OrderLineTests
         var fullfilledQuantity = 0m;
         var price = new Money(150m, "USD");
         // Act
-        var orderLine = OrderLine.Reconstitute(id, orderItem, orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
+        var orderLine = OrderLine.Reconstitute(id, orderItem, orderedQuantity, cancelledQuantity, fullfilledQuantity, price, OrdersTestData.GetMetadata());
         // Assert
         orderLine.Should().NotBeNull();
         orderLine.Id.Should().Be(id);
@@ -137,7 +139,7 @@ public class OrderLineTests
         var exchangeRate = new ExchangeRate("USD", "EUR", 0.85m);
         var additionalInfo = "Handle with care";
         // Act
-        var orderLine = OrderLine.Reconstitute(id, orderItem, orderedQuantity, cancelledQuantity, fullfilledQuantity, price, exchangeRate, additionalInfo);
+        var orderLine = OrderLine.Reconstitute(id, orderItem, orderedQuantity, cancelledQuantity, fullfilledQuantity, price, OrdersTestData.GetMetadata(), exchangeRate, additionalInfo);
         // Assert
         orderLine.Should().NotBeNull();
         orderLine.Id.Should().Be(id);
@@ -160,7 +162,7 @@ public class OrderLineTests
         var fullfilledQuantity = 0m;
         var price = new Money(150m, "USD");
         // Act
-        Action act = () => OrderLine.Reconstitute(-1, orderItem, orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
+        Action act = () => OrderLine.Reconstitute(-1, orderItem, orderedQuantity, cancelledQuantity, fullfilledQuantity, price, OrdersTestData.GetMetadata());
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -175,7 +177,7 @@ public class OrderLineTests
         var fullfilledQuantity = 0m;
         var price = new Money(150m, "USD");
         // Act
-        Action act = () => OrderLine.Reconstitute(id, null!, orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
+        Action act = () => OrderLine.Reconstitute(id, null!, orderedQuantity, cancelledQuantity, fullfilledQuantity, price, OrdersTestData.GetMetadata());
         // Assert
         act.Should().Throw<ArgumentNullException>();
     }
@@ -192,7 +194,7 @@ public class OrderLineTests
         var fullfilledQuantity = 0m;
         var price = new Money(150m, "USD");
         // Act
-        Action act = () => OrderLine.Reconstitute(id, orderItem, invalidQuantity, cancelledQuantity, fullfilledQuantity, price);
+        Action act = () => OrderLine.Reconstitute(id, orderItem, invalidQuantity, cancelledQuantity, fullfilledQuantity, price, OrdersTestData.GetMetadata());
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -208,7 +210,7 @@ public class OrderLineTests
         var fullfilledQuantity = 0m;
         Money price = null!;
         // Act
-        Action act = () => OrderLine.Reconstitute(id, orderItem, orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
+        Action act = () => OrderLine.Reconstitute(id, orderItem, orderedQuantity, cancelledQuantity, fullfilledQuantity, price, OrdersTestData.GetMetadata());
         // Assert
         act.Should().Throw<ArgumentNullException>();
     }
@@ -225,7 +227,7 @@ public class OrderLineTests
         var price = new Money(150m, "USD");
         var exchangeRate = new ExchangeRate("EUR", "GBP", 0.75m);
         // Act
-        Action act = () => OrderLine.Reconstitute(id, orderItem, orderedQuantity, cancelledQuantity, fullfilledQuantity, price, exchangeRate, "Info");
+        Action act = () => OrderLine.Reconstitute(id, orderItem, orderedQuantity, cancelledQuantity, fullfilledQuantity, price, OrdersTestData.GetMetadata(), exchangeRate, "Info");
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -394,7 +396,7 @@ public class OrderLineTests
         var fullfilledQuantity = 3m;
         var activeQuantityExpected = orderedQuantity - cancelledQuantity - fullfilledQuantity;
         var price = new Money(150m, "USD");
-        var orderLine = OrderLine.Reconstitute(id, OrdersTestData.CreateOrderItem(), orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
+        var orderLine = OrderLine.Reconstitute(id, OrdersTestData.CreateOrderItem(), orderedQuantity, cancelledQuantity, fullfilledQuantity, price, OrdersTestData.GetMetadata());
         // Act & Assert
         orderLine.ActiveQuantity.Should().Be(activeQuantityExpected);
     }
@@ -409,7 +411,7 @@ public class OrderLineTests
         var fullfilledQuantity = 3m;
         var price = new Money(150m, "USD");
         var exchangeRate = new ExchangeRate("USD", "EUR", 0.8m);
-        var orderLine = OrderLine.Reconstitute(id, OrdersTestData.CreateOrderItem(), orderedQuantity, cancelledQuantity, fullfilledQuantity, price, exchangeRate, "Info");
+        var orderLine = OrderLine.Reconstitute(id, OrdersTestData.CreateOrderItem(), orderedQuantity, cancelledQuantity, fullfilledQuantity, price, OrdersTestData.GetMetadata(), exchangeRate, "Info");
         var expectedConvertedAmount = price.Amount * exchangeRate.Rate;
         // Act
         var convertedPrice = orderLine.ConvertedPrice;
@@ -428,7 +430,7 @@ public class OrderLineTests
         var cancelledQuantity = 2m;
         var fullfilledQuantity = 3m;
         var price = new Money(150m, "USD");
-        var orderLine = OrderLine.Reconstitute(id, OrdersTestData.CreateOrderItem(), orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
+        var orderLine = OrderLine.Reconstitute(id, OrdersTestData.CreateOrderItem(), orderedQuantity, cancelledQuantity, fullfilledQuantity, price, OrdersTestData.GetMetadata());
         // Act
         var convertedPrice = orderLine.ConvertedPrice;
         // Assert
@@ -444,7 +446,7 @@ public class OrderLineTests
         var cancelledQuantity = 2m;
         var fullfilledQuantity = 3m;
         var price = new Money(150m, "USD");
-        var orderLine = OrderLine.Reconstitute(id, OrdersTestData.CreateOrderItem(), orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
+        var orderLine = OrderLine.Reconstitute(id, OrdersTestData.CreateOrderItem(), orderedQuantity, cancelledQuantity, fullfilledQuantity, price, OrdersTestData.GetMetadata());
         var expectedActiveValue = new Money(orderLine.ActiveQuantity * price.Amount, orderLine.ConvertedPrice.Currency);
         // Act
         var lineActiveValue = orderLine.LineActiveValue;
@@ -462,7 +464,7 @@ public class OrderLineTests
         var fullfilledQuantity = 3m;
         var price = new Money(150m, "USD");
         var exchangeRate = new ExchangeRate("USD", "EUR", 0.8m);
-        var orderLine = OrderLine.Reconstitute(id, OrdersTestData.CreateOrderItem(), orderedQuantity, cancelledQuantity, fullfilledQuantity, price, exchangeRate, "Info");
+        var orderLine = OrderLine.Reconstitute(id, OrdersTestData.CreateOrderItem(), orderedQuantity, cancelledQuantity, fullfilledQuantity, price, OrdersTestData.GetMetadata(), exchangeRate, "Info");
         var expectedActiveValue = new Money(orderLine.ActiveQuantity * orderLine.ConvertedPrice!.Amount, orderLine.ConvertedPrice.Currency);
         // Act
         var lineActiveConvertedValue = orderLine.LineActiveConvertedValue;
@@ -479,7 +481,7 @@ public class OrderLineTests
         var cancelledQuantity = 2m;
         var fullfilledQuantity = 3m;
         var price = new Money(150m, "USD");
-        var orderLine = OrderLine.Reconstitute(id, OrdersTestData.CreateOrderItem(), orderedQuantity, cancelledQuantity, fullfilledQuantity, price);
+        var orderLine = OrderLine.Reconstitute(id, OrdersTestData.CreateOrderItem(), orderedQuantity, cancelledQuantity, fullfilledQuantity, price, OrdersTestData.GetMetadata());
         var expectedActiveValue = new Money(orderLine.ActiveQuantity * price.Amount, price.Currency);
         // Act
         var lineActiveConvertedValue = orderLine.LineActiveConvertedValue;

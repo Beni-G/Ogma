@@ -1,5 +1,6 @@
 ﻿using Ogma.Domain.Catalog.Entities;
 using Ogma.Domain.Catalog.Parameters;
+using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.SharedKernel.ValueObjects;
 
 namespace Ogma.Domain.UnitTests.Catalog.Helpers;
@@ -47,4 +48,6 @@ internal static class CatalogTestData
     public static bool CreateIsActive() => Random.Shared.Next(0, 2) == 1;
 
     public static Item CreateItem() => Item.Create(CreateItemParameters());
+
+    public static EntityMetadata GetMetadata() => new EntityMetadata(DateTime.UtcNow, DateTime.UtcNow, 1);
 }

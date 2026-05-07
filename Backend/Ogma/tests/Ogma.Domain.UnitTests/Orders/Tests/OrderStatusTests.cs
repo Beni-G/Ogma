@@ -42,7 +42,7 @@ public class OrderStatusTests
         var name = "Shipped";
         var description = "Order has been shipped.";
         // Act
-        var orderStatus = OrderStatus.Reconstitute(id, name, description);
+        var orderStatus = OrderStatus.Reconstitute(id, name, description, OrdersTestData.GetMetadata());
         // Assert
         orderStatus.Should().NotBeNull();
         orderStatus.Id.Should().Be(id);
@@ -60,7 +60,7 @@ public class OrderStatusTests
         var id = OrdersTestData.NextId();
         var description = "Order has been shipped.";
         // Act
-        Action act = () => OrderStatus.Reconstitute(id, invalidName, description);
+        Action act = () => OrderStatus.Reconstitute(id, invalidName, description, OrdersTestData.GetMetadata());
         // Assert
         act.Should().Throw<ArgumentException>();
     }

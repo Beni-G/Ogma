@@ -58,6 +58,9 @@ public class CategoryRepository : ICategoryRepository
         // Update basic fields
         model.Name = category.Name;
         model.ParentCategoryId = category.ParentCategoryId;
+        model.CreatedAt = category.Metadata.CreatedAt;
+        model.UpdatedAt = category.Metadata.UpdatedAt;
+        model.Version = category.Metadata.Version;
 
         if (parentChanged)
         {

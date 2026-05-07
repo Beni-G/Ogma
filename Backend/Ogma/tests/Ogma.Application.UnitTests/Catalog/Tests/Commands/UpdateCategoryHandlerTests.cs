@@ -4,6 +4,7 @@ using Ogma.Application.Catalog.Commands;
 using Ogma.Domain.Catalog.Entities;
 using Ogma.Domain.Catalog.Repositories;
 using Ogma.Domain.Catalog.Services;
+using Ogma.Domain.SharedKernel.BaseTypes;
 
 namespace Ogma.Application.UnitTests.Catalog.Tests.Commands;
 public class UpdateCategoryHandlerTests
@@ -11,12 +12,14 @@ public class UpdateCategoryHandlerTests
     private readonly Mock<ICategoryRepository> _categoryRepositoryStub;
     private readonly Mock<ICategoryDomainService> _categoryDomainServiceStub;
     private readonly UpdateCategoryHandler _handler;
+    private readonly EntityMetadata _metadata;
 
     public UpdateCategoryHandlerTests()
     {
         _categoryRepositoryStub = new Mock<ICategoryRepository>();
         _categoryDomainServiceStub = new Mock<ICategoryDomainService>();
         _handler = new UpdateCategoryHandler(_categoryRepositoryStub.Object, _categoryDomainServiceStub.Object);
+        _metadata = new EntityMetadata(DateTime.UtcNow, DateTime.UtcNow, 1);
     }
 
     [Fact]
@@ -24,7 +27,7 @@ public class UpdateCategoryHandlerTests
     {
         // Arrange
         long id = 1;
-        var existingCategory = Category.Reconstitute(id, "ExistingName", null, "");
+        var existingCategory = Category.Reconstitute(id, "ExistingName", _metadata, null, "");
         var command = new UpdateCategoryCommand(id, "UpdatedName", null);
         _categoryRepositoryStub.Setup(repo => repo.GetByIdAsync(id))
             .ReturnsAsync(existingCategory);
@@ -48,9 +51,9 @@ public class UpdateCategoryHandlerTests
     public async Task Handle_UpdateChildCategory_ReturnsUpdatedCategory()
     {
         // Arrange
-        var parentCategory = Category.Reconstitute(1L, "ParentCategory", null, "");
-        var childCategory = Category.Reconstitute(2L, "ExistingChildCategory", 1, "1");
-        var newParentCategory = Category.Reconstitute(3L, "NewParentCategory", null, "");
+        var parentCategory = Category.Reconstitute(1L, "ParentCategory", _metadata, null, "");
+        var childCategory = Category.Reconstitute(2L, "ExistingChildCategory", _metadata, 1, "1");
+        var newParentCategory = Category.Reconstitute(3L, "NewParentCategory", _metadata, null, "");
 
         var categories = new Dictionary<long, Category>
             {
@@ -118,7 +121,7 @@ public class UpdateCategoryHandlerTests
     {
         // Arrange
         long id = 1;
-        var existingCategory = Category.Reconstitute(id, "ExistingName", null, "");
+        var existingCategory = Category.Reconstitute(id, "ExistingName", _metadata, null, "");
         _categoryRepositoryStub.Setup(repo => repo.GetByIdAsync(id))
             .ReturnsAsync(existingCategory);
         var command = new UpdateCategoryCommand(id, "UpdatedName", 2);
@@ -139,7 +142,7 @@ public class UpdateCategoryHandlerTests
     {
         // Arrange
         long id = 1;
-        var existingCategory = Category.Reconstitute(id, "ExistingName", null, "");
+        var existingCategory = Category.Reconstitute(id, "ExistingName", _metadata, null, "");
         var command = new UpdateCategoryCommand(id, "UpdatedName", null);
         _categoryRepositoryStub.Setup(repo => repo.GetByIdAsync(id))
             .ReturnsAsync(existingCategory);

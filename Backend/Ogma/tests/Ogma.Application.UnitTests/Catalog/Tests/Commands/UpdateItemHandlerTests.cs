@@ -7,6 +7,7 @@ using Ogma.Application.SharedKernel.Dtos;
 using Ogma.Application.UnitTests.Catalog.Helpers;
 using Ogma.Domain.Catalog.Entities;
 using Ogma.Domain.Catalog.Repositories;
+using Ogma.Domain.SharedKernel.BaseTypes;
 
 namespace Ogma.Application.UnitTests.Catalog.Tests.Commands;
 
@@ -17,6 +18,7 @@ public class UpdateItemHandlerTests
     private readonly Mock<IItemTypeReader> _itemTypeReaderMock;
     private readonly Mock<ICategoryReader> _categoryReaderMock;
     private readonly UpdateItemHandler _handler;
+    private readonly EntityMetadata _metadata;
 
     public UpdateItemHandlerTests()
     {
@@ -25,13 +27,14 @@ public class UpdateItemHandlerTests
         _itemTypeReaderMock = new Mock<IItemTypeReader>();
         _categoryReaderMock = new Mock<ICategoryReader>();
         _handler = new UpdateItemHandler(_itemRepositoryMock.Object, _itemReaderMock.Object, _itemTypeReaderMock.Object, _categoryReaderMock.Object);
+        _metadata = new EntityMetadata(DateTime.UtcNow, DateTime.UtcNow, 1);
     }
 
     [Fact]
     public async Task Handle_ValidItem_ReturnsUpdatedItem()
     {
         // Arrange
-        var existingItem = Item.Reconstitute(CatalogTestData.NextId(), CatalogTestData.CreateItemParameters());
+        var existingItem = Item.Reconstitute(CatalogTestData.NextId(), CatalogTestData.CreateItemParameters(), _metadata);
         var ancestorCategories = CatalogTestData.CreateCategoryDtoAncestors();
         var newCategory = CatalogTestData.CreateCategoryDto(ancestors: ancestorCategories);
         var itemType = CatalogTestData.CreateItemTypeDto();

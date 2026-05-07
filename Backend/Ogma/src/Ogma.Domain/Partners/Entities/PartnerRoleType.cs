@@ -34,20 +34,17 @@ public class PartnerRoleType : AggregateRoot<long>
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="PartnerRoleType"/> class with the specified identifier, code, name, and
+    /// Initializes a new instance of the <see cref="PartnerRoleType"/> class with the specified identifier, code, name, metadata, and
     /// optional color.
     /// </summary>
     /// <param name="id">The unique identifier for the partner role.</param>
     /// <param name="code">The code representing the partner role. Cannot be null or empty.</param>
     /// <param name="name">The name of the partner role. Cannot be null or empty.</param>
+    /// <param name="metadata">Metadata for the partner role</param>
     /// <param name="color">The optional color associated with the partner role. Can be null.</param>
     /// <exception cref="ArgumentException">Thrown if <paramref name="code"/> or <paramref name="name"/> is null or empty.</exception>
-    private PartnerRoleType(long id, string code, string name, string? color = null) : base(id)
+    private PartnerRoleType(long id, string code, string name, EntityMetadata metadata, string? color = null) : base(id, metadata)
     {
-        if (id <= 0)
-        {
-            throw new ArgumentException("Id must be a positive number.", nameof(id));
-        }
 
         if (string.IsNullOrWhiteSpace(code))
         {
@@ -79,9 +76,10 @@ public class PartnerRoleType : AggregateRoot<long>
     /// <param name="id">The unique identifier for the partner role.</param>
     /// <param name="code">The code representing the partner role.</param>
     /// <param name="name">The name of the partner role.</param>
+    /// <param name="metadata">Metadata for the partner role</param>
     /// <param name="color">The optional color associated with the partner role. Can be <see langword="null"/>.</param>
     /// <returns>A <see cref="PartnerRoleType"/> object initialized with the provided attributes.</returns>
-    public static PartnerRoleType Reconstitute(long id, string code, string name, string? color = null) => new(id, code, name, color);
+    public static PartnerRoleType Reconstitute(long id, string code, string name, EntityMetadata metadata, string? color = null) => new(id, code, name, metadata, color);
 
     public void Update(string code, string name, string? color = null)
     {
@@ -98,6 +96,7 @@ public class PartnerRoleType : AggregateRoot<long>
         Code = code;
         Name = name;
         Color = color;
+        Touch();
     }
 
 }

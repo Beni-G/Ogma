@@ -1,5 +1,7 @@
 ﻿using FluentAssertions;
 using Ogma.Domain.Catalog.Entities;
+using Ogma.Domain.SharedKernel.BaseTypes;
+using Ogma.Domain.UnitTests.Catalog.Helpers;
 
 namespace Ogma.Domain.UnitTests.Catalog.Tests;
 public class ItemTypeTests
@@ -52,7 +54,7 @@ public class ItemTypeTests
         long id = 1;
 
         // Act
-        var itemType = ItemType.Reconstitute(id, name, description);
+        var itemType = ItemType.Reconstitute(id, name, description, CatalogTestData.GetMetadata());
 
         // Assert
         itemType.Id.Should().Be(id);
@@ -69,7 +71,7 @@ public class ItemTypeTests
         string name = "TestItem";
         string description = "A test item type";
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => ItemType.Reconstitute(invalidId, name, description));
+        Assert.Throws<ArgumentException>(() => ItemType.Reconstitute(invalidId, name, description, CatalogTestData.GetMetadata()));
     }
 
     [Theory]
@@ -79,7 +81,7 @@ public class ItemTypeTests
     public void Reconstitute_NullOrEmptyName_ThrowsArgumentException(string invalidName)
     {
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => ItemType.Reconstitute(1, invalidName, "Description"));
+        Assert.Throws<ArgumentException>(() => ItemType.Reconstitute(1, invalidName, "Description", CatalogTestData.GetMetadata()));
     }
 
     [Fact]
@@ -90,7 +92,7 @@ public class ItemTypeTests
         string name = "TestItem";
 
         // Act
-        var itemType = ItemType.Reconstitute(id, name, null);
+        var itemType = ItemType.Reconstitute(id, name, null, CatalogTestData.GetMetadata());
 
         // Assert
         itemType.Id.Should().Be(id);
@@ -151,7 +153,7 @@ public class ItemTypeTests
         long id = 42;
         string name = "TestItem";
         string description = "A test item type";
-        var itemType = ItemType.Reconstitute(id, name, description);
+        var itemType = ItemType.Reconstitute(id, name, description, CatalogTestData.GetMetadata());
 
         // Act
         itemType.Update("UpdatedName", "UpdatedDescription");

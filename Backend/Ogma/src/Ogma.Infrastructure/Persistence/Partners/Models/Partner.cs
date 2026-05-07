@@ -1,10 +1,10 @@
-﻿using Ogma.Infrastructure.Persistence.SharedKernel.ValueObjectRecords;
+﻿using Ogma.Infrastructure.Persistence.SharedKernel.BaseTypes;
+using Ogma.Infrastructure.Persistence.SharedKernel.ValueObjectRecords;
 
 namespace Ogma.Infrastructure.Persistence.Partners.Models;
 
-public class Partner
+public class Partner : Entity
 {
-    public long Id { get; set; }
     public string? IndividualFirstName { get; set; }
     public string? IndividualLastName { get; set; }
     public string? CompanyName { get; set; }

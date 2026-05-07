@@ -1,7 +1,8 @@
-﻿namespace Ogma.Infrastructure.Persistence.Catalog.Models;
-public class Category
+﻿using Ogma.Infrastructure.Persistence.SharedKernel.BaseTypes;
+
+namespace Ogma.Infrastructure.Persistence.Catalog.Models;
+public class Category : Entity
 {
-    public long Id { get; set; }
     public string Name { get; set; } = default!;
     public long? ParentCategoryId { get; set; }
     public Category ParentCategory { get; set; } = default!;

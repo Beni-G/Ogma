@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Moq;
 using Ogma.Application.Catalog.Commands;
+using Ogma.Application.UnitTests.Catalog.Helpers;
 using Ogma.Domain.Catalog.Entities;
 using Ogma.Domain.Catalog.Repositories;
 
@@ -22,7 +23,7 @@ public class UpdateItemTypeHandlerTests
     {
         // Arrange
         long id = 1;
-        var existingItemType = ItemType.Reconstitute(id, "ExistingName", "ExistingDescription");
+        var existingItemType = ItemType.Reconstitute(id, "ExistingName", "ExistingDescription", CatalogTestData.GetMetadata());
         var command = new UpdateItemTypeCommand(id, "UpdatedName", "UpdatedDescription");
         _itemTypeRepositoryStub.Setup(repo => repo.UpdateAsync(It.IsAny<ItemType>()))
             .ReturnsAsync((ItemType itemType) => true);
@@ -59,7 +60,7 @@ public class UpdateItemTypeHandlerTests
     {
         // Arrange
         long id = 1;
-        var existingItemType = ItemType.Reconstitute(id, "ExistingName", "ExistingDescription");
+        var existingItemType = ItemType.Reconstitute(id, "ExistingName", "ExistingDescription", CatalogTestData.GetMetadata());
         var command = new UpdateItemTypeCommand(id, "UpdatedName", "UpdatedDescription");
         _itemTypeRepositoryStub.Setup(repo => repo.GetByIdAsync(id)).ReturnsAsync(existingItemType);
         _itemTypeRepositoryStub.Setup(repo => repo.UpdateAsync(It.IsAny<ItemType>()))

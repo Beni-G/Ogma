@@ -2,7 +2,10 @@
 using Ogma.Application.SharedKernel.Dtos;
 using Ogma.Domain.Catalog.Entities;
 using Ogma.Domain.Catalog.Parameters;
+using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.SharedKernel.ValueObjects;
+using Ogma.Infrastructure.Persistence.SharedKernel.BaseTypes;
+using Ogma.Infrastructure.Persistence.SharedKernel.Extensions;
 
 namespace Ogma.Infrastructure.Persistence.Catalog.Extensions;
 public static class CatalogMappingExtensions
@@ -152,7 +155,7 @@ public static class CatalogMappingExtensions
             IsActive: item.IsActive
         );
 
-        return Item.Reconstitute(item.Id, itemParameters);
+        return Item.Reconstitute(item.Id, itemParameters, new EntityMetadata(item.CreatedAt, item.UpdatedAt, item.Version));
     }
 
     /// <summary>
@@ -167,7 +170,12 @@ public static class CatalogMappingExtensions
         {
             throw new ArgumentNullException(nameof(category));
         }
-        var domainCategory = Category.Reconstitute(category.Id, category.Name, category.ParentCategoryId, category.Path);
+        var domainCategory = Category.Reconstitute(
+            category.Id, 
+            category.Name, 
+            new EntityMetadata(category.CreatedAt, category.UpdatedAt, category.Version), 
+            category.ParentCategoryId, 
+            category.Path);
 
         foreach (var subCategory in category.SubCategories)
         {
@@ -188,7 +196,7 @@ public static class CatalogMappingExtensions
         {
             throw new ArgumentNullException(nameof(itemType));
         }
-        var domainItemType = ItemType.Reconstitute(itemType.Id, itemType.Name, itemType.Description);
+        var domainItemType = ItemType.Reconstitute(itemType.Id, itemType.Name, itemType.Description, new EntityMetadata(itemType.CreatedAt, itemType.UpdatedAt, itemType.Version));
 
         return domainItemType;
     }
@@ -211,7 +219,6 @@ public static class CatalogMappingExtensions
         }
         var modelItem = new Models.Item
         {
-            Id = item.Id,
             Name = item.Name,
             Code = item.Code,
             Description = item.Description,
@@ -222,6 +229,7 @@ public static class CatalogMappingExtensions
             UnitOfMeasurement = item.UnitOfMeasurement,
             IsActive = item.IsActive
         };
+        item.MapBaseProperties(modelItem);
         return modelItem;
     }
 
@@ -239,11 +247,11 @@ public static class CatalogMappingExtensions
         }
         var modelCategory = new Models.Category
         {
-            Id = category.Id,
             Name = category.Name,
             ParentCategoryId = category.ParentCategoryId,
             Path = category.Path
         };
+        category.MapBaseProperties(modelCategory);
         return modelCategory;
     }
 
@@ -261,10 +269,10 @@ public static class CatalogMappingExtensions
         }
         var modelItemType = new Models.ItemType
         {
-            Id = itemType.Id,
             Name = itemType.Name,
             Description = itemType.Description
         };
+        itemType.MapBaseProperties(modelItemType);
         return modelItemType;
     }
 

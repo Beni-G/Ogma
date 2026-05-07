@@ -1,7 +1,8 @@
 ﻿using FluentAssertions;
 using Ogma.Domain.Partners.Entities;
+using Ogma.Domain.UnitTests.Partners.Helpers;
 
-namespace Ogma.Domain.UnitTests.Partners;
+namespace Ogma.Domain.UnitTests.Partners.Tests;
 
 public class PartnerRoleTypeTests
 {
@@ -71,7 +72,7 @@ public class PartnerRoleTypeTests
         var name = "Distributor";
         var color = "#33FF57";
         // Act
-        var partnerRole = PartnerRoleType.Reconstitute(id, code, name, color);
+        var partnerRole = PartnerRoleType.Reconstitute(id, code, name, PartnersTestData.GetMetadata(), color);
         // Assert
         partnerRole.Id.Should().Be(id);
         partnerRole.Code.Should().Be(code);
@@ -88,7 +89,7 @@ public class PartnerRoleTypeTests
         var code = "RESELLER";
         var name = "Reseller";
         // Act
-        Action act = () => PartnerRoleType.Reconstitute(invalidId, code, name);
+        Action act = () => PartnerRoleType.Reconstitute(invalidId, code, name, PartnersTestData.GetMetadata());
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -103,7 +104,7 @@ public class PartnerRoleTypeTests
         var id = 1L;
         var name = "Reseller";
         // Act
-        Action act = () => PartnerRoleType.Reconstitute(id, invalidCode, name);
+        Action act = () => PartnerRoleType.Reconstitute(id, invalidCode, name, PartnersTestData.GetMetadata());
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -118,7 +119,7 @@ public class PartnerRoleTypeTests
         var id = 1L;
         var code = "RESELLER";
         // Act
-        Action act = () => PartnerRoleType.Reconstitute(id, code, invalidName);
+        Action act = () => PartnerRoleType.Reconstitute(id, code, invalidName, PartnersTestData.GetMetadata());
         // Assert
         act.Should().Throw<ArgumentException>();
     }
@@ -131,7 +132,7 @@ public class PartnerRoleTypeTests
         var code = "PARTNER";
         var name = "Partner";
         // Act
-        var partnerRole = PartnerRoleType.Reconstitute(id, code, name);
+        var partnerRole = PartnerRoleType.Reconstitute(id, code, name, PartnersTestData.GetMetadata());
         // Assert
         partnerRole.Id.Should().Be(id);
         partnerRole.Code.Should().Be(code);

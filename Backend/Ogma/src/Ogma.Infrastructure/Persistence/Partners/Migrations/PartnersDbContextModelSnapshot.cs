@@ -36,6 +36,10 @@ namespace Ogma.Infrastructure.Persistence.Partners.Migrations
                         .HasColumnType("text")
                         .HasColumnName("company_name");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
                     b.Property<string>("DisplayName")
                         .HasColumnType("text")
                         .HasColumnName("display_name");
@@ -56,6 +60,14 @@ namespace Ogma.Infrastructure.Persistence.Partners.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("is_natural_person");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("integer")
+                        .HasColumnName("version");
+
                     b.HasKey("Id")
                         .HasName("pk_partners");
 
@@ -70,6 +82,10 @@ namespace Ogma.Infrastructure.Persistence.Partners.Migrations
                         .HasColumnName("id");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
 
                     b.Property<string>("Email")
                         .HasColumnType("text")
@@ -109,6 +125,14 @@ namespace Ogma.Infrastructure.Persistence.Partners.Migrations
                         .HasColumnType("text")
                         .HasColumnName("title");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("integer")
+                        .HasColumnName("version");
+
                     b.HasKey("Id")
                         .HasName("pk_partner_contact");
 
@@ -127,6 +151,10 @@ namespace Ogma.Infrastructure.Persistence.Partners.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
                     b.Property<bool>("IsPrimary")
                         .HasColumnType("boolean")
                         .HasColumnName("is_primary");
@@ -140,6 +168,10 @@ namespace Ogma.Infrastructure.Persistence.Partners.Migrations
                         .HasColumnType("text")
                         .HasColumnName("type");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
                     b.Property<DateTime?>("ValidityEnd")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("validity_end");
@@ -152,6 +184,10 @@ namespace Ogma.Infrastructure.Persistence.Partners.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("value");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("integer")
+                        .HasColumnName("version");
 
                     b.HasKey("Id")
                         .HasName("pk_partner_identifier");
@@ -180,10 +216,22 @@ namespace Ogma.Infrastructure.Persistence.Partners.Migrations
                         .HasColumnType("text")
                         .HasColumnName("color");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("name");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("integer")
+                        .HasColumnName("version");
 
                     b.HasKey("Id")
                         .HasName("pk_partner_role_types");
@@ -225,9 +273,21 @@ namespace Ogma.Infrastructure.Persistence.Partners.Migrations
 
                             NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<long>("Id"));
 
+                            b1.Property<DateTime>("CreatedAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("created_at");
+
                             b1.Property<bool>("IsDefault")
                                 .HasColumnType("boolean")
                                 .HasColumnName("is_default");
+
+                            b1.Property<DateTime>("UpdatedAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("updated_at");
+
+                            b1.Property<int>("Version")
+                                .HasColumnType("integer")
+                                .HasColumnName("version");
 
                             b1.HasKey("PartnerId", "Id")
                                 .HasName("pk_partner_bank_accounts");
@@ -238,7 +298,7 @@ namespace Ogma.Infrastructure.Persistence.Partners.Migrations
                                 .HasForeignKey("PartnerId")
                                 .HasConstraintName("fk_partner_bank_accounts_partners_partner_id");
 
-                            b1.OwnsOne("Ogma.Infrastructure.Persistence.Partners.ValueObjectRecords.BankAccountRecord", "BankAccount", b2 =>
+                            b1.OwnsOne("Ogma.Infrastructure.Persistence.SharedKernel.ValueObjectRecords.BankAccountRecord", "BankAccount", b2 =>
                                 {
                                     b2.Property<long>("PartnerBankAccountPartnerId")
                                         .HasColumnType("bigint")
@@ -282,7 +342,7 @@ namespace Ogma.Infrastructure.Persistence.Partners.Migrations
                             b1.Navigation("Partner");
                         });
 
-                    b.OwnsOne("Ogma.Infrastructure.Persistence.Partners.ValueObjectRecords.AddressRecord", "HQAddress", b1 =>
+                    b.OwnsOne("Ogma.Infrastructure.Persistence.SharedKernel.ValueObjectRecords.AddressRecord", "HQAddress", b1 =>
                         {
                             b1.Property<long>("PartnerId")
                                 .HasColumnType("bigint");

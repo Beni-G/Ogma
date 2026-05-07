@@ -1,8 +1,9 @@
-﻿namespace Ogma.Infrastructure.Persistence.Orders.Models;
+﻿using Ogma.Infrastructure.Persistence.SharedKernel.BaseTypes;
 
-public class OrderStatus
+namespace Ogma.Infrastructure.Persistence.Orders.Models;
+
+public class OrderStatus : Entity
 {
-    public long Id { get; set; }
     public string Name { get; set; } = default!;
     public string Description { get; set; } = default!;
 }

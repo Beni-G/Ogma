@@ -99,12 +99,14 @@ public class CreatePartnerHandlerTests
                             newPartnerIdentifierId,
                             command.Identifier.Type,
                             command.Identifier.Value,
+                            PartnersTestData.GetMetadata(),
                             new Period(command.Identifier.ValidityPeriod!.Start, command.Identifier.ValidityPeriod.End),
                             command.Identifier.IsPrimary)
                     },
                     new List<long> { partnerRolyType.Id },
                     new List<PartnerBankAccount>(),
-                    new List<PartnerContact>()
+                    new List<PartnerContact>(),
+                    PartnersTestData.GetMetadata()
                     );
             });
         _partnerReaderStub.Setup(r => r.GetByIdAsync(It.IsAny<long>())).ReturnsAsync(createdPartner);
@@ -188,12 +190,14 @@ public class CreatePartnerHandlerTests
                             newPartnerIdentifierId,
                             command.Identifier.Type,
                             command.Identifier.Value,
+                            PartnersTestData.GetMetadata(),
                             new Period(command.Identifier.ValidityPeriod!.Start, command.Identifier.ValidityPeriod.End),
                             command.Identifier.IsPrimary)
                     },
                     new List<long> { partnerRolyType.Id },
                     new List<PartnerBankAccount>(),
-                    new List<PartnerContact>()
+                    new List<PartnerContact>(),
+                    PartnersTestData.GetMetadata()
                     );
             });
         _partnerReaderStub.Setup(r => r.GetByIdAsync(It.IsAny<long>())).ReturnsAsync(createdPartner);
@@ -292,12 +296,14 @@ public class CreatePartnerHandlerTests
                             newPartnerIdentifierId,
                             command.Identifier.Type,
                             command.Identifier.Value,
+                            PartnersTestData.GetMetadata(),
                             new Period(command.Identifier.ValidityPeriod!.Start, command.Identifier.ValidityPeriod.End),
                             command.Identifier.IsPrimary)
                     },
                     new List<long> { partnerRolyType.Id },
                     new List<PartnerBankAccount>(),
-                    new List<PartnerContact>()
+                    new List<PartnerContact>(),
+                    PartnersTestData.GetMetadata()
                     );
             });
         _partnerReaderStub.Setup(r => r.GetByIdAsync(It.IsAny<long>())).ReturnsAsync((PartnerDto?)null);

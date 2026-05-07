@@ -80,6 +80,7 @@ public class OrderBuilder
             _orderDate,
             _orderTypeId,
             _orderStatusId,
+            OrdersTestData.GetMetadata(),
             _info,
             _orderLines.AsReadOnly()
         );

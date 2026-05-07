@@ -2,6 +2,7 @@
 using Moq;
 using Ogma.Application.Orders.Commands;
 using Ogma.Application.Orders.Extensions;
+using Ogma.Application.UnitTests.Orders.Helpers;
 using Ogma.Domain.Orders.Entities;
 using Ogma.Domain.Orders.Repositories;
 
@@ -23,8 +24,8 @@ public class UpdateOrderTypeHandlerTests
     {
         // Arrange
         var command = new UpdateOrderTypeCommand(1L, "sales", "sales");
-        var existingOrderType = OrderType.Reconstitute(command.Id, "sale", "sale");
-        var updatedOrderType = OrderType.Reconstitute(command.Id, command.Code, command.Description);
+        var existingOrderType = OrderType.Reconstitute(command.Id, "sale", "sale", OrdersTestData.GetMetadata());
+        var updatedOrderType = OrderType.Reconstitute(command.Id, command.Code, command.Description, OrdersTestData.GetMetadata());
         _orderTypeRepositoryStub.Setup(r => r.GetByIdAsync(It.IsAny<long>()))
             .ReturnsAsync(existingOrderType);
         _orderTypeRepositoryStub.Setup(r => r.UpdateAsync(It.IsAny<OrderType>()))
@@ -61,8 +62,8 @@ public class UpdateOrderTypeHandlerTests
     {
         // Arrange
         var command = new UpdateOrderTypeCommand(1L, "sales", "sales");
-        var existingOrderType = OrderType.Reconstitute(command.Id, "sale", "sale");
-        var updatedOrderType = OrderType.Reconstitute(command.Id, command.Code, command.Description);
+        var existingOrderType = OrderType.Reconstitute(command.Id, "sale", "sale", OrdersTestData.GetMetadata());
+        var updatedOrderType = OrderType.Reconstitute(command.Id, command.Code, command.Description, OrdersTestData.GetMetadata());
         _orderTypeRepositoryStub.Setup(r => r.GetByIdAsync(It.IsAny<long>()))
             .ReturnsAsync(existingOrderType);
         _orderTypeRepositoryStub.Setup(r => r.UpdateAsync(It.IsAny<OrderType>()))

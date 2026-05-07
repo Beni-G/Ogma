@@ -1,10 +1,10 @@
 ﻿using MediatR;
 using Ogma.Application.Orders.Dtos;
 using Ogma.Application.Orders.Ports;
-using Ogma.Application.SharedKernel.Extensions;
 using Ogma.Domain.Orders.Entities;
 using Ogma.Domain.Orders.Repositories;
 using Ogma.Domain.Orders.ValueObjects;
+using Ogma.Domain.SharedKernel.ValueObjects;
 
 namespace Ogma.Application.Orders.Commands;
 
@@ -45,32 +45,33 @@ public class UpdateOrderHandler : IRequestHandler<UpdateOrderCommand, OrderDto>
         var itemIds = command.OrderLines.Select(ol => ol.ItemId).Distinct();
         var itemsLookup = await _catalogItemReader.GetByIdsAsync(itemIds);
 
-        existingOrder.Update(
-            new OrderPartner(command.PartnerId, partner.PartnerName),
-            command.OrderNumber,
-            command.OrderDate,
-            command.OrderTypeId,
-            command.OrderStatusId,
-            command.AdditionalInformation!);
-
-        existingOrder.ClearOrderLines();
-
-        foreach (var orderLine in command.OrderLines)
+        var orderLineInputs = command.OrderLines.Select(orderLine =>
         {
             var item = itemsLookup.TryGetValue(orderLine.ItemId, out var catalogItem)
-                ? catalogItem
-                : throw new KeyNotFoundException($"Item with ID {orderLine.ItemId} not found");
-            var updatedOrderLine = OrderLine.Reconstitute(
+            ? catalogItem
+            : throw new KeyNotFoundException($"Item with ID {orderLine.ItemId} not found");
+
+            return new OrderLineInput(
                 orderLine.Id,
                 new OrderItem(item.ItemId, item.ItemName, item.ItemCode),
-               orderLine.OrderedQuantity,
-               orderLine.CancelledQuantity,
-               orderLine.FullfilledQuantity,
-               orderLine.Price.ToDomain(),
-               orderLine.ExchangeRate?.ToDomain(),
-               orderLine.AdditionalInformation);
-            existingOrder.AddOrderLine(updatedOrderLine);
-        }
+                orderLine.OrderedQuantity,
+                orderLine.CancelledQuantity,
+                orderLine.FullfilledQuantity,
+                new Money(orderLine.Price.Amount, orderLine.Price.Currency),
+                orderLine.ExchangeRate != null
+                    ? new ExchangeRate(orderLine.ExchangeRate.BaseCurrency, orderLine.ExchangeRate.TargetCurrency, orderLine.ExchangeRate.Rate)
+                    : null,
+                orderLine.AdditionalInformation);
+        });
+
+        existingOrder.Update(
+                new OrderPartner(command.PartnerId, partner.PartnerName),
+                command.OrderNumber,
+                command.OrderDate,
+                command.OrderTypeId,
+                command.OrderStatusId,
+                command.AdditionalInformation!,
+                orderLineInputs);
 
         var result = await _orderRepository.UpdateAsync(existingOrder);
         if (!result)

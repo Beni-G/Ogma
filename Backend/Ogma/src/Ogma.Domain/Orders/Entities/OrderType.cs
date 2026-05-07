@@ -18,19 +18,12 @@ public class OrderType : AggregateRoot<long>
         Description = description;
     }
 
-    private OrderType(long id, string code, string description)
+    private OrderType(long id, string code, string description, EntityMetadata metadata) : base(id, metadata)
     {
-        if (id <= 0)
-        {
-            throw new ArgumentException("ID must be a positive number.", nameof(id));
-        }
-
         if (string.IsNullOrWhiteSpace(code))
         {
             throw new ArgumentException(nameof(code));
         }
-
-        Id = id;
         Code = code;
         Description = description;
     }
@@ -49,8 +42,9 @@ public class OrderType : AggregateRoot<long>
     /// <param name="id"></param>
     /// <param name="code"></param>
     /// <param name="description"></param>
+    /// <param name="metadata"></param>
     /// <returns></returns>
-    public static OrderType Reconstitute(long id, string code, string description) => new(id, code, description);
+    public static OrderType Reconstitute(long id, string code, string description, EntityMetadata metadata) => new(id, code, description, metadata);
 
     /// <summary>
     /// Updates the OrderType instance.
@@ -67,5 +61,6 @@ public class OrderType : AggregateRoot<long>
 
         Code = code;
         Description = description;
+        Touch();
     }
 }

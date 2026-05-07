@@ -1,10 +1,10 @@
 ﻿using Ogma.Infrastructure.Persistence.Orders.ValueObjectRecords;
+using Ogma.Infrastructure.Persistence.SharedKernel.BaseTypes;
 
 namespace Ogma.Infrastructure.Persistence.Orders.Models;
 
-public class Order
+public class Order : Entity
 {
-    public long Id { get; set; }
     public OrderPartner OrderPartner { get; set; } = default!;
     public string OrderNumber { get; set; } = default!;
     public DateTime OrderDate { get; set; }

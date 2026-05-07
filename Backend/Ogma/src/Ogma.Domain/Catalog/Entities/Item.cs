@@ -69,13 +69,8 @@ public class Item : AggregateRoot<long>
     /// <param name="itemParameters"></param>
     /// <exception cref="ArgumentException"></exception>
     /// <exception cref="ArgumentNullException"></exception>
-    private Item(long id, ItemParameters itemParameters) : base(id)
+    private Item(long id, ItemParameters itemParameters, EntityMetadata metadata) : base(id, metadata)
     {
-        if (id <= 0)
-        {
-            throw new ArgumentException("ID must be a positive number.", nameof(id));
-        }
-
         if (itemParameters == null)
         {
             throw new ArgumentNullException(nameof(itemParameters));
@@ -124,12 +119,13 @@ public class Item : AggregateRoot<long>
     public static Item Create(ItemParameters itemParameters) => new(itemParameters);
 
     /// <summary>
-    /// Reconstitutes an Item from the given ID and parameters.
+    /// Reconstitutes an Item from the given ID parameters and metadata.
     /// </summary>
     /// <param name="id"></param>
     /// <param name="itemParameters"></param>
+    /// <param name="metadata"></param>
     /// <returns></returns>
-    public static Item Reconstitute(long id, ItemParameters itemParameters) => new(id, itemParameters);
+    public static Item Reconstitute(long id, ItemParameters itemParameters, EntityMetadata metadata) => new(id, itemParameters, metadata);
 
     /// <summary>
     /// Updates the item's properties based on the provided parameters.
@@ -157,6 +153,7 @@ public class Item : AggregateRoot<long>
         {
             Deactivate();
         }
+        Touch();
     }
 
     /// <summary>

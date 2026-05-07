@@ -3,6 +3,7 @@ using Ogma.Application.Catalog.Dtos;
 using Ogma.Application.SharedKernel.Dtos;
 using Ogma.Domain.Catalog.Entities;
 using Ogma.Domain.Catalog.Parameters;
+using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.SharedKernel.ValueObjects;
 
 namespace Ogma.Application.UnitTests.Catalog.Helpers;
@@ -110,5 +111,7 @@ internal static class CatalogTestData
     );
 
     public static Item CreateItem() => Item.Create(CreateItemParameters());
+
+    public static EntityMetadata GetMetadata() => new EntityMetadata(DateTime.UtcNow, DateTime.UtcNow, 1);
 
 }

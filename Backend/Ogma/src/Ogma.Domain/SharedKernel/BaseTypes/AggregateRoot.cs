@@ -2,5 +2,5 @@
 public abstract class AggregateRoot<TKey> : Entity<TKey>
 {
     protected AggregateRoot() : base() { }
-    protected AggregateRoot(TKey id) : base(id) { }
+    protected AggregateRoot(TKey id, EntityMetadata metadata) : base(id, metadata) { }
 }

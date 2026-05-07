@@ -67,6 +67,7 @@ public class OrderLineBuilder
             _cancelled,
             _fulfilled,
             _price,
+            OrdersTestData.GetMetadata(),
             _exchangeRate,
             _info
         );

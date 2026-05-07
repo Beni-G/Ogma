@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Moq;
 using Ogma.Application.Orders.Commands;
+using Ogma.Application.UnitTests.Orders.Helpers;
 using Ogma.Domain.Orders.Entities;
 using Ogma.Domain.Orders.Repositories;
 
@@ -21,7 +22,7 @@ public class DeleteOrderTypeHandlerTests
     public async Task Handle_ExistingOrderType_DeletesOrderType()
     {
         // Arrange
-        var existingOrderType = OrderType.Reconstitute(1L, "sales", "sales");
+        var existingOrderType = OrderType.Reconstitute(1L, "sales", "sales", OrdersTestData.GetMetadata());
         var command = new DeleteOrderTypeCommand(existingOrderType.Id);
         _orderTypeRepositoryStub.Setup(r => r.GetByIdAsync(It.IsAny<long>()))
             .ReturnsAsync(existingOrderType);

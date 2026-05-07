@@ -12,7 +12,6 @@ public class PartnerBankAccount : Entity<long>
     /// </summary>
     /// <param name="bankAccount"></param>
     /// <param name="isDefault"></param>
-    /// <exception cref="ArgumentException"></exception>
     /// <exception cref="ArgumentNullException"></exception>
     private PartnerBankAccount(BankAccount bankAccount, bool isDefault = false)
     {
@@ -21,19 +20,15 @@ public class PartnerBankAccount : Entity<long>
     }
 
     /// <summary>
-    /// Creates a new instance of the <see cref="PartnerBankAccount"/> class with the specified ID, partner ID, bank account,
+    /// Creates a new instance of the <see cref="PartnerBankAccount"/> class with the specified ID, partner ID, bank account, metadata,
     /// </summary>
     /// <param name="id"></param>
     /// <param name="bankAccount"></param>
+    /// <param name="metadata"></param>
     /// <param name="isDefault"></param>
-    /// <exception cref="ArgumentException"></exception>
     /// <exception cref="ArgumentNullException"></exception>
-    private PartnerBankAccount(long id, BankAccount bankAccount, bool isDefault = false) : base(id)
+    private PartnerBankAccount(long id, BankAccount bankAccount, EntityMetadata metadata, bool isDefault = false) : base(id, metadata)
     {
-        if (id <= 0)
-        {
-            throw new ArgumentException("ID must be a positive number.", nameof(id));
-        }
         BankAccount = bankAccount ?? throw new ArgumentNullException(nameof(bankAccount));
         IsDefault = isDefault;
     }
@@ -52,14 +47,16 @@ public class PartnerBankAccount : Entity<long>
     /// </summary>
     /// <param name="id"></param>
     /// <param name="bankAccount"></param>
+    /// <param name="metadata"></param>
     /// <param name="isDefault"></param>
     /// <returns></returns>
-    public static PartnerBankAccount Reconstitute(long id, BankAccount bankAccount, bool isDefault = false) 
-        => new(id, bankAccount, isDefault);
+    public static PartnerBankAccount Reconstitute(long id, BankAccount bankAccount, EntityMetadata metadata, bool isDefault = false) 
+        => new(id, bankAccount, metadata, isDefault);
 
     public void UpdateBankAccount(BankAccount bankAccount, bool isDefault)
     {
         BankAccount = bankAccount ?? throw new ArgumentNullException(nameof(bankAccount));
         IsDefault = isDefault;
+        Touch();
     }
 }

@@ -4,6 +4,7 @@ using Ogma.Application.Catalog.Commands;
 using Ogma.Application.UnitTests.Catalog.Helpers;
 using Ogma.Domain.Catalog.Entities;
 using Ogma.Domain.Catalog.Repositories;
+using Ogma.Domain.SharedKernel.BaseTypes;
 
 namespace Ogma.Application.UnitTests.Catalog.Tests.Commands;
 
@@ -11,11 +12,13 @@ public class DeleteItemHandlerTests
 {
     private readonly Mock<IItemRepository> _itemRepositoryMock;
     private readonly DeleteItemHandler _handler;
+    private readonly EntityMetadata _metadata;
 
     public DeleteItemHandlerTests()
     {
         _itemRepositoryMock = new Mock<IItemRepository>();
         _handler = new DeleteItemHandler(_itemRepositoryMock.Object);
+        _metadata = new EntityMetadata(DateTime.UtcNow, DateTime.UtcNow, 1);
     }
 
     [Fact]
@@ -23,7 +26,7 @@ public class DeleteItemHandlerTests
     {
         // Arrange
         var itemParameters = CatalogTestData.CreateItemParameters();
-        var item = Item.Reconstitute(1L, itemParameters);
+        var item = Item.Reconstitute(1L, itemParameters, _metadata);
         var command = new DeleteItemCommand(item.Id);
         _itemRepositoryMock.Setup(r => r.GetByIdAsync(item.Id))
             .ReturnsAsync(item);

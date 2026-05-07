@@ -36,6 +36,10 @@ namespace Ogma.Infrastructure.Persistence.Orders.Migrations
                         .HasColumnType("text")
                         .HasColumnName("additional_information");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("order_date");
@@ -52,6 +56,14 @@ namespace Ogma.Infrastructure.Persistence.Orders.Migrations
                     b.Property<long>("OrderTypeId")
                         .HasColumnType("bigint")
                         .HasColumnName("order_type_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("integer")
+                        .HasColumnName("version");
 
                     b.HasKey("Id")
                         .HasName("pk_orders");
@@ -74,6 +86,10 @@ namespace Ogma.Infrastructure.Persistence.Orders.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text")
@@ -83,6 +99,14 @@ namespace Ogma.Infrastructure.Persistence.Orders.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("name");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("integer")
+                        .HasColumnName("version");
 
                     b.HasKey("Id")
                         .HasName("pk_order_statuses");
@@ -104,10 +128,22 @@ namespace Ogma.Infrastructure.Persistence.Orders.Migrations
                         .HasColumnType("text")
                         .HasColumnName("code");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("description");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("integer")
+                        .HasColumnName("version");
 
                     b.HasKey("Id")
                         .HasName("pk_order_types");
@@ -148,6 +184,10 @@ namespace Ogma.Infrastructure.Persistence.Orders.Migrations
                                 .HasColumnType("numeric")
                                 .HasColumnName("cancelled_quantity");
 
+                            b1.Property<DateTime>("CreatedAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("created_at");
+
                             b1.Property<decimal>("ExchangeRate")
                                 .HasColumnType("numeric")
                                 .HasColumnName("exchange_rate");
@@ -177,6 +217,14 @@ namespace Ogma.Infrastructure.Persistence.Orders.Migrations
                                 .IsRequired()
                                 .HasColumnType("text")
                                 .HasColumnName("price_currency");
+
+                            b1.Property<DateTime>("UpdatedAt")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("updated_at");
+
+                            b1.Property<int>("Version")
+                                .HasColumnType("integer")
+                                .HasColumnName("version");
 
                             b1.HasKey("Id")
                                 .HasName("pk_order_lines");
