@@ -258,6 +258,28 @@ public class OrderLineTests
     }
 
     [Fact]
+    public void Update_ValidParameters_ShouldUpdateMetadata()
+    {
+        // Arrange
+        var orderItem = OrdersTestData.CreateOrderItem();
+        var orderLine = OrderLine.Create(orderItem, 10m, new Money(100m, "USD"));
+        var oldOrderLineMetadata = new EntityMetadata(orderLine.Metadata.CreatedAt, orderLine.Metadata.UpdatedAt, orderLine.Metadata.Version);
+        var newOrderItem = OrdersTestData.CreateOrderItem();
+        var newOrderedQuantity = 20m;
+        var newCancelledQuantity = 5m;
+        var newFullfilledQuantity = 10m;
+        var newPrice = new Money(150m, "USD");
+        var newExchangeRate = new ExchangeRate("USD", "EUR", 0.85m);
+        var newAdditionalInfo = "Updated info";
+        // Act
+        orderLine.Update(newOrderItem, newOrderedQuantity, newCancelledQuantity, newFullfilledQuantity, newPrice, newExchangeRate, newAdditionalInfo);
+        // Assert
+        orderLine.Metadata.CreatedAt.Should().Be(oldOrderLineMetadata.CreatedAt);
+        orderLine.Metadata.UpdatedAt.Should().BeAfter(oldOrderLineMetadata.UpdatedAt);
+        orderLine.Metadata.Version.Should().Be(oldOrderLineMetadata.Version + 1);
+    }
+
+    [Fact]
     public void Update_NullOrderItem_ShouldThrowArgumentNullException()
     {
         // Arrange

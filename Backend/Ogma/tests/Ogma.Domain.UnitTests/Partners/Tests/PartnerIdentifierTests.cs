@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Ogma.Domain.Partners.Entities;
+using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.SharedKernel.ValueObjects;
 using Ogma.Domain.UnitTests.Partners.Helpers;
 
@@ -183,6 +184,22 @@ public class PartnerIdentifierTests
         partnerIdentifier.IsPrimary.Should().Be(newIsPrimary);
     }
 
+    [Fact]
+    public void Update_ValidParameters_UpdatesMetadataCorrectly()
+    {
+        // Arrange
+        var partnerIdentifier = PartnerIdentifier.Create("TaxID", "123-45-6789");
+        var oldPartnerIdentifierTypeMetadata = new EntityMetadata(partnerIdentifier.Metadata.CreatedAt, partnerIdentifier.Metadata.UpdatedAt, partnerIdentifier.Metadata.Version);
+        string newType = "BusinessID";
+        string newValue = "987-65-4321";
+        // Act
+        partnerIdentifier.Update(newType, newValue);
+        // Assert
+        partnerIdentifier.Metadata.CreatedAt.Should().Be(oldPartnerIdentifierTypeMetadata.CreatedAt);
+        partnerIdentifier.Metadata.UpdatedAt.Should().BeAfter(oldPartnerIdentifierTypeMetadata.UpdatedAt);
+        partnerIdentifier.Metadata.Version.Should().Be(oldPartnerIdentifierTypeMetadata.Version + 1);
+    }
+
     [Theory]
     [InlineData(null)]
     [InlineData("")]
@@ -251,7 +268,7 @@ public class PartnerIdentifierTests
     public void UnmarkAsPrimary_SetsIsPrimaryToTrue()
     {
         // Arrange
-        var partnerIdentifier = PartnerIdentifier.Create("TaxID", "123-45-6789", isPrimary:true);
+        var partnerIdentifier = PartnerIdentifier.Create("TaxID", "123-45-6789", isPrimary: true);
         // Act
         partnerIdentifier.UnmarkAsPrimary();
         // Assert

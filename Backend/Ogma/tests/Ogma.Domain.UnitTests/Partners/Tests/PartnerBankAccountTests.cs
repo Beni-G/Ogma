@@ -104,6 +104,22 @@ public class PartnerBankAccountTests
     }
 
     [Fact]
+    public void UpdateBankAccount_ValidParameters_UpdatesMetadataCorrectly()
+    {
+        // Arrange
+        var partnerBankAccount = PartnerBankAccount.Create(new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX"));
+        var oldPartnerBankAccountMetadata = new EntityMetadata(partnerBankAccount.Metadata.CreatedAt, partnerBankAccount.Metadata.UpdatedAt, partnerBankAccount.Metadata.Version);
+        var newBankAccount = new BankAccount("New Bank", "DE89370400440532013000", "usd", "NEWBDEFFXXX");
+        var isDefault = true;
+        // Act
+        partnerBankAccount.UpdateBankAccount(newBankAccount, isDefault);
+        // Assert
+        partnerBankAccount.Metadata.CreatedAt.Should().Be(oldPartnerBankAccountMetadata.CreatedAt);
+        partnerBankAccount.Metadata.UpdatedAt.Should().BeAfter(oldPartnerBankAccountMetadata.UpdatedAt);
+        partnerBankAccount.Metadata.Version.Should().Be(oldPartnerBankAccountMetadata.Version + 1);
+    }
+
+    [Fact]
     public void UpdateBankAccount_NullBankAccount_ThrowsArgumentNullException()
     {
         // Arrange

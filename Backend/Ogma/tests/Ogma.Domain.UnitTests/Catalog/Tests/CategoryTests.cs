@@ -1,8 +1,10 @@
 ﻿using FluentAssertions;
 using Ogma.Domain.Catalog.Entities;
+using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.UnitTests.Catalog.Helpers;
 
 namespace Ogma.Domain.UnitTests.Catalog.Tests;
+
 public class CategoryTests
 {
     [Fact]
@@ -118,7 +120,7 @@ public class CategoryTests
     [InlineData("2/2/99")] // Path with duplicate IDs
     public void Reconstitute_InvalidPath_ThrowsArgumentException(string path)
     {
-        Assert.Throws<ArgumentException>(() => Category.Reconstitute(1,"category", CatalogTestData.GetMetadata(), 99, path));
+        Assert.Throws<ArgumentException>(() => Category.Reconstitute(1, "category", CatalogTestData.GetMetadata(), 99, path));
     }
 
     [Fact]
@@ -135,6 +137,24 @@ public class CategoryTests
         // Assert
         category.Name.Should().Be(newName);
         category.ParentCategoryId.Should().Be(newParentCategoryId);
+    }
+
+    [Fact]
+    public void Update_ValidProperties_UpdatesMetadataCorrectly()
+    {
+        // Arrange
+        var category = Category.Create("initial name", 1);
+        var oldCategoryMetadata = new EntityMetadata(category.Metadata.CreatedAt, category.Metadata.UpdatedAt, category.Metadata.Version);
+        string newName = "updated name";
+        long newParentCategoryId = 2;
+
+        // Act
+        category.Update(newName, newParentCategoryId);
+
+        // Assert
+        category.Metadata.CreatedAt.Should().Be(oldCategoryMetadata.CreatedAt);
+        category.Metadata.UpdatedAt.Should().BeAfter(oldCategoryMetadata.UpdatedAt);
+        category.Metadata.Version.Should().Be(oldCategoryMetadata.Version + 1);
     }
 
     [Fact]

@@ -1,5 +1,7 @@
 ﻿using FluentAssertions;
+using Ogma.Domain.Orders.Entities;
 using Ogma.Domain.Partners.Entities;
+using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.SharedKernel.ValueObjects;
 using Ogma.Domain.UnitTests.Partners.Helpers;
 
@@ -162,6 +164,34 @@ public class PartnerContactTests
         contact.Title.Should().Be(newTitle);
         contact.JobTitle.Should().Be(newJobTitle);
         contact.IsPrimary.Should().Be(newIsPrimary);
+    }
+
+    [Fact]
+    public void UpdateDetails_ValidParameters_UpdatesMetadataCorrectly()
+    {
+        // Arrange
+        var contact = PartnerContact.Create(new PersonName("John", "Doe"));
+        var oldContactMetadata = new EntityMetadata(contact.Metadata.CreatedAt, contact.Metadata.UpdatedAt, contact.Metadata.Version);
+        var newName = new PersonName("Jane", "Smith");
+        var newEmail = new Email("abc@mail.com");
+        string newPhone = "1234567890";
+        string newMobile = "0987654321";
+        string newTitle = "Ms.";
+        string newJobTitle = "Director";
+        bool newIsPrimary = true;
+        // Act
+        contact.UpdateContactDetails(
+            newName,
+            newEmail,
+            newPhone,
+            newMobile,
+            newTitle,
+            newJobTitle,
+            newIsPrimary);
+        // Assert
+        contact.Metadata.CreatedAt.Should().Be(oldContactMetadata.CreatedAt);
+        contact.Metadata.UpdatedAt.Should().BeAfter(oldContactMetadata.UpdatedAt);
+        contact.Metadata.Version.Should().Be(oldContactMetadata.Version + 1);
     }
 
     [Fact]

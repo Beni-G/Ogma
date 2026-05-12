@@ -397,15 +397,27 @@ public class OrderTests
     public void Update_ValidParameters_ShouldUpdateProperties()
     {
         // Arrange
-        var order = Order.Create(OrdersTestData.CreateOrderPartner(), "123", DateTime.Now, 1L, 1L);
+        var orderLineToUpdate = new OrderLineBuilder()
+            .Build();
+        var orderLineToRemove = new OrderLineBuilder()
+            .Build();
+        var order = new OrderBuilder()
+            .WithLine(orderLineToUpdate)
+            .WithLine(orderLineToRemove)
+            .Build();
         var newOrderPartner = OrdersTestData.CreateOrderPartner();
         var newOrderNumber = "456";
         var newOrderDate = DateTime.Now.AddDays(1);
         var newOrderTypeId = 2L;
         var newOrderStatusId = 2L;
         var newAdditionalInformation = "Updated order";
+        var newOrderLines = new List<OrderLineInput>
+        {
+            new OrderLineInput(orderLineToUpdate.Id, OrdersTestData.CreateOrderItem(), 10, 0, 0, new Money(100, "EUR")),
+            new OrderLineInput(0, OrdersTestData.CreateOrderItem(), 20, 0, 0, new Money(200, "EUR"))
+        };
         // Act
-        order.Update(newOrderPartner, newOrderNumber, newOrderDate, newOrderTypeId, newOrderStatusId, newAdditionalInformation, new List<OrderLineInput>());
+        order.Update(newOrderPartner, newOrderNumber, newOrderDate, newOrderTypeId, newOrderStatusId, newAdditionalInformation, newOrderLines);
         // Assert
         order.OrderPartner.Should().Be(newOrderPartner);
         order.OrderNumber.Should().Be(newOrderNumber);
@@ -413,6 +425,38 @@ public class OrderTests
         order.OrderTypeId.Should().Be(newOrderTypeId);
         order.OrderStatusId.Should().Be(newOrderStatusId);
         order.AdditionalInformation.Should().Be(newAdditionalInformation);
+        order.OrderLines.Should().HaveCount(2);
+        order.OrderLines.First().Id.Should().Be(newOrderLines.First().Id);
+        order.OrderLines.First().OrderedQuantity.Should().Be(newOrderLines.First().OrderedQuantity);
+        order.OrderLines.ElementAt(1).Id.Should().Be(newOrderLines.ElementAt(1).Id);
+        order.OrderLines.ElementAt(1).OrderedQuantity.Should().Be(newOrderLines.ElementAt(1).OrderedQuantity);
+        order.OrderLines.Should().NotContain(l => l.Id == orderLineToRemove.Id);
+    }
+
+    [Fact]
+    public void Update_ValidParameters_ShouldUpdateMetadata()
+    {
+        // Arrange
+        var orderLine = new OrderLineBuilder()
+            .Build();
+        var oldOrderLineMetadata = new EntityMetadata(orderLine.Metadata.CreatedAt, orderLine.Metadata.UpdatedAt, orderLine.Metadata.Version);
+        var order = new OrderBuilder()
+            .WithLine(orderLine)
+            .Build();
+        var oldOrderMetadata = new EntityMetadata(order.Metadata.CreatedAt, order.Metadata.UpdatedAt, order.Metadata.Version);
+        var newOrderLines = new List<OrderLineInput>
+        {
+            new OrderLineInput(orderLine.Id, OrdersTestData.CreateOrderItem(), 10, 0, 0, new Money(100, "EUR"))
+        };
+        // Act
+        order.Update(OrdersTestData.CreateOrderPartner(), "123", DateTime.UtcNow.AddDays(1), 2L, 2L, "info", newOrderLines);
+        // Assert
+        order.Metadata.CreatedAt.Should().Be(oldOrderMetadata.CreatedAt);
+        order.Metadata.UpdatedAt.Should().BeAfter(oldOrderMetadata.UpdatedAt);
+        order.Metadata.Version.Should().Be(oldOrderMetadata.Version + 1);
+        order.OrderLines.First().Metadata.CreatedAt.Should().Be(oldOrderLineMetadata.CreatedAt);
+        order.OrderLines.First().Metadata.UpdatedAt.Should().BeAfter(oldOrderLineMetadata.UpdatedAt);
+        order.OrderLines.First().Metadata.Version.Should().Be(oldOrderLineMetadata.Version + 1);
     }
 
     [Fact]
