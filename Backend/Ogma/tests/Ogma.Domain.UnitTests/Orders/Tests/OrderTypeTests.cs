@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Ogma.Domain.Orders.Entities;
+using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.UnitTests.Orders.Helpers;
 
 namespace Ogma.Domain.UnitTests.Orders.Tests;
@@ -74,7 +75,7 @@ public class OrderTypeTests
     }
 
     [Fact]
-    public void Update_ValidParameters_ShouldCreateOrderType()
+    public void Update_ValidParameters_ShouldUpdateOrderType()
     {
         // Arrange
         var orderType = OrderType.Reconstitute(1L, "custord", "Customer Orders", OrdersTestData.GetMetadata());
@@ -85,6 +86,22 @@ public class OrderTypeTests
         // Arrange
         orderType.Code.Should().Be(newCode);
         orderType.Description.Should().Be(newDescription);
+    }
+
+    [Fact]
+    public void Update_ValidParameters_ShouldUpdateMetadata()
+    {
+        // Arrange
+        var orderType = OrderType.Reconstitute(1L, "custord", "Customer Orders", OrdersTestData.GetMetadata());
+        var oldOrderTypeMetadata = new EntityMetadata(orderType.Metadata.CreatedAt, orderType.Metadata.UpdatedAt, orderType.Metadata.Version);
+        var newCode = "sales_ord";
+        var newDescription = "Sales order";
+        // Act
+        orderType.Update(newCode, newDescription);
+        // Arrange
+        orderType.Metadata.CreatedAt.Should().Be(oldOrderTypeMetadata.CreatedAt);
+        orderType.Metadata.UpdatedAt.Should().BeAfter(oldOrderTypeMetadata.UpdatedAt);
+        orderType.Metadata.Version.Should().Be(oldOrderTypeMetadata.Version + 1);
     }
 
     [Theory]

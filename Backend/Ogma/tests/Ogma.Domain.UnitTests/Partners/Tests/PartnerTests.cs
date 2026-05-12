@@ -1,12 +1,8 @@
 ﻿using FluentAssertions;
 using Ogma.Domain.Partners.Entities;
+using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.SharedKernel.ValueObjects;
 using Ogma.Domain.UnitTests.Partners.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ogma.Domain.UnitTests.Partners.Tests;
 
@@ -212,7 +208,7 @@ public class PartnerTests
         var bankAccounts = new List<PartnerBankAccount>();
         var contacts = new List<PartnerContact>();
         // Act & Assert
-        Assert.Throws<ArgumentException>(() => 
+        Assert.Throws<ArgumentException>(() =>
             Partner.Reconstitute(invalidId, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roleIds, bankAccounts, contacts, PartnersTestData.GetMetadata()));
     }
 
@@ -235,7 +231,7 @@ public class PartnerTests
         var bankAccounts = new List<PartnerBankAccount>();
         var contacts = new List<PartnerContact>();
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => 
+        Assert.Throws<InvalidOperationException>(() =>
             Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roleIds, bankAccounts, contacts, PartnersTestData.GetMetadata()));
     }
 
@@ -256,7 +252,7 @@ public class PartnerTests
         var bankAccounts = new List<PartnerBankAccount>();
         var contacts = new List<PartnerContact>();
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => 
+        Assert.Throws<InvalidOperationException>(() =>
             Partner.Reconstitute(id, null, null, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roleIds, bankAccounts, contacts, PartnersTestData.GetMetadata()));
     }
 
@@ -279,7 +275,7 @@ public class PartnerTests
         var bankAccounts = new List<PartnerBankAccount>();
         var contacts = new List<PartnerContact>();
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => 
+        Assert.Throws<InvalidOperationException>(() =>
             Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roleIds, bankAccounts, contacts, PartnersTestData.GetMetadata()));
     }
 
@@ -302,7 +298,7 @@ public class PartnerTests
         var bankAccounts = new List<PartnerBankAccount>();
         var contacts = new List<PartnerContact>();
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => 
+        Assert.Throws<InvalidOperationException>(() =>
             Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roleIds, bankAccounts, contacts, PartnersTestData.GetMetadata()));
     }
 
@@ -321,7 +317,7 @@ public class PartnerTests
         var bankAccounts = new List<PartnerBankAccount>();
         var contacts = new List<PartnerContact>();
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => 
+        Assert.Throws<ArgumentNullException>(() =>
             Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, null!, roleIds, bankAccounts, contacts, PartnersTestData.GetMetadata()));
     }
 
@@ -341,7 +337,7 @@ public class PartnerTests
         var bankAccounts = new List<PartnerBankAccount>();
         var contacts = new List<PartnerContact>();
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => 
+        Assert.Throws<InvalidOperationException>(() =>
             Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roleIds, bankAccounts, contacts, PartnersTestData.GetMetadata()));
     }
 
@@ -363,7 +359,7 @@ public class PartnerTests
         var bankAccounts = new List<PartnerBankAccount>();
         var contacts = new List<PartnerContact>();
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => 
+        Assert.Throws<ArgumentNullException>(() =>
             Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, null!, bankAccounts, contacts, PartnersTestData.GetMetadata()));
     }
 
@@ -386,7 +382,7 @@ public class PartnerTests
         var bankAccounts = new List<PartnerBankAccount>();
         var contacts = new List<PartnerContact>();
         // Act & Assert
-        Assert.Throws<InvalidOperationException>(() => 
+        Assert.Throws<InvalidOperationException>(() =>
             Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roleIds, bankAccounts, contacts, PartnersTestData.GetMetadata()));
     }
 
@@ -408,7 +404,7 @@ public class PartnerTests
         var roleIds = new List<long> { 1L, 2L };
         var contacts = new List<PartnerContact>();
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => 
+        Assert.Throws<ArgumentNullException>(() =>
             Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roleIds, null!, contacts, PartnersTestData.GetMetadata()));
     }
 
@@ -430,7 +426,7 @@ public class PartnerTests
         var roleIds = new List<long> { 1L, 2L };
         var bankAccounts = new List<PartnerBankAccount>();
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => 
+        Assert.Throws<ArgumentNullException>(() =>
             Partner.Reconstitute(id, individualName, companyName, isNaturalPerson, isActive, displayName, mainAddress, identifiers, roleIds, bankAccounts, null!, PartnersTestData.GetMetadata()));
     }
 
@@ -643,6 +639,49 @@ public class PartnerTests
     }
 
     [Fact]
+    public void Update_ValidParameters_UpdatesMetadataCorrectly()
+    {
+        // Arrange
+        var partner = Partner.Reconstitute(
+            1L,
+            null,
+            "Acme Corp",
+            false,
+            true,
+            null,
+            null,
+            new List<PartnerIdentifier>()
+            {
+                PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
+            },
+            new List<long>() { 1L },
+            new List<PartnerBankAccount>(),
+            new List<PartnerContact>(),
+            PartnersTestData.GetMetadata());
+        var oldPartnerMetadata = new EntityMetadata(partner.Metadata.CreatedAt, partner.Metadata.UpdatedAt, partner.Metadata.Version);
+        var newIndividualName = new PersonName("John", "Doe");
+        // Act
+        partner.Update(
+            newIndividualName,
+            null,
+            true,
+            true,
+            null,
+            null,
+            new List<PartnerIdentifier>()
+            {
+                PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
+            },
+            new List<long>() { 2L },
+            new List<PartnerBankAccount>(),
+            new List<PartnerContact>());
+        // Assert
+        partner.Metadata.CreatedAt.Should().Be(oldPartnerMetadata.CreatedAt);
+        partner.Metadata.UpdatedAt.Should().BeAfter(oldPartnerMetadata.UpdatedAt);
+        partner.Metadata.Version.Should().Be(oldPartnerMetadata.Version + 1);
+    }
+
+    [Fact]
     public void Update_IsNaturalPersonNoIndividualName_ThrowsInvalidOperationException()
     {
         // Arrange
@@ -717,7 +756,7 @@ public class PartnerTests
                 new List<PartnerBankAccount>(),
                 new List<PartnerContact>()));
     }
-    
+
     [Fact]
     public void Update_BothCompanyAndIndividualNameProvided_ThrowsInvalidOperationException()
     {
@@ -1131,7 +1170,7 @@ public class PartnerTests
     [InlineData(true, "John", "Doe", null, "John Doe")]
     [InlineData(true, "Alice", "O'Connor", null, "Alice O'Connor")]
     [InlineData(false, null, null, "Acme Corp", "Acme Corp")]
-    [InlineData(false, null, null, "  MegaInc  ", "  MegaInc  ")]   
+    [InlineData(false, null, null, "  MegaInc  ", "  MegaInc  ")]
     public void FullName_ReturnsCorrectValue(
         bool isNaturalPerson,
         string? firstName,

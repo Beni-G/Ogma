@@ -4,6 +4,7 @@ using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.UnitTests.Catalog.Helpers;
 
 namespace Ogma.Domain.UnitTests.Catalog.Tests;
+
 public class ItemTypeTests
 {
     [Fact]
@@ -114,6 +115,24 @@ public class ItemTypeTests
         // Assert
         itemType.Name.Should().Be(newName);
         itemType.Description.Should().Be(newDescription);
+    }
+
+    [Fact]
+    public void Update_ValidNameAndDescription_UpdatesMetadataCorrectly()
+    {
+        // Arrange
+        var itemType = ItemType.Create("OldName", "OldDescription");
+        var oldItemTypeMetadata = new EntityMetadata(itemType.Metadata.CreatedAt, itemType.Metadata.UpdatedAt, itemType.Metadata.Version);
+        string newName = "NewName";
+        string newDescription = "NewDescription";
+
+        // Act
+        itemType.Update(newName, newDescription);
+
+        // Assert
+        itemType.Metadata.CreatedAt.Should().Be(oldItemTypeMetadata.CreatedAt);
+        itemType.Metadata.UpdatedAt.Should().BeAfter(oldItemTypeMetadata.UpdatedAt);
+        itemType.Metadata.Version.Should().Be(oldItemTypeMetadata.Version + 1);
     }
 
     [Theory]

@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Ogma.Domain.Partners.Entities;
+using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.UnitTests.Partners.Helpers;
 
 namespace Ogma.Domain.UnitTests.Partners.Tests;
@@ -141,7 +142,7 @@ public class PartnerRoleTypeTests
     }
 
     [Fact]
-    public void Update_ValidParameters_ShouldUpdateProperties()
+    public void Update_ValidParameters_UpdatesPropertiesCorrectly()
     {
         // Arrange
         var partnerRole = PartnerRoleType.Create("OLD_CODE", "Old Name", "#000000");
@@ -154,6 +155,22 @@ public class PartnerRoleTypeTests
         partnerRole.Code.Should().Be(newCode);
         partnerRole.Name.Should().Be(newName);
         partnerRole.Color.Should().Be(newColor);
+    }
+
+    [Fact]
+    public void Update_ValidParameters_UpdatesMetadataCorrectly()
+    {
+        // Arrange
+        var partnerRoleType = PartnerRoleType.Create("OLD_CODE", "Old Name");
+        var oldPartnerRoleTypeMetadata = new EntityMetadata(partnerRoleType.Metadata.CreatedAt, partnerRoleType.Metadata.UpdatedAt, partnerRoleType.Metadata.Version);
+        var newCode = "NEW_CODE";
+        var newName = "New Name";
+        // Act
+        partnerRoleType.Update(newCode, newName);
+        // Assert
+        partnerRoleType.Metadata.CreatedAt.Should().Be(oldPartnerRoleTypeMetadata.CreatedAt);
+        partnerRoleType.Metadata.UpdatedAt.Should().BeAfter(oldPartnerRoleTypeMetadata.UpdatedAt);
+        partnerRoleType.Metadata.Version.Should().Be(oldPartnerRoleTypeMetadata.Version + 1);
     }
 
     [Theory]

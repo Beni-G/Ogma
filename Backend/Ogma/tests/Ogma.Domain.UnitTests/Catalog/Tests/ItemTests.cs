@@ -1,6 +1,8 @@
 ﻿using FluentAssertions;
 using Ogma.Domain.Catalog.Entities;
 using Ogma.Domain.Catalog.Parameters;
+using Ogma.Domain.Orders.Entities;
+using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.SharedKernel.ValueObjects;
 using Ogma.Domain.UnitTests.Catalog.Helpers;
 
@@ -292,6 +294,21 @@ public class ItemTests
         item.ItemTypeId.Should().Be(updatedParameters.ItemTypeId);
         item.UnitOfMeasurement.Should().Be(updatedParameters.UnitOfMeasurement);
         item.IsActive.Should().Be(updatedParameters.IsActive);
+    }
+
+    [Fact]
+    public void UpdateItem_ValidParameters_UpdatesMetadataCorrectly()
+    {
+        // Arrange
+        var item = CatalogTestData.CreateItem();
+        var oldItemMetadata = new EntityMetadata(item.Metadata.CreatedAt, item.Metadata.UpdatedAt, item.Metadata.Version);
+        var updatedParameters = CatalogTestData.CreateItemParameters();
+        // Act
+        item.UpdateItem(updatedParameters);
+        // Assert
+        item.Metadata.CreatedAt.Should().Be(oldItemMetadata.CreatedAt);
+        item.Metadata.UpdatedAt.Should().BeAfter(oldItemMetadata.UpdatedAt);
+        item.Metadata.Version.Should().Be(oldItemMetadata.Version + 1);
     }
 
     [Fact]

@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Ogma.Domain.Orders.Entities;
+using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.UnitTests.Orders.Helpers;
 
 namespace Ogma.Domain.UnitTests.Orders.Tests;
@@ -77,6 +78,22 @@ public class OrderStatusTests
         // Assert
         orderStatus.Name.Should().Be(newName);
         orderStatus.Description.Should().Be(newDescription);
+    }
+
+    [Fact]
+    public void Update_ValidParameters_ShouldUpdateMetadata()
+    {
+        // Arrange
+        var orderStatus = OrderStatus.Create("Processing", "Order is being processed.");
+        var oldOrderStatusMetadata = new EntityMetadata(orderStatus.Metadata.CreatedAt, orderStatus.Metadata.UpdatedAt, orderStatus.Metadata.Version);
+        var newName = "Completed";
+        var newDescription = "Order has been completed.";
+        // Act
+        orderStatus.Update(newName, newDescription);
+        // Assert
+        orderStatus.Metadata.CreatedAt.Should().Be(oldOrderStatusMetadata.CreatedAt);
+        orderStatus.Metadata.UpdatedAt.Should().BeAfter(oldOrderStatusMetadata.UpdatedAt);
+        orderStatus.Metadata.Version.Should().Be(oldOrderStatusMetadata.Version + 1);
     }
 
     [Theory]
