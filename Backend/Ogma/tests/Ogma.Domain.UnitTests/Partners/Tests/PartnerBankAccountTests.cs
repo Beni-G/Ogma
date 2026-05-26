@@ -97,7 +97,7 @@ public class PartnerBankAccountTests
         var newBankAccount = new BankAccount("New Bank", "DE89370400440532013000", "usd", "NEWBDEFFXXX");
         var isDefault = true;
         // Act
-        partnerBankAccount.UpdateBankAccount(newBankAccount, isDefault);
+        partnerBankAccount.Update(newBankAccount, isDefault);
         // Assert
         partnerBankAccount.BankAccount.Should().Be(newBankAccount);
         partnerBankAccount.IsDefault.Should().BeTrue();
@@ -112,7 +112,7 @@ public class PartnerBankAccountTests
         var newBankAccount = new BankAccount("New Bank", "DE89370400440532013000", "usd", "NEWBDEFFXXX");
         var isDefault = true;
         // Act
-        partnerBankAccount.UpdateBankAccount(newBankAccount, isDefault);
+        partnerBankAccount.Update(newBankAccount, isDefault);
         // Assert
         partnerBankAccount.Metadata.CreatedAt.Should().Be(oldPartnerBankAccountMetadata.CreatedAt);
         partnerBankAccount.Metadata.UpdatedAt.Should().BeAfter(oldPartnerBankAccountMetadata.UpdatedAt);
@@ -125,6 +125,6 @@ public class PartnerBankAccountTests
         // Arrange
         var partnerBankAccount = PartnerBankAccount.Create(new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX"));
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => partnerBankAccount.UpdateBankAccount(null!, true));
+        Assert.Throws<ArgumentNullException>(() => partnerBankAccount.Update(null!, true));
     }
 }

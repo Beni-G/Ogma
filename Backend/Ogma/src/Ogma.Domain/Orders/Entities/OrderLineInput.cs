@@ -1,5 +1,4 @@
 ﻿using Ogma.Domain.Orders.ValueObjects;
-using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.SharedKernel.ValueObjects;
 
 namespace Ogma.Domain.Orders.Entities;

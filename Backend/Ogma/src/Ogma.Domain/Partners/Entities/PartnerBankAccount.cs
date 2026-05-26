@@ -53,7 +53,7 @@ public class PartnerBankAccount : Entity<long>
     public static PartnerBankAccount Reconstitute(long id, BankAccount bankAccount, EntityMetadata metadata, bool isDefault = false) 
         => new(id, bankAccount, metadata, isDefault);
 
-    public void UpdateBankAccount(BankAccount bankAccount, bool isDefault)
+    public void Update(BankAccount bankAccount, bool isDefault)
     {
         BankAccount = bankAccount ?? throw new ArgumentNullException(nameof(bankAccount));
         IsDefault = isDefault;

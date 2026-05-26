@@ -454,18 +454,18 @@ public class PartnerTests
         var newIndividualName = new PersonName("New", "Name");
         string newDisplayName = "New Name";
         bool newIsActive = false;
-        List<PartnerIdentifier> newIdentifiers = new()
+        List<PartnerIdentifierInput> newIdentifiers = new()
         {
-            PartnerIdentifier.Create("SSN", "111-11-1111", isPrimary: true)
+            PartnersTestData.Identifiers.Random(0, "PassNo")
         };
         List<long> newRoleIds = new() { 2L, 3L };
-        List<PartnerBankAccount> newBankAccounts = new()
+        List<PartnerBankAccountInput> newBankAccounts = new()
         {
-            PartnerBankAccount.Create(new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX"))
+            PartnersTestData.BankAccounts.Random(0L)
         };
-        List<PartnerContact> newContacts = new()
+        List<PartnerContactInput> newContacts = new()
         {
-            PartnerContact.Create(new PersonName("Jon", "Snow"))
+            PartnersTestData.Contacts.Random(0L)
         };
         // Act
         partner.Update(
@@ -486,10 +486,20 @@ public class PartnerTests
         partner.IsActive.Should().Be(newIsActive);
         partner.DisplayName.Should().Be(newDisplayName);
         partner.HQAddress.Should().Be(_defaultAddress);
-        partner.Identifiers.Should().BeEquivalentTo(newIdentifiers);
+
         partner.RoleIds.Should().BeEquivalentTo(newRoleIds);
-        partner.BankAccounts.Should().BeEquivalentTo(newBankAccounts);
-        partner.Contacts.Should().BeEquivalentTo(newContacts);
+        partner.Identifiers.Should().BeEquivalentTo(newIdentifiers, opt => opt.ExcludingMissingMembers());
+        partner.BankAccounts.Should().BeEquivalentTo(newBankAccounts, opt => opt.ExcludingMissingMembers());
+
+        partner.Contacts.Should().BeEquivalentTo(newContacts, options => options
+            .ExcludingMissingMembers()
+            .Using<object>(ctx => {
+                var actual = ctx.Subject?.ToString();
+                var expected = ctx.Expectation?.ToString();
+                actual.Should().Be(expected);
+            })
+            .When(info => info.Path.EndsWith("Email"))
+        );
     }
 
     [Fact]
@@ -516,18 +526,21 @@ public class PartnerTests
         var newCompanyName = "Firma Medie SRL";
         string newDisplayName = "Mediumy";
         bool newIsActive = false;
-        List<PartnerIdentifier> newIdentifiers = new()
+        List<PartnerIdentifierInput> newIdentifiers = new()
         {
-            PartnerIdentifier.Create("CUI", "111-11-1111", isPrimary: true)
+            PartnersTestData.Identifiers.Random(0L, "VATNo"),
+            PartnersTestData.Identifiers.Random(0L, "RegNo")
         };
         List<long> newRoleIds = new() { 2L, 3L };
-        List<PartnerBankAccount> newBankAccounts = new()
+        List<PartnerBankAccountInput> newBankAccounts = new()
         {
-            PartnerBankAccount.Create(new BankAccount("Big Bank", "DE12 5001 0517 0648 4898 90", "eur", "COBADEFFXXX"))
+            PartnersTestData.BankAccounts.Random(0L),
+            PartnersTestData.BankAccounts.Random(0L)
         };
-        List<PartnerContact> newContacts = new()
+        List<PartnerContactInput> newContacts = new()
         {
-            PartnerContact.Create(new PersonName("Jon", "Snow"))
+            PartnersTestData.Contacts.Random(0L),
+            PartnersTestData.Contacts.Random(0L)
         };
         // Act
         partner.Update(
@@ -548,10 +561,20 @@ public class PartnerTests
         partner.IsActive.Should().Be(newIsActive);
         partner.DisplayName.Should().Be(newDisplayName);
         partner.HQAddress.Should().Be(_defaultAddress);
-        partner.Identifiers.Should().BeEquivalentTo(newIdentifiers);
+
         partner.RoleIds.Should().BeEquivalentTo(newRoleIds);
-        partner.BankAccounts.Should().BeEquivalentTo(newBankAccounts);
-        partner.Contacts.Should().BeEquivalentTo(newContacts);
+        partner.Identifiers.Should().BeEquivalentTo(newIdentifiers, opt => opt.ExcludingMissingMembers());
+        partner.BankAccounts.Should().BeEquivalentTo(newBankAccounts, opt => opt.ExcludingMissingMembers());
+
+        partner.Contacts.Should().BeEquivalentTo(newContacts, options => options
+            .ExcludingMissingMembers()
+            .Using<object>(ctx => {
+                var actual = ctx.Subject?.ToString();
+                var expected = ctx.Expectation?.ToString();
+                actual.Should().Be(expected);
+            })
+            .When(info => info.Path.EndsWith("Email"))
+        );
     }
 
     [Fact]
@@ -583,13 +606,13 @@ public class PartnerTests
             true,
             null,
             null,
-            new List<PartnerIdentifier>()
+            new List<PartnerIdentifierInput>()
             {
-                PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
+                PartnersTestData.Identifiers.From(partner.Identifiers.First())
             },
             new List<long>() { 2L },
-            new List<PartnerBankAccount>(),
-            new List<PartnerContact>());
+            new List<PartnerBankAccountInput>(),
+            new List<PartnerContactInput>());
         // Assert
         partner.IndividualName.Should().BeNull();
         partner.CompanyName.Should().Be(newCompanyName);
@@ -625,13 +648,13 @@ public class PartnerTests
             true,
             null,
             null,
-            new List<PartnerIdentifier>()
+            new List<PartnerIdentifierInput>()
             {
-                PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
+                PartnersTestData.Identifiers.From(partner.Identifiers.First())
             },
             new List<long>() { 2L },
-            new List<PartnerBankAccount>(),
-            new List<PartnerContact>());
+            new List<PartnerBankAccountInput>(),
+            new List<PartnerContactInput>());
         // Assert
         partner.CompanyName.Should().BeNull();
         partner.IndividualName.Should().Be(newIndividualName);
@@ -668,13 +691,13 @@ public class PartnerTests
             true,
             null,
             null,
-            new List<PartnerIdentifier>()
+            new List<PartnerIdentifierInput>()
             {
-                PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
+                PartnersTestData.Identifiers.From(partner.Identifiers.First())
             },
             new List<long>() { 2L },
-            new List<PartnerBankAccount>(),
-            new List<PartnerContact>());
+            new List<PartnerBankAccountInput>(),
+            new List<PartnerContactInput>());
         // Assert
         partner.Metadata.CreatedAt.Should().Be(oldPartnerMetadata.CreatedAt);
         partner.Metadata.UpdatedAt.Should().BeAfter(oldPartnerMetadata.UpdatedAt);
@@ -710,13 +733,13 @@ public class PartnerTests
                 true,
                 null,
                 null,
-                new List<PartnerIdentifier>()
+                new List<PartnerIdentifierInput>()
                 {
-                    PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
+                    PartnersTestData.Identifiers.From(partner.Identifiers.First())
                 },
                 new List<long>() { 2L },
-                new List<PartnerBankAccount>(),
-                new List<PartnerContact>()));
+                new List<PartnerBankAccountInput>(),
+                new List<PartnerContactInput>()));
     }
 
     [Fact]
@@ -748,13 +771,13 @@ public class PartnerTests
                 true,
                 null,
                 null,
-                new List<PartnerIdentifier>()
+                new List<PartnerIdentifierInput>()
                 {
-                    PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
+                    PartnersTestData.Identifiers.From(partner.Identifiers.First())
                 },
                 new List<long>() { 2L },
-                new List<PartnerBankAccount>(),
-                new List<PartnerContact>()));
+                new List<PartnerBankAccountInput>(),
+                new List<PartnerContactInput>()));
     }
 
     [Fact]
@@ -786,13 +809,13 @@ public class PartnerTests
                 true,
                 null,
                 null,
-                new List<PartnerIdentifier>()
+                new List<PartnerIdentifierInput>()
                 {
-                    PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
+                    PartnersTestData.Identifiers.From(partner.Identifiers.First())
                 },
                 new List<long>() { 2L },
-                new List<PartnerBankAccount>(),
-                new List<PartnerContact>()));
+                new List<PartnerBankAccountInput>(),
+                new List<PartnerContactInput>()));
     }
 
     [Fact]
@@ -824,13 +847,13 @@ public class PartnerTests
                 true,
                 null,
                 null,
-                new List<PartnerIdentifier>()
+                new List<PartnerIdentifierInput>()
                 {
-                    PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
+                    PartnersTestData.Identifiers.From(partner.Identifiers.First())
                 },
                 new List<long>() { 2L },
-                new List<PartnerBankAccount>(),
-                new List<PartnerContact>()));
+                new List<PartnerBankAccountInput>(),
+                new List<PartnerContactInput>()));
     }
 
     [Fact]
@@ -862,13 +885,13 @@ public class PartnerTests
                 true,
                 null,
                 null,
-                new List<PartnerIdentifier>()
+                new List<PartnerIdentifierInput>()
                 {
-                    PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
+                    PartnersTestData.Identifiers.From(partner.Identifiers.First())
                 },
                 new List<long>() { 2L },
-                new List<PartnerBankAccount>(),
-                new List<PartnerContact>()));
+                new List<PartnerBankAccountInput>(),
+                new List<PartnerContactInput>()));
     }
 
     [Fact]
@@ -900,13 +923,13 @@ public class PartnerTests
                 true,
                 null,
                 null,
-                new List<PartnerIdentifier>()
+                new List<PartnerIdentifierInput>()
                 {
-                    PartnerIdentifier.Create("Abc", "111-11-1111", isPrimary: true)
+                    PartnersTestData.Identifiers.From(partner.Identifiers.First())
                 },
                 new List<long>() { 2L },
-                new List<PartnerBankAccount>(),
-                new List<PartnerContact>()));
+                new List<PartnerBankAccountInput>(),
+                new List<PartnerContactInput>()));
     }
 
     [Fact]
@@ -934,10 +957,10 @@ public class PartnerTests
         string newDisplayName = "New Name";
         Address newMainAddress = new Address("Main St", "123", "City", "State", "12345", "US");
         bool newIsActive = false;
-        List<PartnerIdentifier> newIdentifiers = new();
+        List<PartnerIdentifierInput> newIdentifiers = new();
         List<long> newRoleIds = new() { 2L, 3L };
-        List<PartnerBankAccount> newBankAccounts = new();
-        List<PartnerContact> newContacts = new();
+        List<PartnerBankAccountInput> newBankAccounts = new();
+        List<PartnerContactInput> newContacts = new();
         // Act & Assert
         Assert.Throws<InvalidOperationException>(() => partner.Update(
             newIndividualName,
@@ -977,13 +1000,13 @@ public class PartnerTests
         string newDisplayName = "New Name";
         Address newMainAddress = new Address("Main St", "123", "City", "State", "12345", "US");
         bool newIsActive = false;
-        List<PartnerIdentifier> newIdentifiers = new()
+        List<PartnerIdentifierInput> newIdentifiers = new()
         {
-            PartnerIdentifier.Create("SSN", "000-00-0000")
+            PartnersTestData.Identifiers.From(partner.Identifiers.First())
         };
         List<long> newRoleIds = new();
-        List<PartnerBankAccount> newBankAccounts = new();
-        List<PartnerContact> newContacts = new();
+        List<PartnerBankAccountInput> newBankAccounts = new();
+        List<PartnerContactInput> newContacts = new();
         // Act & Assert
         Assert.Throws<InvalidOperationException>(() => partner.Update(
             newIndividualName,
@@ -1024,8 +1047,8 @@ public class PartnerTests
         Address newMainAddress = new Address("Main St", "123", "City", "State", "12345", "US");
         bool newIsActive = false;
         List<long> newRoleIds = new();
-        List<PartnerBankAccount> newBankAccounts = new();
-        List<PartnerContact> newContacts = new();
+        List<PartnerBankAccountInput> newBankAccounts = new();
+        List<PartnerContactInput> newContacts = new();
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => partner.Update(
             newIndividualName,
@@ -1065,9 +1088,9 @@ public class PartnerTests
         string newDisplayName = "New Name";
         Address newMainAddress = new Address("Main St", "123", "City", "State", "12345", "US");
         bool newIsActive = false;
-        List<PartnerIdentifier> newIdentifiers = new();
-        List<PartnerBankAccount> newBankAccounts = new();
-        List<PartnerContact> newContacts = new();
+        List<PartnerIdentifierInput> newIdentifiers = new();
+        List<PartnerBankAccountInput> newBankAccounts = new();
+        List<PartnerContactInput> newContacts = new();
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => partner.Update(
             newIndividualName,
@@ -1107,9 +1130,9 @@ public class PartnerTests
         string newDisplayName = "New Name";
         Address newMainAddress = new Address("Main St", "123", "City", "State", "12345", "US");
         bool newIsActive = false;
-        List<PartnerIdentifier> newIdentifiers = new();
+        List<PartnerIdentifierInput> newIdentifiers = new();
         List<long> newRoleIds = new();
-        List<PartnerContact> newContacts = new();
+        List<PartnerContactInput> newContacts = new();
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => partner.Update(
             newIndividualName,
@@ -1149,9 +1172,9 @@ public class PartnerTests
         string newDisplayName = "New Name";
         Address newMainAddress = new Address("Main St", "123", "City", "State", "12345", "US");
         bool newIsActive = false;
-        List<PartnerIdentifier> newIdentifiers = new();
+        List<PartnerIdentifierInput> newIdentifiers = new();
         List<long> newRoleIds = new();
-        List<PartnerBankAccount> newBankAccounts = new();
+        List<PartnerBankAccountInput> newBankAccounts = new();
         // Act & Assert
         Assert.Throws<ArgumentNullException>(() => partner.Update(
             newIndividualName,

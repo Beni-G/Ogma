@@ -1,16 +1,23 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Ogma.Domain.Partners.Entities;
 using Ogma.Domain.Partners.Repositories;
 using Ogma.Infrastructure.Persistence.Partners.Contexts;
 using Ogma.Infrastructure.Persistence.Partners.Extensions;
+using Ogma.Infrastructure.Persistence.SharedKernel.BaseTypes;
 
 namespace Ogma.Infrastructure.Persistence.Partners.Repositories;
 
 public class PartnerRepository : IPartnerRepository
 {
     private readonly PartnersDbContext _partnersDbContext;
+    private readonly IMapper _mapper;
 
-    public PartnerRepository(PartnersDbContext partnersDbContext) => _partnersDbContext = partnersDbContext;
+    public PartnerRepository(PartnersDbContext partnersDbContext, IMapper mapper)
+    {
+        _partnersDbContext = partnersDbContext;
+        _mapper = mapper;
+    }
 
     public async Task<Partner?> GetByIdAsync(long id)
     {
@@ -66,10 +73,27 @@ public class PartnerRepository : IPartnerRepository
         // Replace owned value object
         existingPartner.HQAddress = partnerModel.HQAddress;
 
-        // Replace child collections
-        ReplaceCollection(existingPartner.Identifiers, partnerModel.Identifiers);
-        ReplaceCollection(existingPartner.BankAccounts, partnerModel.BankAccounts);
-        ReplaceCollection(existingPartner.Contacts, partnerModel.Contacts);
+        // Sync child collections
+        SyncPartnerCollection(
+            partner.Identifiers,
+            existingPartner.Identifiers, 
+            i => i.Id,
+            existingPartner.Id,
+            (identifier, id) => identifier.PartnerId = id);
+
+        SyncPartnerCollection(
+            partner.BankAccounts,
+            existingPartner.BankAccounts, 
+            ba => ba.Id,
+            existingPartner.Id,
+            (bankAccount, id) => bankAccount.PartnerId = id);
+
+        SyncPartnerCollection(
+            partner.Contacts,
+            existingPartner.Contacts, 
+            c => c.Id,
+            existingPartner.Id,
+            (contact, id) => contact.PartnerId = id);
 
         // Replace many-to-many roles in one pass
         var newRoleIds = partner.RoleIds ?? new List<long>();
@@ -116,6 +140,38 @@ public class PartnerRepository : IPartnerRepository
             {
                 existing.Add(item);
             }
+        }
+    }
+
+    private void SyncPartnerCollection<TDomain, TPersistence>(
+        IEnumerable<TDomain> domainCollection, 
+        ICollection<TPersistence> persistenceCollection,
+        Func<TDomain, long> getDomainId,
+        long partnerId,                                    
+        Action<TPersistence, long> setPartnerIdAction) 
+        where TPersistence : Entity
+    {
+        var persistenceOrderLinesById = persistenceCollection.ToDictionary(l => l.Id);
+
+        foreach (var domainLine in domainCollection)
+        {
+            var domainId = getDomainId(domainLine);
+            if (domainId == 0)
+            {
+                var newLine = _mapper.Map<TPersistence>(domainLine);
+                setPartnerIdAction(newLine, partnerId);
+                persistenceCollection.Add(newLine);
+            }
+            else if (persistenceOrderLinesById.TryGetValue(domainId, out var existingLine))
+            {
+                _mapper.Map(domainLine, existingLine);
+                persistenceOrderLinesById.Remove(domainId);
+            }
+        }
+
+        foreach (var orphan in persistenceOrderLinesById.Values)
+        {
+            persistenceCollection.Remove(orphan);
         }
     }
 }

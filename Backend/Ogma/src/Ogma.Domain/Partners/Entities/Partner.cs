@@ -1,4 +1,5 @@
-﻿using Ogma.Domain.SharedKernel.BaseTypes;
+﻿using Ogma.Domain.Orders.Entities;
+using Ogma.Domain.SharedKernel.BaseTypes;
 using Ogma.Domain.SharedKernel.Extentions;
 using Ogma.Domain.SharedKernel.ValueObjects;
 using System.Net;
@@ -186,18 +187,15 @@ public class Partner : AggregateRoot<long>
         bool isActive,
         string? displayName,
         Address? hqAddress,
-        IReadOnlyCollection<PartnerIdentifier> identifiers,
+        IReadOnlyCollection<PartnerIdentifierInput> identifiers,
         IReadOnlyCollection<long> roleIds,
-        IReadOnlyCollection<PartnerBankAccount> bankAccounts,
-        IReadOnlyCollection<PartnerContact> contacts)
+        IReadOnlyCollection<PartnerBankAccountInput> bankAccounts,
+        IReadOnlyCollection<PartnerContactInput> contacts)
     {
         ArgumentNullException.ThrowIfNull(identifiers);
         ArgumentNullException.ThrowIfNull(roleIds);
         ArgumentNullException.ThrowIfNull(bankAccounts);
         ArgumentNullException.ThrowIfNull(contacts);
-
-        EnforceLegalStatusInvariant(individualName, companyName, isNaturalPerson);
-        EnsureIdentifiersAndRolesInvariant(identifiers, roleIds);
 
         IndividualName = individualName;
         CompanyName = companyName?.Trim();
@@ -215,10 +213,14 @@ public class Partner : AggregateRoot<long>
             UpdateHQAddress(hqAddress);
         }
 
-        ReplaceIdentifiers(identifiers);
         ReplaceRoles(roleIds);
-        ReplaceBankAccounts(bankAccounts);
-        ReplaceContacts(contacts);
+        SyncIdentifiers(identifiers);
+        SyncBankAccounts(bankAccounts);
+        SyncContacts(contacts);
+
+        EnforceLegalStatusInvariant(individualName, companyName, isNaturalPerson);
+        EnsureIdentifiersAndRolesInvariant(_identifiers, _roleIds);
+
         Touch();
     }
 
@@ -367,5 +369,101 @@ public class Partner : AggregateRoot<long>
             throw new ArgumentException("Display name cannot be null or empty.", nameof(newDisplayName));
         }
         DisplayName = newDisplayName;
+    }
+
+    private void SyncBankAccounts(IEnumerable<PartnerBankAccountInput> bankAccountInputs)
+    {
+        var incomingIds = bankAccountInputs.Select(i => i.Id).Where(Id => Id > 0).ToHashSet();
+        _bankAccounts.RemoveAll(line => !incomingIds.Contains(line.Id));
+
+        foreach (var input in bankAccountInputs)
+        {
+            var existingLine = _bankAccounts.FirstOrDefault(l => l.Id == input.Id && input.Id != 0L);
+            if (existingLine != null)
+            {
+                existingLine.Update(
+                    new BankAccount(input.BankAccount.Bank, input.BankAccount.Iban, input.BankAccount.Currency, input.BankAccount.Bic), 
+                    input.IsDefault
+                );
+            }
+            else
+            {
+                var newLine = PartnerBankAccount.Create(
+                    new BankAccount(input.BankAccount.Bank, input.BankAccount.Iban, input.BankAccount.Currency, input.BankAccount.Bic),
+                    input.IsDefault
+                );
+                _bankAccounts.Add(newLine);
+            }
+        }
+    }
+
+    private void SyncIdentifiers(IEnumerable<PartnerIdentifierInput> identifierInputs)
+    {
+        var incomingIds = identifierInputs.Select(i => i.Id).Where(Id => Id > 0).ToHashSet();
+        _identifiers.RemoveAll(line => !incomingIds.Contains(line.Id));
+
+        foreach (var input in identifierInputs)
+        {
+            var existingLine = _identifiers.FirstOrDefault(l => l.Id == input.Id && input.Id != 0L);
+            if (existingLine != null)
+            {
+                existingLine.Update(
+                    input.Type, 
+                    input.Value, 
+                    input.ValidityPeriod is not null
+                    ? new Period(input.ValidityPeriod.Start, input.ValidityPeriod.End)
+                    : null, 
+                    input.IsPrimary
+                );
+            }
+            else
+            {
+                var newLine = PartnerIdentifier.Create(
+                    input.Type,
+                    input.Value,
+                    input.ValidityPeriod is not null
+                    ? new Period(input.ValidityPeriod.Start, input.ValidityPeriod.End)
+                    : null,
+                    input.IsPrimary
+                );
+                _identifiers.Add(newLine);
+            }
+        }
+    }
+
+    private void SyncContacts(IEnumerable<PartnerContactInput> contactInputs)
+    {
+        var incomingIds = contactInputs.Select(i => i.Id).Where(Id => Id > 0).ToHashSet();
+        _contacts.RemoveAll(line => !incomingIds.Contains(line.Id));
+
+        foreach (var input in contactInputs)
+        {
+            var existingLine = _contacts.FirstOrDefault(l => l.Id == input.Id && input.Id != 0L);
+            if (existingLine != null)
+            {
+                existingLine.Update(
+                    new PersonName(input.Name.FirstName, input.Name.LastName),
+                    input.Email is not null ? new Email(input.Email) : null,
+                    input.Phone,
+                    input.Mobile,
+                    input.Title,
+                    input.JobTitle,
+                    input.IsPrimary
+                );
+            }
+            else
+            {
+                var newLine = PartnerContact.Create(
+                    new PersonName(input.Name.FirstName, input.Name.LastName),
+                    input.Email is not null ? new Email(input.Email) : null,
+                    input.Phone,
+                    input.Mobile,
+                    input.Title,
+                    input.JobTitle,
+                    input.IsPrimary
+                );
+                _contacts.Add(newLine);
+            }
+        }
     }
 }

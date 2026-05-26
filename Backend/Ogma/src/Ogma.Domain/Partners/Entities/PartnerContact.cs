@@ -131,7 +131,7 @@ public class PartnerContact : Entity<long>
         bool isPrimary = false) 
         => new(id, name, metadata, email, phone, mobile, title, jobTitle, isPrimary);
 
-    public void UpdateContactDetails(
+    public void Update(
         PersonName name,
         Email? email = null,
         string? phone = null,
