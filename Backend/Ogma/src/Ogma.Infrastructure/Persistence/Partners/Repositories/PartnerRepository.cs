@@ -73,12 +73,7 @@ public class PartnerRepository : IPartnerRepository
         // Replace owned value object
         existingPartner.HQAddress = partnerModel.HQAddress;
 
-        // Replace child collections
-        //ReplaceCollection(existingPartner.Identifiers, partnerModel.Identifiers);
-        //ReplaceCollection(existingPartner.BankAccounts, partnerModel.BankAccounts);
-        //ReplaceCollection(existingPartner.Contacts, partnerModel.Contacts);
-
-
+        // Sync child collections
         SyncPartnerCollection(
             partner.Identifiers,
             existingPartner.Identifiers, 
