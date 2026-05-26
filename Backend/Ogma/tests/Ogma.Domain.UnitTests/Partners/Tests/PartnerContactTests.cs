@@ -148,7 +148,7 @@ public class PartnerContactTests
         string newJobTitle = "Director";
         bool newIsPrimary = true;
         // Act
-        contact.UpdateContactDetails(
+        contact.Update(
             newName,
             newEmail,
             newPhone,
@@ -180,7 +180,7 @@ public class PartnerContactTests
         string newJobTitle = "Director";
         bool newIsPrimary = true;
         // Act
-        contact.UpdateContactDetails(
+        contact.Update(
             newName,
             newEmail,
             newPhone,
@@ -208,7 +208,7 @@ public class PartnerContactTests
             true);
         var newName = new PersonName("Jane", "Smith");
         // Act
-        contact.UpdateContactDetails(newName);
+        contact.Update(newName);
         // Assert
         contact.Name.Should().BeEquivalentTo(newName);
         contact.Email.Should().BeNull();
@@ -225,7 +225,7 @@ public class PartnerContactTests
         // Arrange
         var contact = PartnerContact.Create(new PersonName("John", "Doe"));
         // Act & Assert
-        Assert.Throws<ArgumentNullException>(() => contact.UpdateContactDetails(null));
+        Assert.Throws<ArgumentNullException>(() => contact.Update(null));
     }
 
 }
