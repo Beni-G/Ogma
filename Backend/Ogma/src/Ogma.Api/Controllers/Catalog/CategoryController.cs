@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Ogma.Api.Contracts.Catalog;
@@ -9,6 +10,7 @@ using Ogma.Application.Catalog.Queries;
 namespace Ogma.Api.Controllers.Catalog;
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class CategoryController : ControllerBase
 {
     private readonly IMediator _mediator;

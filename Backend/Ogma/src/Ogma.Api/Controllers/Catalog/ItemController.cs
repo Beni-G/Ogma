@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ogma.Api.Contracts.Catalog;
 using Ogma.Api.Extensions;
@@ -8,8 +8,10 @@ using Ogma.Application.Catalog.Queries;
 using Ogma.Application.SharedKernel.Dtos;
 
 namespace Ogma.Api.Controllers.Catalog;
+
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class ItemController : ControllerBase
 {
     private readonly IMediator _mediator;

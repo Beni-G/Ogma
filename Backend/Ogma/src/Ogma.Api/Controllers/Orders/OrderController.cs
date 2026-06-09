@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ogma.Api.Contracts.Orders;
 using Ogma.Api.Extensions;
@@ -11,6 +12,7 @@ namespace Ogma.Api.Controllers.Orders;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class OrderController : ControllerBase
 {
     private readonly IMediator _mediator;
