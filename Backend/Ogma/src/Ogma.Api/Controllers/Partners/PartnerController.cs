@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Ogma.Api.Contracts.Partners;
 using Ogma.Api.Extensions;
@@ -11,6 +12,7 @@ namespace Ogma.Api.Controllers.Partners;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class PartnerController : ControllerBase
 {
     private readonly IMediator _mediator;
