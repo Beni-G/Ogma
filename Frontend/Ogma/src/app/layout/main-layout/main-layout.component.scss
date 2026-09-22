@@ -1,0 +1,29 @@
+:host {
+  display: block; 
+}
+
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.layout-content {
+  flex: 1;
+  padding: 1.5rem;
+}
+
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem; 
+  padding: 0.5rem 0.85rem;
+  background-color: var(--p-content-hover-background, #f4f4f5);
+  color: var(--p-content-color, #18181b);
+  border-radius: var(--p-content-border-radius, 6px);
+  font-size: 0.875rem;
+
+  i {
+    font-size: 1rem;
+  }
+}

@@ -1,0 +1,23 @@
+<p-menubar [model]="navItems()">
+  
+  <ng-template pTemplate="end">
+    <div class="user-menu-container">
+      
+      <p-button 
+        [label]="displayName()" 
+        icon="pi pi-user" 
+        iconPos="right"
+        severity="secondary" 
+        [text]="true"
+        (onClick)="userMenu.toggle($event)">
+      </p-button>
+
+      <p-menu #userMenu [model]="userMenuItems()" [popup]="true"></p-menu>
+    </div>
+  </ng-template>
+</p-menubar>
+
+
+<main class="layout-content">
+  <router-outlet></router-outlet>
+</main>
