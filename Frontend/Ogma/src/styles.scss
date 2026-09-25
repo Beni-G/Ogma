@@ -1,5 +1,8 @@
 /* src/styles.scss */
 @import "primeicons/primeicons.css";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Optional baseline resets */
 html, body {
