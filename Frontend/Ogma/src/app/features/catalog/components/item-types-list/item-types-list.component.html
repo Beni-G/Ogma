@@ -1,0 +1,60 @@
+<div class="card p-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-gray-200">
+        <div class="flex flex-col gap-1">
+            <h2 class="text-2xl font-bold tracking-tight text-gray-900">Item Types</h2>
+            <p class="text-sm text-gray-500">Manage and organize your item classifications.</p>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <p-iconfield iconPosition="left" class="w-full sm:w-64">
+                <p-inputicon class="pi pi-search" />
+                <input type="text" pInputText placeholder="Search item types..." class="w-full"
+                    (input)="onSearch($event)" />
+            </p-iconfield>
+
+            <p-button label="New Item Type" icon="pi pi-plus" class="shrink-0" (onClick)="openNew()" />
+        </div>
+    </div>
+
+
+    <p-table [value]="filteredItemTypes()" [tableStyle]="{ 'min-width': '50rem' }">
+        <ng-template pTemplate="header">
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th style="width: 8rem">Actions</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-item>
+            <tr>
+                <td>{{ item.name }}</td>
+                <td>{{ item.description }}</td>
+                <td class="flex gap-2">
+                    <p-button icon="pi pi-pencil" [text]="true" severity="secondary" (onClick)="openEdit(item)" />
+                    <p-button icon="pi pi-trash" [text]="true" severity="danger" (onClick)="delete(item.id)" />
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <p-dialog [header]="editingItem() ? 'Edit Item Type' : 'New Item Type'" [(visible)]="dialogVisible" [modal]="true"
+        [style]="{ width: '400px' }">
+
+        <form [formGroup]="form" class="flex flex-col gap-4 mt-3">
+            <div class="flex flex-col gap-1.5">
+                <label for="name" class="font-medium text-sm">Name</label>
+                <input pInputText id="name" formControlName="name" class="w-full" />
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label for="description" class="font-medium text-sm">Description</label>
+                <input pInputText id="description" formControlName="description" class="w-full" />
+            </div>
+        </form>
+
+        <ng-template pTemplate="footer">
+            <p-button label="Cancel" icon="pi pi-times" [text]="true" (onClick)="dialogVisible.set(false)" />
+            <p-button label="Save" icon="pi pi-check" [disabled]="form.invalid" (onClick)="save()" />
+        </ng-template>
+    </p-dialog>
+</div>

@@ -46,6 +46,18 @@ builder.Services.AddApplicationLayer();
 
 builder.Services.AddAuthorization();
 
+var allowAngularOrigin = "_allowAngularOrigin";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: allowAngularOrigin,
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:4200")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -68,6 +80,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.UseCors(allowAngularOrigin);
 
 app.UseAuthentication();
 
