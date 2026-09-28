@@ -8,6 +8,7 @@ import Aura from '@primeng/themes/aura';
 import { routes } from './app.routes';
 import { bearerTokenInterceptor } from './core/auth/interceptors/bearer-token-interceptor';
 import { providePrimeNG } from 'primeng/config';
+import { apiInterceptor } from './core/http/interceptors/api.interceptor';
 
 export const keycloak = new Keycloak({
   url: 'http://localhost:8080',
@@ -26,29 +27,28 @@ export const appConfig: ApplicationConfig = {
 
     providePrimeNG({
       theme: {
-        preset: Aura, 
+        preset: Aura,
         options: {
-          darkModeSelector: 'system' // Or false / '.my-app-dark'
+          darkModeSelector: 'system'
         }
       }
     }),
-    
-    // Attach the Bearer Token Interceptor to HttpClient
+
     provideHttpClient(
-      withInterceptors([bearerTokenInterceptor])
+      withInterceptors([
+        bearerTokenInterceptor,
+        apiInterceptor])
     ),
 
-    // Provide Keycloak for Dependency Injection (So guards & services can inject it)
-    { 
-      provide: Keycloak, 
-      useValue: keycloak 
+    {
+      provide: Keycloak,
+      useValue: keycloak
     },
 
-    // Initialize Keycloak before Angular boots
     provideAppInitializer(() => {
       return keycloak.init({
         onLoad: 'check-sso',
-        pkceMethod: 'S256', 
+        pkceMethod: 'S256',
         silentCheckSsoRedirectUri: `${window.location.origin}/silent-check-sso.html`
       });
     })
