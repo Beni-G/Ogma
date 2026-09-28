@@ -9,7 +9,7 @@ import { CreateItemTypeCommand, ItemType, UpdateItemTypeCommand } from '../model
 export class ItemTypeService {
 
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'https://localhost:7070/api/ItemType';
+  private readonly baseUrl = '/api/ItemType';
 
   getAll(): Observable<ItemType[]> {
     return this.http.get<ItemType[]>(this.baseUrl);
