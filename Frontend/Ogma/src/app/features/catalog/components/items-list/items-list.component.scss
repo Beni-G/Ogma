@@ -1,0 +1,35 @@
+/* items.component.scss */
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.layout-wrapper {
+  max-width: 100%;
+}
+
+// 1. Force PrimeFlex grid to maintain inline-flex layout
+.grid {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  margin-right: -0.5rem;
+  margin-left: -0.5rem;
+  margin-top: -0.5rem;
+}
+
+// 2. Stop p-table from overflowing and breaking out of column bounds
+::ng-deep .p-datatable {
+  width: 100%;
+  table-layout: fixed;
+  
+  .p-datatable-wrapper {
+    overflow-x: auto;
+  }
+}
+
+// 3. Keep tree inside left column bounds
+::ng-deep .p-tree {
+  width: 100%;
+  overflow-x: hidden;
+}
