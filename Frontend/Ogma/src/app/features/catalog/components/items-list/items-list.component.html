@@ -1,0 +1,194 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="layout-wrapper p-4">
+
+    <div class="flex justify-content-between align-items-center bg-white p-3 border-round shadow-1 mb-4">
+        <div class="flex gap-2 align-items-center">
+            <h2 class="m-0 text-xl font-bold">Catalog Items</h2>
+            <p-tag [value]="items.length + ' items'" severity="info"></p-tag>
+        </div>
+        <p-button label="New Item" icon="pi pi-plus" (click)="openNewItem()"></p-button>
+    </div>
+
+    <div class="grid flex-grow-1">
+
+        <div class="col-12 md:col-3">
+            <div class="bg-white p-3 border-round shadow-1 h-full flex flex-column gap-2">
+                <div class="flex justify-content-between align-items-center mb-2">
+                    <span class="font-bold text-gray-700">Filter by Category</span>
+                    @if (activeCategoryId) {
+                    <p-button icon="pi pi-filter-slash" [text]="true" size="small" pTooltip="Clear Category Filter"
+                        (click)="clearCategoryFilter()"></p-button>
+                    }
+                </div>
+
+                <p-tree [value]="categoryNodes" selectionMode="single" [(selection)]="selectedCategoryNode"
+                    (onNodeSelect)="onCategorySelect($event)" (onNodeUnselect)="onCategoryUnselect()">
+                </p-tree>
+            </div>
+        </div>
+
+        <div class="col-12 md:col-9">
+            <div class="bg-white p-3 border-round shadow-1">
+
+                <p-table #dt [value]="items" [columns]="selectedColumns" [reorderableColumns]="true" [paginator]="true"
+                    [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
+                    [globalFilterFields]="['name', 'code', 'category.name', 'itemType.name', 'unitOfMeasurement']"
+                    styleClass="p-datatable-gridlines p-datatable-striped">
+
+                    <ng-template pTemplate="caption">
+                        <div class="flex flex-column sm:flex-row justify-content-between gap-3">
+                            <span class="p-input-icon-left w-full sm:w-20rem">
+                                <i class="pi pi-search"></i>
+                                <input pInputText type="text"
+                                    (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                                    placeholder="Search Code, Name, Type..." class="w-full" />
+                            </span>
+
+                            <p-multiselect [options]="cols" [(ngModel)]="selectedColumns" optionLabel="header"
+                                selectedItemsLabel="{0} columns visible" [style]="{'max-width': '220px'}"
+                                placeholder="Toggle Columns">
+                            </p-multiselect>
+                        </div>
+                    </ng-template>
+
+                    <ng-template pTemplate="header" let-columns>
+                        <tr>
+                            @for (col of columns; track col.field) {
+                            <th pReorderableColumn [pSortableColumn]="col.sortable ? col.field : null">
+                                <div class="flex align-items-center justify-content-between">
+                                    {{ col.header }}
+                                    @if (col.sortable) {
+                                    <p-sortIcon [field]="col.field"></p-sortIcon>
+                                    }
+                                </div>
+                            </th>
+                            }
+                            <th style="width: 7rem">Actions</th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-item let-columns="columns">
+                        <tr>
+                            @for (col of columns; track col.field) {
+                            <td>
+                                @switch (col.field) {
+                                @case ('category') {
+                                <span class="text-sm font-medium text-gray-700">
+                                    <i class="pi pi-folder mr-1 text-primary"></i>
+                                    {{ getBreadcrumbPath(item.category) }}
+                                </span>
+                                }
+
+                                @case ('itemType.name') {
+                                {{ item.itemType?.name || '—' }}
+                                }
+
+                                @case ('listPrice.amount') {
+                                <span class="font-semibold text-green-700">
+                                    {{ item.listPrice?.amount | currency: item.listPrice?.currency }}
+                                </span>
+                                }
+
+                                @case ('isActive') {
+                                <p-tag [value]="item.isActive ? 'Active' : 'Inactive'"
+                                    [severity]="item.isActive ? 'success' : 'danger'"></p-tag>
+                                }
+
+                                @default {
+                                {{ item[col.field] }}
+                                }
+                                }
+                            </td>
+                            }
+                            <td>
+                                <div class="flex gap-1">
+                                    <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" size="small"
+                                        pTooltip="Edit" (click)="editItem(item)"></p-button>
+                                    <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger"
+                                        size="small" pTooltip="Delete" (click)="deleteItem(item)"></p-button>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td [attr.colspan]="selectedColumns.length + 1" class="text-center p-4">
+                                No items found.
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+
+            </div>
+        </div>
+
+    </div>
+
+    <p-dialog [(visible)]="itemDialog" [header]="isEditMode ? 'Edit Item' : 'Create Item'" [modal]="true"
+        [style]="{width: '520px'}">
+        <form [formGroup]="itemForm" (ngSubmit)="saveItem()" class="flex flex-column gap-3 mt-2">
+
+            <div class="grid">
+                <div class="col-4">
+                    <label for="code" class="font-bold block mb-1">Code</label>
+                    <input pInputText id="code" formControlName="code" class="w-full" />
+                </div>
+                <div class="col-8">
+                    <label for="name" class="font-bold block mb-1">Name</label>
+                    <input pInputText id="name" formControlName="name" class="w-full" />
+                </div>
+            </div>
+
+            <div class="p-field">
+                <label for="description" class="font-bold block mb-1">Description</label>
+                <input pInputText id="description" formControlName="description" class="w-full" />
+            </div>
+
+            <div class="grid">
+                <div class="col-6">
+                    <label for="category" class="font-bold block mb-1">Category</label>
+                    <p-select [options]="categories" formControlName="categoryId" optionLabel="name" optionValue="id"
+                        placeholder="Select Category" [style]="{width: '100%'}"></p-select>
+                </div>
+                <div class="col-6">
+                    <label for="itemType" class="font-bold block mb-1">Item Type</label>
+                    <p-select [options]="itemTypes" formControlName="itemTypeId" optionLabel="name" optionValue="id"
+                        placeholder="Select Type" [style]="{width: '100%'}"></p-select>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="col-8">
+                    <label for="amount" class="font-bold block mb-1">List Price</label>
+                    <p-inputnumber id="amount" formControlName="amount" mode="decimal" [minFractionDigits]="2"
+                        class="w-full"></p-inputnumber>
+                </div>
+                <div class="col-4">
+                    <label for="currency" class="font-bold block mb-1">Currency</label>
+                    <input pInputText id="currency" formControlName="currency" class="w-full" />
+                </div>
+            </div>
+
+            <div class="grid align-items-center">
+                <div class="col-8">
+                    <label for="uom" class="font-bold block mb-1">Unit of Measurement</label>
+                    <input pInputText id="uom" formControlName="unitOfMeasurement" class="w-full"
+                        placeholder="e.g. buc, KG, HR" />
+                </div>
+                <div class="col-4 flex flex-column align-items-center">
+                    <label for="active" class="font-bold mb-1">Active</label>
+                    <p-toggleswitch formControlName="isActive"></p-toggleswitch>
+                </div>
+            </div>
+
+            <div class="flex justify-content-end gap-2 mt-3">
+                <p-button label="Cancel" [text]="true" (click)="itemDialog = false"></p-button>
+                <p-button label="Save" type="submit" [disabled]="itemForm.invalid"></p-button>
+            </div>
+        </form>
+    </p-dialog>
+
+</div>

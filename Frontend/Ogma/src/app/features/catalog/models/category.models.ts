@@ -2,7 +2,8 @@ export interface Category {
   id: number;
   name: string;
   parentCategoryId?: number | null;
-  children?: Category[];
+  ancestors?: Category[] | null;
+  subCategories?: Category[] | null;
 }
 
 export interface CreateCategoryCommand {
