@@ -1,0 +1,52 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="layout-wrapper p-4">
+  <div
+    class="flex justify-content-between align-items-center bg-white p-3 border-round shadow-1 mb-4">
+
+    <div class="flex gap-2 align-items-center">
+      <h2 class="m-0 text-xl font-bold">Catalog Items</h2>
+      <p-tag
+        [value]="items.length + ' items'"
+        severity="info">
+      </p-tag>
+    </div>
+
+    <p-button
+      label="New Item"
+      icon="pi pi-plus"
+      (click)="openNewItem()">
+    </p-button>
+  </div>
+
+  <div class="grid flex-grow-1">
+    <div class="col-12 md:col-3">
+      <app-category-filter
+        [categories]="categories"
+        [activeCategoryId]="activeCategoryId"
+        (categoryChange)="onCategoryChange($event)">
+      </app-category-filter>
+    </div>
+
+    <div class="col-12 md:col-9">
+      <app-items-table
+        [items]="items"
+        [columns]="columns"
+        (create)="openNewItem()"
+        (edit)="editItem($event)"
+        (delete)="deleteItem($event)">
+      </app-items-table>
+    </div>
+  </div>
+
+  <app-item-form-dialog
+    [visible]="dialogVisible"
+    [item]="editingItem"
+    [categories]="categories"
+    [itemTypes]="itemTypes"
+    [defaultCategoryId]="activeCategoryId"
+    (visibleChange)="dialogVisible = $event"
+    (save)="saveItem($event)">
+  </app-item-form-dialog>
+</div>

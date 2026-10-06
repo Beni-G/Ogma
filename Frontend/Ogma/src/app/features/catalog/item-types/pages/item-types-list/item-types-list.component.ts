@@ -7,8 +7,8 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
-import { ItemTypeService } from '../../services/item-type.service';
 import { CreateItemTypeCommand, ItemType, UpdateItemTypeCommand } from '../../models/item-type.models';
+import { ItemTypeService } from '../../services/item-type.service';
 
 @Component({
   selector: 'app-item-types-list',
