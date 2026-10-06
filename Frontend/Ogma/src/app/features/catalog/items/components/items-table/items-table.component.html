@@ -1,0 +1,135 @@
+<div class="bg-white p-3 border-round shadow-1">
+  <p-table
+    #dt
+    [value]="items()"
+    [columns]="selectedColumns"
+    [reorderableColumns]="true"
+    [paginator]="true"
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [globalFilterFields]="[
+      'name',
+      'code',
+      'category.name',
+      'itemType.name',
+      'unitOfMeasurement'
+    ]"
+    styleClass="p-datatable-gridlines p-datatable-striped">
+
+    <ng-template pTemplate="caption">
+      <div class="flex flex-column sm:flex-row justify-content-between gap-3">
+        <span class="p-input-icon-left w-full sm:w-20rem">
+          <i class="pi pi-search"></i>
+          <input
+            pInputText
+            type="text"
+            (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+            placeholder="Search Code, Name, Type..."
+            class="w-full" />
+        </span>
+
+        <p-multiselect
+          [options]="columns()"
+          [ngModel]="selectedColumns"
+          (ngModelChange)="onColumnsChange($event)"
+          optionLabel="header"
+          selectedItemsLabel="{0} columns visible"
+          [style]="{'max-width': '220px'}"
+          placeholder="Toggle Columns">
+        </p-multiselect>
+
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="header" let-columns>
+      <tr>
+        @for (col of columns; track col.field) {
+          <th
+            pReorderableColumn
+            [pSortableColumn]="col.sortable ? col.field : null">
+            <div class="flex align-items-center justify-content-between">
+              {{ col.header }}
+
+              @if (col.sortable) {
+                <p-sortIcon [field]="col.field"></p-sortIcon>
+              }
+            </div>
+          </th>
+        }
+
+        <th style="width: 7rem">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-item let-columns="columns">
+      <tr>
+        @for (col of columns; track col.field) {
+          <td>
+            @switch (col.field) {
+              @case ('category') {
+                <span class="text-sm font-medium text-gray-700">
+                  <i class="pi pi-folder mr-1 text-primary"></i>
+                  {{ getBreadcrumbPath(item.category) }}
+                </span>
+              }
+
+              @case ('itemType.name') {
+                {{ item.itemType?.name || '—' }}
+              }
+
+              @case ('listPrice.amount') {
+                <span class="font-semibold text-green-700">
+                  {{ item.listPrice?.amount | currency:item.listPrice?.currency }}
+                </span>
+              }
+
+              @case ('isActive') {
+                <p-tag
+                  [value]="item.isActive ? 'Active' : 'Inactive'"
+                  [severity]="item.isActive ? 'success' : 'danger'">
+                </p-tag>
+              }
+
+              @default {
+                {{ item[col.field] }}
+              }
+            }
+          </td>
+        }
+
+        <td>
+          <div class="flex gap-1">
+            <p-button
+              icon="pi pi-pencil"
+              [rounded]="true"
+              [text]="true"
+              size="small"
+              pTooltip="Edit"
+              (click)="edit.emit(item)">
+            </p-button>
+
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              [text]="true"
+              severity="danger"
+              size="small"
+              pTooltip="Delete"
+              (click)="delete.emit(item)">
+            </p-button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td
+          [attr.colspan]="selectedColumns.length + 1"
+          class="text-center p-4">
+          No items found.
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

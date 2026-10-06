@@ -1,0 +1,27 @@
+<div class="bg-white p-3 border-round shadow-1 h-full flex flex-column gap-2">
+  <div class="flex justify-content-between align-items-center mb-2">
+    <span class="font-bold text-gray-700">
+      Filter by Category
+    </span>
+
+    @if (activeCategoryId() !== null) {
+      <p-button
+        icon="pi pi-filter-slash"
+        [text]="true"
+        size="small"
+        pTooltip="Clear Category Filter"
+        (click)="clearFilter()">
+      </p-button>
+    }
+  </div>
+
+  <p-tree
+    [value]="categoryNodes()"
+    selectionMode="single"
+    [selection]="selectedNode()"
+    (onNodeSelect)="selectCategory($event)"
+    (onNodeUnselect)="clearFilter()"
+    (onNodeExpand)="onNodeExpand($event)"
+    (onNodeCollapse)="onNodeCollapse($event)">
+  </p-tree>
+</div>

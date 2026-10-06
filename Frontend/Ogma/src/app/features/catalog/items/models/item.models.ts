@@ -1,6 +1,7 @@
-import { Money } from "../../shared-kernel/models/money.model";
-import { Category } from "./category.models";
-import { ItemType } from "./item-type.models";
+import { Money } from "../../../shared-kernel/models/money.model";
+import { Category } from "../../categories/models/category.models";
+import { ItemType } from "../../item-types/models/item-type.models";
+
 
 export interface Item {
   id: number;
