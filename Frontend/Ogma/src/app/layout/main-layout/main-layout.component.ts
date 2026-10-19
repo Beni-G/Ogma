@@ -1,16 +1,17 @@
   import { Component, computed, inject, OnInit, signal, Signal } from '@angular/core';
   import { AuthService } from '../../core/auth/services/auth.service';
-  import { RouterOutlet } from '@angular/router';
+  import { RouterLink, RouterOutlet } from '@angular/router';
   import { Menubar } from 'primeng/menubar';
   import { MenuItem } from 'primeng/api';
   import { Menu } from 'primeng/menu';
   import { PrimeTemplate } from 'primeng/api';
   import { ButtonModule } from 'primeng/button';
+  import { DrawerModule } from 'primeng/drawer';
   import { UserProfile } from '../../core/auth/models/user-profile.model';
 
   @Component({
     selector: 'app-main-layout',
-    imports: [RouterOutlet, Menubar, Menu, PrimeTemplate, ButtonModule],
+    imports: [RouterOutlet, RouterLink, Menubar, Menu, PrimeTemplate, ButtonModule, DrawerModule],
     templateUrl: './main-layout.component.html',
     styleUrl: './main-layout.component.scss'
   })
@@ -31,6 +32,7 @@
 
   navItems = signal<MenuItem[]>([]);
   userMenuItems = signal<MenuItem[]>([]);
+  sidebarVisible = signal<boolean>(false);
 
   ngOnInit(): void {
     this.navItems.set([
@@ -44,6 +46,10 @@
         command: () => this.authService.logout() 
       }
     ]);
+  }
+
+  toggleSidebar() {
+    this.sidebarVisible.update(visible => !visible);
   }
 
   }
