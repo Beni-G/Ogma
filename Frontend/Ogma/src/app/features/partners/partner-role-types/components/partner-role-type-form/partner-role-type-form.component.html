@@ -1,0 +1,26 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4 pt-2 pb-6">
+  <div class="flex flex-col gap-1">
+    <label for="code" class="text-sm font-medium text-gray-700">Code</label>
+    <input pInputText id="code" formControlName="code" placeholder="e.g. SUPPLIER" />
+    <small class="text-red-500" *ngIf="form.get('code')?.invalid && form.get('code')?.touched">Code is required.</small>
+  </div>
+
+  <div class="flex flex-col gap-1">
+    <label for="name" class="text-sm font-medium text-gray-700">Name</label>
+    <input pInputText id="name" formControlName="name" placeholder="e.g. Primary Supplier" />
+    <small class="text-red-500" *ngIf="form.get('name')?.invalid && form.get('name')?.touched">Name is required.</small>
+  </div>
+
+  <div class="flex flex-col gap-1 relative">
+    <label for="color" class="text-sm font-medium text-gray-700">Badge Color</label>
+    <div class="flex items-center gap-3">
+      <p-colorPicker formControlName="color" [appendTo]="'body'" />
+      <input pInputText formControlName="color" placeholder="#HEXCODE" class="font-mono text-sm w-32" />
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-2 mt-6 pt-2 border-t border-gray-100">
+    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="cancelled.emit()" type="button" />
+    <p-button label="Save" [disabled]="form.invalid" type="submit" />
+  </div>
+</form>
