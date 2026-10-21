@@ -9,12 +9,17 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { CreateItemTypeCommand, ItemType, UpdateItemTypeCommand } from '../../models/item-type.models';
 import { ItemTypeService } from '../../services/item-type.service';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'app-item-types-list',
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    ConfirmDialogModule,
+    ToastModule,
     TableModule,
     ButtonModule,
     DialogModule,
@@ -22,11 +27,14 @@ import { ItemTypeService } from '../../services/item-type.service';
     IconFieldModule,
     InputIconModule
   ],
+  providers: [ConfirmationService, MessageService],
   templateUrl: './item-types-list.component.html',
   styleUrl: './item-types-list.component.scss'
 })
 export class ItemTypesListComponent implements OnInit {
 
+  private readonly confirmationService = inject(ConfirmationService);
+  private readonly messageService = inject(MessageService);
   private readonly itemTypeService = inject(ItemTypeService);
   private readonly formBuilder = inject(FormBuilder);
 
@@ -96,13 +104,44 @@ export class ItemTypesListComponent implements OnInit {
     }
   }
 
-  delete(id: number): void {
-    this.itemTypeService.delete(id).subscribe(() => this.loadItemTypes());
+  delete(itemType: ItemType): void {
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete "${itemType.name}"?`,
+      header: 'Confirm Deletion',
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonStyleClass: 'p-button-danger p-button-sm',
+      rejectButtonStyleClass: 'p-button-secondary p-button-text p-button-sm',
+
+      accept: () => {
+        this.itemTypeService.delete(itemType.id).subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Item type deleted successfully'
+            });
+
+            this.loadItemTypes();
+          },
+          error: () => {
+            this.showError('Failed to delete the item type.');
+          }
+        });
+      }
+    });
   }
 
   private onSaveSuccess(): void {
     this.dialogVisible.set(false);
     this.loadItemTypes();
+  }
+
+  private showError(detail: string): void {
+    this.messageService.add({
+      severity: 'error',
+      summary: 'Error',
+      detail
+    });
   }
 }
 
