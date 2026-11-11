@@ -1,0 +1,200 @@
+<p-toast />
+<p-confirmDialog />
+
+<div class="card p-6 bg-white rounded-lg shadow-sm">
+    <div class="flex justify-between items-center mb-4 gap-4 flex-wrap">
+        <div>
+            <h2 class="text-xl font-bold text-gray-800">Partners</h2>
+            <p class="text-sm text-gray-500">Manage customers, suppliers and business partners.</p>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <p-multiSelect [options]="cols" [(ngModel)]="selectedColumns" optionLabel="header"
+                placeholder="Select Columns" display="chip" class="w-64" />
+
+            <p-button label="Add Partner" icon="pi pi-plus" (onClick)="openNew()" />
+        </div>
+    </div>
+
+    <p-table #dt [value]="partners()" [loading]="loading()" [paginator]="true" [rows]="10" [rowHover]="true"
+        dataKey="id" class="p-datatable-gridlines">
+
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 3rem"></th>
+
+                @for (col of selectedColumns(); track col.field) {
+                <th [pSortableColumn]="col.field" pResizableColumn>
+                    {{ col.header }}
+                    <p-sortIcon [field]="col.field" />
+                </th>
+                }
+                <th style="width: 10rem" class="text-center">Actions</th>
+            </tr>
+
+            <tr>
+                <th></th>
+                @for (col of selectedColumns(); track col.field) {
+                <th>
+                    @if (col.field === 'isActive') {
+                    <p-columnFilter field="isActive" matchMode="equals" [showMenu]="false">
+                        <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                            <p-select [ngModel]="value" [options]="statusOptions" optionLabel="label"
+                                optionValue="value" (onChange)="filter($event.value)" placeholder="All"
+                                [showClear]="true" class="w-full text-xs" appendTo="body" />
+                        </ng-template>
+                    </p-columnFilter>
+                    } @else {
+                    <p-columnFilter [field]="col.field" matchMode="contains" [showMenu]="false" placeholder="Filter..."
+                        class="w-full text-xs" />
+                    }
+                </th>
+                }
+                <th></th>
+            </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-partner>
+            <tr>
+                <td>
+                    <button type="button" pButton class="p-button-text p-button-secondary p-button-rounded p-button-sm"
+                        [icon]="isRowExpanded(partner) ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+                        (click)="toggleRow(partner)">
+                    </button>
+                </td>
+
+                @for (col of selectedColumns(); track col.field) {
+                @switch (col.field) {
+                @case ('fullName') {
+                <td>{{ partner.fullName }}</td>
+                }
+                @case ('displayName') {
+                <td>{{ partner.displayName || '-' }}</td>
+                }
+                @case ('typeDisplay') {
+                <td>{{ partner.typeDisplay }}</td>
+                }
+                @case ('primaryIdentifierDisplay') {
+                <td>{{ partner.primaryIdentifierDisplay }}</td>
+                }
+                @case ('rolesDisplay') {
+                <td>{{ partner.rolesDisplay }}</td>
+                }
+                @case ('isActive') {
+                <td class="text-center">
+                    <span class="px-2 py-1 text-xs rounded-full" [class.bg-green-100]="partner.isActive !== false"
+                        [class.text-green-700]="partner.isActive !== false"
+                        [class.bg-gray-100]="partner.isActive === false"
+                        [class.text-gray-600]="partner.isActive === false">
+                        {{ partner.isActive !== false ? 'Active' : 'Inactive' }}
+                    </span>
+                </td>
+                }
+                }
+                }
+
+                <td class="text-center flex justify-center gap-2">
+                    <p-button icon="pi pi-pencil" [text]="true" severity="secondary" (onClick)="openEdit(partner)" />
+                    <p-button icon="pi pi-trash" [text]="true" severity="danger" (onClick)="deletePartner(partner)" />
+                </td>
+            </tr>
+
+            @if (isRowExpanded(partner)) {
+            <tr>
+                <td [attr.colspan]="selectedColumns().length + 2" class="bg-gray-50 p-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+
+                        <div class="bg-white p-3 rounded border border-gray-200 shadow-sm">
+                            <span class="font-semibold text-gray-700 block mb-1">HQ Address</span>
+                            @if(partner.hqAddress){
+                            <p class="text-gray-600">{{ formatAddress(partner.hqAddress) }}</p>
+                            } @else {
+                            <p class="text-gray-400 italic">No HQ Address provided.</p>
+                            }
+                        </div>
+
+                        <div class="bg-white p-3 rounded border border-gray-200 shadow-sm">
+                            <span class="font-semibold text-gray-700 block mb-1">Other Identifiers</span>
+                            @if (getSecondaryIdentifiers(partner).length > 0) {
+                            <ul class="list-disc pl-4 text-gray-600">
+                                @for (secId of getSecondaryIdentifiers(partner); track secId.value) {
+                                <li>
+                                    <strong>{{ secId.type }}:</strong> {{ secId.value }}
+                                    @if (secId.validityPeriod) {
+                                    <span class="text-gray-500 text-xs ml-1">
+                                        {{ formatValidityPeriod(secId.validityPeriod) }}
+                                    </span>
+                                    }
+                                </li>
+                                }
+                            </ul>
+                            } @else {
+                            <p class="text-gray-400 italic">No additional identifiers.</p>
+                            }
+                        </div>
+
+                        <div class="bg-white p-3 rounded border border-gray-200 shadow-sm">
+                            <span class="font-semibold text-gray-700 block mb-1">Contacts</span>
+                            @if (partner.contacts && partner.contacts.length > 0) {
+                            <ul class="list-disc pl-4 text-gray-600">
+                                @for (c of partner.contacts; track c.id) {
+                                <li [innerHTML]="formatContact(c)"></li>
+                                }
+                            </ul>
+                            } @else {
+                            <p class="text-gray-400 italic">No contacts added.</p>
+                            }
+                        </div>
+
+                        <div class="bg-white p-3 rounded border border-gray-200 shadow-sm">
+                            <span class="font-semibold text-gray-700 block mb-1">Bank Accounts</span>
+                            @if (partner.bankAccounts?.length) {
+                            <ul class="list-disc pl-4 text-gray-600 space-y-1">
+                                @for (b of partner.bankAccounts; track b.id || $index) {
+                                <li>
+                                    <div class="font-medium">
+                                        {{ b.bankAccount?.bank || 'Bank' }}
+                                        @if (b.isDefault) {
+                                        <span
+                                            class="ml-1 text-xs bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">Default</span>
+                                        }
+                                    </div>
+                                    <div class="text-xs text-gray-500">
+                                        IBAN: {{ b.bankAccount?.iban }}
+                                        @if (b.bankAccount?.bic) {
+                                        · BIC: {{ b.bankAccount.bic }}
+                                        }
+                                        @if (b.bankAccount?.currency) {
+                                        · {{ b.bankAccount.currency }}
+                                        }
+                                    </div>
+                                </li>
+                                }
+                            </ul>
+                            } @else {
+                            <p class="text-gray-400 italic">No bank accounts added.</p>
+                            }
+                        </div>
+
+                    </div>
+                </td>
+            </tr>
+            }
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td [attr.colspan]="selectedColumns().length + 2" class="text-center text-gray-400 py-6">No partners
+                    found.</td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+
+<p-dialog [(visible)]="dialogVisible" [header]="selectedPartner() ? 'Edit Partner' : 'New Partner'" [modal]="true"
+    [style]="{width: '650px'}">
+    @if (dialogVisible()) {
+    <app-partner-form-dialog [partner]="selectedPartner()" (saved)="onSaveComplete()"
+        (cancelled)="dialogVisible.set(false)" />
+    }
+</p-dialog>

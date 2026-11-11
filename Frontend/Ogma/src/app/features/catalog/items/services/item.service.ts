@@ -12,7 +12,6 @@ export class ItemService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = '/api';
 
-  // Items CRUD
   getAll(categoryId?: number | null): Observable<Item[]> {
     let params = new HttpParams();
     if (categoryId != null) {

@@ -1,0 +1,38 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+  <p-tabs value="0">
+    <p-tablist>
+      <p-tab value="0">General</p-tab>
+      <p-tab value="1">HQ Address</p-tab>
+      @if (partner) {
+        <p-tab value="2">Identifiers</p-tab>
+        <p-tab value="3">Bank Accounts</p-tab>
+        <p-tab value="4">Contacts</p-tab>
+      }
+    </p-tablist>
+
+    <p-tabpanels>
+      <p-tabpanel value="0">
+        <app-partner-general-form [parentForm]="form" [roleTypes]="roleTypes()" [isEdit]="!!partner" />
+      </p-tabpanel>
+      <p-tabpanel value="1">
+        <app-partner-address-form [parentForm]="$any(form.get('hqAddress'))" />
+      </p-tabpanel>
+      @if (partner) {
+        <p-tabpanel value="2">
+          <app-partner-identifiers-subform [parentForm]="form" />
+        </p-tabpanel>
+        <p-tabpanel value="3">
+          <app-partner-bank-accounts-subform [parentForm]="form" />
+        </p-tabpanel>
+        <p-tabpanel value="4">
+          <app-partner-contacts-subform [parentForm]="form" />
+        </p-tabpanel>
+      }
+    </p-tabpanels>
+  </p-tabs>
+
+  <div class="flex justify-end gap-2 mt-4 pt-2 border-t border-gray-100">
+    <p-button label="Cancel" severity="secondary" [text]="true" (onClick)="cancelled.emit()" type="button" />
+    <p-button label="Save Partner" [disabled]="form.invalid" type="submit" />
+  </div>
+</form>
