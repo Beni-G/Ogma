@@ -1,0 +1,32 @@
+<div [formGroup]="parentForm">
+  <div formArrayName="contacts" class="flex flex-col gap-3 pt-2 max-h-80 overflow-y-auto">
+    @for (contact of contacts.controls; track $index) {
+    <div [formGroupName]="$index" class="flex flex-col gap-2 p-3 border rounded bg-gray-50">
+      <div class="flex gap-2">
+        <input pInputText formControlName="title" placeholder="Title" class="w-1/2 text-sm" />
+        <input pInputText formControlName="jobTitle" placeholder="Job Title" class="w-1/2 text-sm" />
+      </div>
+      <div formGroupName="name" class="flex gap-2">
+        <input pInputText formControlName="firstName" placeholder="First Name" class="w-1/2 text-sm" />
+        <input pInputText formControlName="lastName" placeholder="Last Name" class="w-1/2 text-sm" />
+      </div>
+      <div class="flex gap-2">
+        <input pInputText formControlName="mobile" placeholder="Mobile" class="w-1/2 text-sm" />
+        <input pInputText formControlName="phone" placeholder="Phone" class="w-1/2 text-sm" />
+      </div>
+      <div class="flex gap-2">
+        <input pInputText formControlName="email" placeholder="Email" class="w-1/2 text-sm" />
+        <div class="flex items-center gap-2">
+          <p-checkbox formControlName="isPrimary" [binary]="true" inputId="isPrimary" />
+          <label for="isPrimary" class="text-sm font-medium text-gray-700 cursor-pointer">Primary Contact</label>
+        </div>
+      </div>
+      <div class="flex justify-end">
+        <p-button icon="pi pi-trash" severity="danger" [text]="true" (onClick)="remove($index)" />
+      </div>
+    </div>
+    }
+    <p-button label="Add Contact" icon="pi pi-plus" severity="secondary" [outlined]="true" size="small"
+      (onClick)="add()" />
+  </div>
+</div>

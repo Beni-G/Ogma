@@ -35,6 +35,10 @@ public class DomainToPersistenceProfile : Profile
                 opt => opt.MapFrom(src => src.Name.LastName))
             .ReverseMap();
         CreateMap<PartnerIdentifier, Models.PartnerIdentifier>()
+            .ForMember(dest => dest.ValidityStart,
+                opt => opt.MapFrom(src => src.ValidityPeriod!.Start))
+            .ForMember(dest => dest.ValidityEnd,
+                opt => opt.MapFrom(src => src.ValidityPeriod!.End))
             .ReverseMap();
         CreateMap<Address, AddressRecord>()
             .ReverseMap();

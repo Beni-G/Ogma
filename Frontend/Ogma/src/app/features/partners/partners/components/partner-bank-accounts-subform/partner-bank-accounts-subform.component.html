@@ -1,0 +1,26 @@
+<div [formGroup]="parentForm">
+  <div formArrayName="bankAccounts" class="flex flex-col gap-3 pt-2 max-h-80 overflow-y-auto">
+    @for (acc of bankAccounts.controls; track $index) {
+    <div [formGroupName]="$index" class="flex flex-col gap-2 p-3 border rounded bg-gray-50">
+      <div formGroupName="bankAccount" class="flex flex-col gap-2">
+        <div class="flex gap-2">
+          <input pInputText formControlName="iban" placeholder="IBAN" class="w-full text-sm" />
+
+          <p-button icon="pi pi-trash" severity="danger" [text]="true" (onClick)="remove($index)" />
+        </div>
+        <div class="flex gap-2">
+          <input pInputText formControlName="bank" placeholder="Bank Name" class="w-1/2 text-sm" />
+          <input pInputText formControlName="currency" placeholder="Currency" class="w-1/2 text-sm" />
+          <input pInputText formControlName="bic" placeholder="BIC" class="w-1/2 text-sm" />
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+          <p-checkbox formControlName="isDefault" [binary]="true" inputId="isDefault" />
+          <label for="isDefault" class="text-sm font-medium text-gray-700 cursor-pointer">Default Bank Account</label>
+        </div>
+    </div>
+    }
+    <p-button label="Add Bank Account" icon="pi pi-plus" severity="secondary" [outlined]="true" size="small"
+      (onClick)="add()" />
+  </div>
+</div>

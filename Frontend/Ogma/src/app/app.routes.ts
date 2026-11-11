@@ -6,6 +6,7 @@ import { ItemTypesListComponent } from './features/catalog/item-types/pages/item
 import { ItemsListComponent } from './features/catalog/items/pages/items-list/items-list.component';
 import { CategoriesListComponent } from './features/catalog/categories/pages/categories-list/categories-list.component';
 import { PartnerRoleTypesListComponent } from './features/partners/partner-role-types/pages/partner-role-types-list/partner-role-types-list.component';
+import { PartnersListComponent } from './features/partners/partners/pages/partners-list/partners-list.component';
 
 export const routes: Routes = [
   
@@ -21,6 +22,8 @@ export const routes: Routes = [
       { path: 'catalog/items', component: ItemsListComponent},
 
       { path: 'partners/partner-role-types', component: PartnerRoleTypesListComponent},
+      // Avoided redundant partners/partners
+      { path: 'partners', component: PartnersListComponent},
     ]
   },
 
